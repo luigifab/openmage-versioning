@@ -1,0 +1,47 @@
+@charset "utf-8";
+/**
+ * Created J/22/12/2011
+ * Updated W/18/04/2012
+ * Version 10
+ *
+ * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ *
+ * This program is free software, you can redistribute it or modify
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
+ */
+
+body.versioning-repository-index h3.icon-head, body.versioning-repository-history h3.icon-head, body.versioning-repository-lastlog h3 {
+	min-height:18px; padding-left:22px;
+	background:url("../../../images/fam_server_database.gif") no-repeat left center;
+}
+
+body.versioning-repository-history tbody tr td.last { padding:2px 6px; }
+
+#versioningGrid_table thead tr.headings { background-position:left -18px; }
+#versioningGrid_table thead tr.headings th.no-link { padding-bottom:5px; text-align:center; color:#666; }
+
+#versioningGrid_table tbody tr:hover { background-color:#DEDEDE; }
+#versioningGrid_table tbody tr:hover td.revision strong { background-color:#EFEFEF; }
+
+#versioningGrid_table tbody tr td.revision { padding:2px 0; }
+#versioningGrid_table tbody tr td.revision strong { display:block; background-color:#DDD; }
+#versioningGrid_table tbody tr td a.issue, #versioningGrid_table tbody tr td span.issue { float:right; color:#999; text-decoration:none; }
+
+#versioningGrid_table tbody tr td a.issue:hover, #versioningGrid_table tbody tr td a.issue:active,
+#versioningGrid_table tbody tr td a.issue:focus { color:#777; text-decoration:underline; }
+
+#versioningLog { font:11px monospace; line-height:16px; color:#666; white-space:pre-wrap; }
+#versioningLog span { color:black; }
+#versioningLog em { color:#444; }
+
+#row_versioning_tweak_bugtracker td a { color:#2F2F2F; }
+#box.confirmation.versioning h1 { font-size:1.5em; white-space:nowrap; }
+

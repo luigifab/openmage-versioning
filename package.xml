@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+    <name>Luigifab_Versioning</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license uri="http://www.opensource.org/licenses/GPL-2.0">GPL</license>
+    <channel>luigifab</channel>
+    <extends/>
+    <summary>Synchronize your Magento installation with your version control system.</summary>
+    <description>Works with BZR and GIT repositories with SSH authentication.</description>
+    <notes>- Synchronize your Magento installation with your version control system&#xD;
+- Works with BZR and GIT repositories</notes>
+    <authors><author><name>Fabrice Creuzot</name><user>luigifab</user><email>code@luigifab.info</email></author></authors>
+    <date>2012-04-22</date>
+    <time>14:22:35</time>
+    <contents><target name="magecommunity"><dir name="Luigifab"><dir name="Versioning"><dir name="Block"><dir name="Adminhtml"><dir name="History"><file name="Grid.php" hash="98fbe65e22069b44da2b153466322474"/></dir><file name="History.php" hash="682dee6103362265674ab125483298d7"/><file name="Lastlog.php" hash="c99831a8139bc864df15f0386ee984ce"/><dir name="Repository"><file name="Grid.php" hash="73b5e0e4531490dc816701b0dd29b2d6"/></dir><file name="Repository.php" hash="94ace696d3d3015a8c84654763ae1b1e"/><dir name="Widget"><file name="Description.php" hash="f468911178ed78b17817f3f6d70f6fdc"/><file name="Duration.php" hash="d3b07a02e89b8bf900e0d6ad195218d1"/><file name="Revision.php" hash="5b0966928579edbf27e6fd77d5e584ac"/><file name="Status.php" hash="433161cc9bcc9eb993976a4171dc8c2d"/></dir></dir></dir><dir name="Helper"><file name="Data.php" hash="8f76833dadf8b465c37da05c9d2c5e4a"/></dir><dir name="Model"><dir name="Scm"><file name="Bzr.php" hash="0f491a25e3f1b12fb97952cbe01b7727"/><file name="Git.php" hash="c1dcb29cc77633460317476772560fae"/><file name="Svn.php" hash="cdc52d29afd2d43ec15cba304e7977db"/></dir><dir name="Source"><file name="Type.php" hash="ebd214030f1d930068aaaa5ab6367256"/></dir></dir><file name="changelog" hash="7eb42765e64d076e9ae263a0c892b649"/><dir name="controllers"><file name="RepositoryController.php" hash="3005c3bd0ab007e67375d06dfde46eee"/><file name="UpgradeController.php" hash="fed6b5145b07a174db516d5731e3e050"/></dir><dir name="etc"><file name="adminhtml.xml" hash="58326b7964ed121a84197d6f9be78458"/><file name="config.xml" hash="cb3df4464b2ae9d7e000621e671bb30e"/><file name="system.xml" hash="e82e265879c7621c6ec8cda2d1f1253b"/></dir><file name="license" hash="b819c62bf1b7f2d249241db9a4ab3c99"/><file name="readme" hash="33686b61c3fcd3e48534f9077ad2134c"/></dir></dir></target><target name="magedesign"><dir name="adminhtml"><dir name="default"><dir name="default"><dir name="layout"><dir name="luigifab"><file name="versioning.xml" hash="ab91abd54d17a1d9251919a06925e011"/></dir></dir></dir></dir></dir></target><target name="mageskin"><dir name="adminhtml"><dir name="default"><dir name="default"><dir name="images"><dir name="luigifab"><dir name="versioning"><file name="info.svg.php" hash="6b0b6e827ea7de9f18ddadb31ea6590b"/></dir></dir></dir><dir name="css"><dir name="luigifab"><dir name="versioning"><file name="styles.css" hash="4ef1f2f1d73922a93d056aece7e74c62"/></dir></dir></dir><dir name="js"><dir name="luigifab"><dir name="versioning"><file name="app.js" hash="1e86abf454cd9cd766131bfa423d9fe1"/></dir></dir></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Luigifab_Versioning.xml" hash="40532adf9d877e6854dd20c938e6fdfe"/></dir></target><target name="magelocale"><dir name="fr_FR"><file name="Luigifab_Versioning.csv" hash="0c706ea86ae3bbe8ec01b74ac8fe76ac"/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.2.0</min><max>5.9.9</max></php></required></dependencies>
+</package>

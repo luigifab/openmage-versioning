@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+ * Created S/03/12/2011
+ * Updated L/02/04/2012
+ * Version 12
+ *
+ * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ *
+ * This program is free software, you can redistribute it or modify
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
+-->
+
+<config>
+	<tabs>
+		<luigifab>
+			<label>luigifab</label>
+			<sort_order>103</sort_order>
+		</luigifab>
+	</tabs>
+	<sections>
+		<versioning translate="label">
+			<label>Version control</label>
+			<tab>luigifab</tab>
+			<sort_order>79</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>0</show_in_website>
+			<show_in_store>0</show_in_store>
+			<groups>
+				<scm translate="label">
+					<label>General</label>
+					<sort_order>1</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<enabled translate="label">
+							<label>Enable</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</enabled>
+						<type translate="label">
+							<label>Versioning</label>
+							<frontend_type>select</frontend_type>
+							<source_model>versioning/source_type</source_model>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</type>
+						<fulllog translate="label">
+							<label>Show full log</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</fulllog>
+					</fields>
+				</scm>
+				<tweak translate="label">
+					<label>Tweak</label>
+					<sort_order>2</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+					<fields>
+						<bugtracker translate="label comment">
+							<label>Bug tracker</label>
+							<frontend_type>text</frontend_type>
+							<validate>validate-url</validate>
+							<comment><![CDATA[Example: <a href="https://redmine.luigifab.info/issues/" onclick="window.open(this.href); return false;">https://redmine.luigifab.info/issues/</a>]]></comment>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</bugtracker>
+						<showlog translate="label comment">
+							<label>Show upgrade log on success</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<comment>Displays the list of changes after the upgrade</comment>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</showlog>
+						<deletelog translate="label comment">
+							<label>Delete upgrade log on success</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<comment>Only if the previous option is set to no</comment>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</deletelog>
+					</fields>
+				</tweak>
+			</groups>
+		</versioning>
+	</sections>
+</config>

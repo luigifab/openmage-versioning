@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+ * Created S/03/12/2011
+ * Updated S/07/04/2012
+ * Version 8
+ *
+ * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ *
+ * This program is free software, you can redistribute it or modify
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
+-->
+
+<layout version="0.1.0">
+	<default>
+		<reference name="head">
+			<action method="addItem">
+				<type>skin_css</type>
+				<name>css/luigifab/versioning/styles.css</name>
+				<params>media="screen, projection"</params>
+			</action>
+			<action method="addItem">
+				<type>skin_js</type>
+				<name>js/luigifab/versioning/app.js</name>
+			</action>
+		</reference>
+	</default>
+	<versioning_repository_index>
+		<reference name="head">
+			<action method="setTitle" translate="title">
+				<title>Versioning / Tools / Magento Admin</title>
+			</action>
+		</reference>
+		<reference name="content">
+			<block type="versioning/adminhtml_repository" name="versioning_repository" />
+		</reference>
+	</versioning_repository_index>
+	<versioning_repository_history>
+		<reference name="head">
+			<action method="setTitle" translate="title">
+				<title>Versioning / Tools / Magento Admin</title>
+			</action>
+		</reference>
+		<reference name="content">
+			<block type="versioning/adminhtml_history" name="versioning_history" />
+		</reference>
+	</versioning_repository_history>
+	<versioning_repository_lastlog>
+		<reference name="head">
+			<action method="setTitle" translate="title">
+				<title>Versioning / Tools / Magento Admin</title>
+			</action>
+		</reference>
+		<reference name="content">
+			<block type="versioning/adminhtml_lastlog" name="versioning_lastlog" />
+		</reference>
+	</versioning_repository_lastlog>
+</layout>
