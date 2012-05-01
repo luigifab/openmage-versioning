@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created J/22/12/2011
- * Updated V/06/04/2012
- * Version 6
+ * Updated D/29/04/2012
+ * Version 7
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -32,7 +32,7 @@
 				<versioning translate="title">
 					<title>Version control</title>
 					<action>versioning/repository</action>
-					<sort_order>79</sort_order>
+					<sort_order>97</sort_order>
 				</versioning>
 			</children>
 		</tools>
@@ -51,7 +51,7 @@
 							</configuration>
 							<versioning translate="title">
 								<title>Version control</title>
-								<sort_order>79</sort_order>
+								<sort_order>97</sort_order>
 							</versioning>
 						</children>
 					</tools>
@@ -65,7 +65,7 @@
 										<children-->
 											<versioning translate="title">
 												<title>Version control</title>
-												<sort_order>103079</sort_order>
+												<sort_order>103097</sort_order>
 											</versioning>
 										<!--/children>
 									</luigifab-->

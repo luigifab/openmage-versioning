@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/07/04/2012
- * Version 2
+ * Updated V/27/04/2012
+ * Version 3
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -50,6 +50,17 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'sortable' => false,
 			'filter'   => false
 		));
+
+		if (Mage::getStoreConfig('versioning/scm/type') === 'git') {
+			$this->addColumn('branch', array(
+				'header'   => $this->__('Branch'),
+				'align'    => 'center',
+				'width'    => '100px',
+				'index'    => 'branch',
+				'sortable' => false,
+				'filter'   => false
+			));
+		}
 
 		$this->addColumn('current_revision', array(
 			'header'   => $this->__('Current revision'),
@@ -104,6 +115,16 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'sortable' => false,
 			'filter'   => false,
 			'renderer' => 'versioning/adminhtml_widget_status'
+		));
+
+		$this->addColumn('details', array(
+			'header'   => $this->helper('adminhtml')->__('Details'),
+			'align'    => 'center',
+			'width'    => '60px',
+			'index'    => 'details',
+			'sortable' => false,
+			'filter'   => false,
+			'renderer' => 'versioning/adminhtml_widget_details'
 		));
 
 		return parent::_prepareColumns();

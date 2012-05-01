@@ -1,8 +1,8 @@
 <?php
 /**
  * Created M/25/01/2011
- * Updated W/11/04/2012
- * Version 9
+ * Updated L/23/04/2012
+ * Version 10
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -17,6 +17,8 @@
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
  */
+
+date_default_timezone_set('UTC');
 
 header('Pragma: public');
 header('Cache-Control: public');

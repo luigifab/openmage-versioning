@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/07/04/2012
- * Version 8
+ * Updated V/27/04/2012
+ * Version 9
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -27,7 +27,11 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
 
-		$this->_headerText = $this->__('Commit history (%s)', Mage::getStoreConfig('versioning/scm/type'));
+		if (Mage::getStoreConfig('versioning/scm/type') === 'git')
+			$this->_headerText = $this->__('Commit history (%s/%s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
+		else
+			$this->_headerText = $this->__('Commit history (%s)', Mage::getStoreConfig('versioning/scm/type'));
+
 		$this->_removeButton('add');
 
 		if (is_file($this->helper('versioning')->getHistoryFile())) {

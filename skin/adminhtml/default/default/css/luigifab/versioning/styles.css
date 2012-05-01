@@ -1,8 +1,8 @@
 @charset "utf-8";
 /**
  * Created J/22/12/2011
- * Updated W/18/04/2012
- * Version 10
+ * Updated S/28/04/2012
+ * Version 11
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -44,4 +44,7 @@ body.versioning-repository-history tbody tr td.last { padding:2px 6px; }
 
 #row_versioning_tweak_bugtracker td a { color:#2F2F2F; }
 #box.confirmation.versioning h1 { font-size:1.5em; white-space:nowrap; }
+#box.options.versioning h1 { font-size:1.5em; white-space:nowrap; background-position:0 -132px; }
+#box.options.versioning div.bbcode input { margin-right:0.1em; vertical-align:text-top; }
+#box.options.versioning div.bbcode label { cursor:pointer; }
 

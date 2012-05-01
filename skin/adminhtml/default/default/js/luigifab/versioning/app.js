@@ -1,7 +1,7 @@
 /**
  * Created J/22/12/2011
- * Updated S/04/04/2012
- * Version 4
+ * Updated S/28/04/2012
+ * Version 5
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -22,8 +22,10 @@ function luigifabVersioningInit() {
 
 	apijs.i18n.data.en.versioning_uptitle = "Upgrade to revision §";
 	apijs.i18n.data.en.versioning_uptext = "Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.";
+	apijs.i18n.data.en.versioning_uptext_code = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][p][label][input type='checkbox' name='code' value='true'] Update the application code[/label][/p]";
 
 	apijs.i18n.data.fr.versioning_uptitle = "Mise à jour vers la révision §";
+	apijs.i18n.data.fr.versioning_uptext_code = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][p][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application[/label][/p]";
 	apijs.i18n.data.fr.versioning_uptext = "Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.";
 
 	apijs.i18n.data.en.versioning_deltitle = "Deleting";
@@ -34,7 +36,10 @@ function luigifabVersioningInit() {
 }
 
 // demande de confirmation (livraison)
-function luigifabVersioningUpgrade(url, go) {
+function luigifabVersioningUpgrade(url, go, compressor) {
+
+	if (url === true)
+		return true;
 
 	if ((typeof apijs !== 'undefined') && (typeof apijs !== null)) {
 
@@ -45,11 +50,23 @@ function luigifabVersioningUpgrade(url, go) {
 		}
 		else {
 			var revision = url.match(/revision\/([0-9a-z]+)\//);
-			apijs.dialogue.dialogConfirmation(
-				apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-				apijs.i18n.translate('versioning_uptext'),
-				luigifabVersioningUpgrade, url, 'versioning'
-			);
+
+			if (compressor === true) {
+				apijs.dialogue.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate('versioning_uptext_code'),
+					luigifabVersioningUpgrade, true, url, 'versioning'
+				);
+				$('box').setAttribute('method', 'get');
+				$$('#box button')[0].focus();
+			}
+			else {
+				apijs.dialogue.dialogConfirmation(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate('versioning_uptext'),
+					luigifabVersioningUpgrade, url, 'versioning'
+				);
+			}
 		}
 
 		return false;

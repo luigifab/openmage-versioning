@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated W/18/04/2012
- * Version 9
+ * Updated S/28/04/2012
+ * Version 10
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,6 +52,17 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'column_css_class' => 'revision'
 		));
 
+		if (Mage::getStoreConfig('versioning/scm/type') === 'git') {
+			$this->addColumn('branch', array(
+				'header'   => $this->__('Branch'),
+				'align'    => 'center',
+				'width'    => '100px',
+				'index'    => 'branch',
+				'sortable' => false,
+				'filter'   => false
+			));
+		}
+
 		$this->addColumn('author', array(
 			'header'   => $this->__('Author'),
 			'align'    => 'center',
@@ -82,7 +93,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 		$this->addColumn('action', array(
 			'header'  =>  $this->helper('adminhtml')->__('Action'),
-			'width'   => '70px',
+			'width'   => '60px',
 			'align'   => 'center',
 			'type'    => 'action',
 			'getter'  => 'getRevision',
@@ -91,7 +102,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => 'versioning/upgrade/run'),
 					'field'   => 'revision',
-					'onclick' => 'return luigifabVersioningUpgrade(this.href, false);'
+					'onclick' => 'return luigifabVersioningUpgrade(this.href, false, '.((class_exists('Luigifab_Compressor_Block_Head')) ? 'true' : 'false').');'
 				)
 			),
 			'sortable'  => false,

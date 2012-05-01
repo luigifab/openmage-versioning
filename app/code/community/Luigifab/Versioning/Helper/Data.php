@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/07/04/2012
- * Version 11
+ * Updated V/27/04/2012
+ * Version 12
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -66,7 +66,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 			$items = array();
 			$ressource = fopen($file, 'r');
 
-			while (($line = fgetcsv($ressource, 4000, ',', '`')) !== false) {
+			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
 
 				if (strlen($line[0]) > 1) {
 					$item = new Varien_Object();
@@ -76,7 +76,18 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 					$item->setRemoteAddr($line[3]);
 					$item->setUser($line[4]);
 					$item->setDuration($line[5]);
-					$item->setStatus($this->__($line[6]));
+
+					// modifié en version 1.1.0
+					if (strpos($line[6], "\n") !== false) {
+						$item->setStatus($this->__(substr($line[6], 0, strpos($line[6], "\n"))));
+						$item->setDetails('<a href="#" onclick="alert(\''.str_replace("\n", '\n', strip_tags(substr($line[6], strpos($line[6], "\n") + 1))).'\');">'.Mage::helper('adminhtml')->__('Details').'</a>');
+					}
+					else {
+						$item->setStatus($this->__($line[6]));
+						$item->setDetails('');
+					}
+
+					$item->setBranch((isset($line[7])) ? $line[7] : ''); // ajouté en version 1.1.0
 					$items[] = $item;
 				}
 			}
