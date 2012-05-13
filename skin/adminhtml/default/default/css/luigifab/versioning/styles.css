@@ -1,8 +1,8 @@
 @charset "utf-8";
 /**
  * Created J/22/12/2011
- * Updated S/28/04/2012
- * Version 11
+ * Updated M/08/05/2012
+ * Version 12
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,7 +18,8 @@
  * GNU General Public License (GPL) for more details.
  */
 
-body.versioning-repository-index h3.icon-head, body.versioning-repository-history h3.icon-head, body.versioning-repository-lastlog h3 {
+body.versioning-repository-index h3.icon-head, body.versioning-repository-history h3.icon-head,
+body.versioning-repository-lastlog h3, body.versioning-repository-status h3 {
 	min-height:18px; padding-left:22px;
 	background:url("../../../images/fam_server_database.gif") no-repeat left center;
 }

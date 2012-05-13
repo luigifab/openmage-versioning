@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/28/04/2012
- * Version 10
+ * Updated M/08/05/2012
+ * Version 14
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,14 +52,15 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'column_css_class' => 'revision'
 		));
 
-		if (Mage::getStoreConfig('versioning/scm/type') === 'git') {
+		if (in_array(Mage::getStoreConfig('versioning/scm/type'), array('bzr','git')) && (Mage::getStoreConfig('versioning/tweak/svgbranch') === '1')) {
 			$this->addColumn('branch', array(
 				'header'   => $this->__('Branch'),
 				'align'    => 'center',
 				'width'    => '100px',
 				'index'    => 'branch',
 				'sortable' => false,
-				'filter'   => false
+				'filter'   => false,
+				'column_css_class' => 'branch'
 			));
 		}
 

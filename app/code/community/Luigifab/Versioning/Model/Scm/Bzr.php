@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/07/04/2012
- * Version 10
+ * Updated M/08/05/2012
+ * Version 14
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Model_Scm_Bzr extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 27
+	// = révision : 30
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande bzr log (requiert bzr-xmloutput)
 	// » Utilise BZR_SSH si le fichier de configuration existe
@@ -81,34 +81,17 @@ class Luigifab_Versioning_Model_Scm_Bzr extends Mage_Core_Model_Abstract {
 			$configsh = realpath('../.bzr/ssh/config.sh');
 
 		if (is_string($configsh) && is_executable($configsh)) {
-			if (Mage::getStoreConfig('versioning/scm/fulllog') === '1') {
-				exec('
-					export BZR_SSH="'.$configsh.'"
-					export LANG=fr_FR.utf-8
-					bzr log --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
-				', $data, $val);
-			}
-			else {
-				exec('
-					export BZR_SSH="'.$configsh.'"
-					export LANG=fr_FR.utf-8
-					bzr log --limit 20 --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
-				', $data, $val);
-			}
+			exec('
+				export BZR_SSH="'.$configsh.'"
+				export LANG=fr_FR.utf-8
+				bzr log --limit '.Mage::getStoreConfig('versioning/scm/number').' --show-ids --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
+			', $data, $val);
 		}
 		else {
-			if (Mage::getStoreConfig('versioning/scm/fulllog') === '1') {
-				exec('
-					export LANG=fr_FR.utf-8
-					bzr log --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
-				', $data, $val);
-			}
-			else {
-				exec('
-					export LANG=fr_FR.utf-8
-					bzr log --limit 20 --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
-				', $data, $val);
-			}
+			exec('
+				export LANG=fr_FR.utf-8
+				bzr log --limit '.Mage::getStoreConfig('versioning/scm/number').' --show-ids --xml `cat .bzr/branch/branch.conf | grep bound_location | cut -c18-` 2>&1
+			', $data, $val);
 		}
 
 		$data = implode("\n", $data);
@@ -151,11 +134,38 @@ class Luigifab_Versioning_Model_Scm_Bzr extends Mage_Core_Model_Abstract {
 					$description = preg_replace('#\#([0-9]+)#', '<span class="issue">$1</span>', $description);
 				}
 
-				$commitEntry = new Varien_Object();
-				$commitEntry->setRevision($revision);
-				$commitEntry->setAuthor($author);
-				$commitEntry->setDate(date('c', strtotime($timestamp)));
-				$commitEntry->setDescription(nl2br($description));
+				if (Mage::getStoreConfig('versioning/tweak/svgbranch') === '1') {
+
+					$branch = (strpos($revision, '.') !== false) ? substr($revision, strpos($revision, '.') + 1, strlen($revision) - 1 - strrpos($revision, '.')) : 'm';
+
+					$parents = array();
+
+					if ($logentry->getElementsByTagName('parents')->item(0)) {
+
+						foreach ($logentry->getElementsByTagName('parents')->item(0)->getElementsByTagName('parent') as $parent) {
+							$id = array();
+							exec('bzr log -r '.trim($parent->firstChild->nodeValue).' | grep "revno:" | cut -c8-', $id);
+							$parents[] = trim(array_pop($id));
+						}
+					}
+
+					$parents = array_unique($parents);
+					$parents = implode(' ', $parents);
+
+					$commitEntry = new Varien_Object();
+					$commitEntry->setRevision($revision);
+					$commitEntry->setAuthor($author);
+					$commitEntry->setBranch($branch);
+					$commitEntry->setDate(date('c', strtotime($timestamp)));
+					$commitEntry->setDescription(nl2br($description).' <input type="hidden" value="'.$parents.'" class="parents" />');
+				}
+				else {
+					$commitEntry = new Varien_Object();
+					$commitEntry->setRevision($revision);
+					$commitEntry->setAuthor($author);
+					$commitEntry->setDate(date('c', strtotime($timestamp)));
+					$commitEntry->setDescription(nl2br($description));
+				}
 
 				$this->commitCollection->addItem($commitEntry);
 			}
@@ -182,6 +192,21 @@ class Luigifab_Versioning_Model_Scm_Bzr extends Mage_Core_Model_Abstract {
 
 		$this->currentRevision = $data;
 		return $this->currentRevision;
+	}
+
+
+	// #### État #################################################################### public ### //
+	// = révision : 2
+	// » Renvoie l'état de la copie locale à partir de la réponse des commandes bzr info et bzr status
+	public function getCurrentStatus() {
+
+		exec('bzr info', $dataInfo);
+		exec('bzr status', $dataStatus);
+
+		array_unshift($dataInfo, '<span>bzr info</span>');
+		array_unshift($dataStatus, '<span>bzr status</span>');
+
+		return implode("\n", $dataInfo)."\n\n".implode("\n", $dataStatus);
 	}
 
 

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated L/02/04/2012
- * Version 12
+ * Updated M/08/05/2012
+ * Version 15
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -59,15 +59,15 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
 						</type>
-						<fulllog translate="label">
-							<label>Show full log</label>
+						<number translate="label">
+							<label>Number of commits per page</label>
 							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<source_model>cronlog/source_number</source_model>
 							<sort_order>3</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
-						</fulllog>
+						</number>
 					</fields>
 				</scm>
 				<tweak translate="label">
@@ -107,6 +107,15 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
 						</deletelog>
+						<svgbranch translate="label">
+							<label>Enable branch representation (SVG image)</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>4</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</svgbranch>
 					</fields>
 				</tweak>
 			</groups>

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/07/04/2012
- * Version 8
+ * Updated M/08/05/2012
+ * Version 10
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Model_Scm_Svn extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 22
+	// = révision : 23
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande svn log
 	// » N'utilise pas SVN_SSH même si le fichier de configuration existe
@@ -75,10 +75,7 @@ class Luigifab_Versioning_Model_Scm_Svn extends Mage_Core_Model_Abstract {
 
 		// lecture de l'historique
 		// en cas de problème d'encodage dans /etc/apache2/envvars décommenter '. /etc/default/locale' ou utiliser 'export LANG=fr_FR.utf-8;'
-		if (Mage::getStoreConfig('versioning/scm/fulllog') === '1')
-			exec('svn log --xml `svn info | sed --quiet "s/URL.*\(h.*\)/\1/p"` 2>&1', $data, $val);
-		else
-			exec('svn log --limit 20 --xml `svn info | sed --quiet "s/URL.*\(h.*\)/\1/p"` 2>&1', $data, $val);
+		exec('svn log --limit '.Mage::getStoreConfig('versioning/scm/number').' --xml `svn info | sed --quiet "s/URL.*\(h.*\)/\1/p"` 2>&1', $data, $val);
 
 		$data = implode("\n", $data);
 		$data = str_replace(array("\n\n",'<msg>','</msg>'), array("\n",'<msg><![CDATA[',']]></msg>'), $data);
@@ -150,6 +147,21 @@ class Luigifab_Versioning_Model_Scm_Svn extends Mage_Core_Model_Abstract {
 
 		$this->currentRevision = $data;
 		return $this->currentRevision;
+	}
+
+
+	// #### État #################################################################### public ### //
+	// = révision : 2
+	// » Renvoie l'état de la copie locale à partir de la réponse des commandes svn info et svn status
+	public function getCurrentStatus() {
+
+		exec('svn info', $dataInfo);
+		exec('svn status', $dataStatus);
+
+		array_unshift($dataInfo, '<span>svn info</span>');
+		array_unshift($dataStatus, '<span>svn status</span>');
+
+		return implode("\n", $dataInfo)."\n\n".implode("\n", $dataStatus);
 	}
 
 

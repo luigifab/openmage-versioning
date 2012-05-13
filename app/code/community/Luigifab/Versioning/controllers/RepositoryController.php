@@ -1,8 +1,8 @@
 <?php
 /**
  * Created W/21/12/2011
- * Updated S/07/04/2012
- * Version 15
+ * Updated M/08/05/2012
+ * Version 16
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -55,6 +55,14 @@ class Luigifab_Versioning_RepositoryController extends Mage_Adminhtml_Controller
 	}
 
 	public function lastlogAction() {
+
+		if (Mage::getStoreConfig('versioning/scm/enabled') === '1')
+			$this->_initAction()->renderLayout();
+		else
+			$this->_redirect('versioning/repository');
+	}
+
+	public function statusAction() {
 
 		if (Mage::getStoreConfig('versioning/scm/enabled') === '1')
 			$this->_initAction()->renderLayout();

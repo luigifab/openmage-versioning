@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/27/04/2012
- * Version 9
+ * Updated M/08/05/2012
+ * Version 10
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,15 +28,15 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_blockGroup = 'versioning';
 
 		if (Mage::getStoreConfig('versioning/scm/type') === 'git')
-			$this->_headerText = $this->__('Commit history (%s/%s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
+			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>/%s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
 		else
-			$this->_headerText = $this->__('Commit history (%s)', Mage::getStoreConfig('versioning/scm/type'));
+			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
 		$this->_removeButton('add');
 
 		if (is_file($this->helper('versioning')->getHistoryFile())) {
 			$this->_addButton('history', array(
-				'label'   => $this->__('Show upgrades log'),
+				'label'   => $this->__('Upgrades log'),
 				'onclick' => "location.href = '".$this->getUrl('versioning/repository/history')."';",
 				'class'   => 'go'
 			));
@@ -44,10 +44,16 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		if (is_file($this->helper('versioning')->getLastlogFile())) {
 			$this->_addButton('lastlog', array(
-				'label'   => $this->__('Show upgrade log'),
+				'label'   => $this->__('Upgrade log'),
 				'onclick' => "location.href = '".$this->getUrl('versioning/repository/lastlog')."';",
 				'class'   => 'go'
 			));
 		}
+
+		$this->_addButton('status', array(
+			'label'   => $this->__('Current repository status'),
+			'onclick' => "location.href = '".$this->getUrl('versioning/repository/status')."';",
+			'class'   => 'go'
+		));
 	}
 }

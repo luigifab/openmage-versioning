@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/27/04/2012
- * Version 11
+ * Updated M/08/05/2012
+ * Version 14
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 30
+	// = révision : 35
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande git log
 	// » Utilise GIT_SSH si le fichier de configuration existe
@@ -83,34 +83,17 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		$description = (version_compare($this->getSoftwareVersion(), '1.7.2', '>=')) ? '%B' : '%s%n%b';
 
 		if (is_string($configsh) && is_executable($configsh)) {
-			if (Mage::getStoreConfig('versioning/scm/fulllog') === '1') {
-				exec('
-					export GIT_SSH="'.$configsh.'"
-					git fetch 2>&1
-					git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" 2>&1
-				', $data, $val);
-			}
-			else {
-				exec('
-					export GIT_SSH="'.$configsh.'"
-					git fetch 2>&1
-					git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -20 2>&1
-				', $data, $val);
-			}
+			exec('
+				export GIT_SSH="'.$configsh.'"
+				git fetch 2>&1
+				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' 2>&1
+			', $data, $val);
 		}
 		else {
-			if (Mage::getStoreConfig('versioning/scm/fulllog') === '1') {
-				exec('
-					git fetch 2>&1
-					git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" 2>&1
-				', $data, $val);
-			}
-			else {
-				exec('
-					git fetch 2>&1
-					git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -20 2>&1
-				', $data, $val);
-			}
+			exec('
+				git fetch 2>&1
+				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' 2>&1
+			', $data, $val);
 		}
 
 		$data = implode("\n", $data);
@@ -142,6 +125,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			foreach ($xml->getElementsByTagName('log') as $logentry) {
 
 				$revision = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
+				$parents = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
 				$author = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
 				$timestamp = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
 				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
@@ -155,16 +139,28 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 					$description = preg_replace('#\#([0-9]+)#', '<span class="issue">$1</span>', $description);
 				}
 
-				$branch = '';
-				exec('git branch --all --contains '.$revision, $branch);
-				$branch = array_pop($branch);
+				if (Mage::getStoreConfig('versioning/tweak/svgbranch') === '1') {
 
-				$commitEntry = new Varien_Object();
-				$commitEntry->setRevision($revision);
-				$commitEntry->setAuthor($author);
-				$commitEntry->setBranch(substr($branch, strrpos($branch, '/') + 1));
-				$commitEntry->setDate(date('c', strtotime($timestamp)));
-				$commitEntry->setDescription(nl2br($description));
+					$branch = array();
+					exec('perl lib/luigifab/git-what-branch/git-what-branch --quiet --allbranches '.$revision, $branch);
+					$branch = array_pop($branch);
+					$branch = (strrpos($branch, ' ') !== false) ? substr($branch, strrpos($branch, ' ') + 1, -1) : $branch;
+					$branch = (strrpos($branch, '/') !== false) ? substr($branch, strrpos($branch, '/') + 1) : $branch;
+
+					$commitEntry = new Varien_Object();
+					$commitEntry->setRevision($revision);
+					$commitEntry->setAuthor($author);
+					$commitEntry->setBranch($branch);
+					$commitEntry->setDate(date('c', strtotime($timestamp)));
+					$commitEntry->setDescription(nl2br($description).' <input type="hidden" value="'.trim($parents).'" class="parents" />');
+				}
+				else {
+					$commitEntry = new Varien_Object();
+					$commitEntry->setRevision($revision);
+					$commitEntry->setAuthor($author);
+					$commitEntry->setDate(date('c', strtotime($timestamp)));
+					$commitEntry->setDescription(nl2br($description));
+				}
 
 				$this->commitCollection->addItem($commitEntry);
 			}
@@ -191,6 +187,18 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		$this->currentRevision = $data;
 		return $this->currentRevision;
+	}
+
+
+	// #### État #################################################################### public ### //
+	// = révision : 2
+	// » Renvoie l'état de la copie locale à partir de la réponse de la commande git status
+	public function getCurrentStatus() {
+
+		exec('git status', $dataStatus);
+		array_unshift($dataStatus, '<span>git status</span>');
+
+		return implode("\n", $dataStatus);
 	}
 
 
