@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated V/27/04/2012
- * Version 3
+ * Updated V/03/08/2012
+ * Version 4
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -35,7 +35,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	protected function _prepareCollection() {
 
-		$this->setCollection(Mage::registry('versioning'));
+		$this->setCollection(Mage::getModel('versioning/history')->getCollection());
 		return parent::_prepareCollection();
 	}
 

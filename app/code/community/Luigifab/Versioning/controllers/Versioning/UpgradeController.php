@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/29/04/2012
- * Version 19
+ * Updated M/11/09/2012
+ * Version 24
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,10 +18,10 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_action {
+class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Controller_action {
 
 	// #### Gestion de la mise à jour ############################## debug ## i18n ## public ### //
-	// = révision : 47
+	// = révision : 52
 	// » Affiche l'état d'avancement de la mise à jour sous la forme d'une page html
 	// » Désactive toutes les touches du clavier et empèche la fermeture de la page
 	// » S'assure de ne pas intervernir juste après l'identification
@@ -39,7 +39,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 		}
 
 		if (Mage::getSingleton('admin/session')->isFirstPageAfterLogin() || (strlen($revision) < 1)) {
-			$this->_redirect('versioning/repository');
+			$this->_redirect('*/versioning_repository');
 			return false;
 		}
 
@@ -55,13 +55,15 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 		echo "\n".'<link rel="icon" href="'.Mage::getDesign()->getSkinUrl('images/ajax-loader.gif').'" type="image/x-icon" />';
 		echo "\n".'<style type="text/css">';
 		echo "\n". '* { margin:0; padding:0; }';
-		echo "\n". 'body { margin:2em 165px 3.5em; font:1em Verdana, sans-serif; color:#AAA; background-color:black; overflow-y:scroll; }';
-		echo "\n". 'object { position:fixed; top:3em; left:35px; }';
-		echo "\n". 'p { padding:0 1em; }';
-		echo "\n". 'p.first { padding-bottom:0.8em; border-bottom:1px solid #111; }';
-		echo "\n". 'p.last { padding-top:0.8em; border-top:1px solid #111; }';
+		echo "\n". 'body { margin:1.8em 3em 3.5em 150px; font:1em Verdana, sans-serif; color:#AAA; overflow-y:scroll; background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAABJJREFUCNdjEBQU/M9AFMCpEgBn3AJlgv0NRQAAAABJRU5ErkJggg==") black; }';
+		echo "\n". 'div.obj { position:fixed; left:0; right:0; top:3.8em; padding:10px 33px; background-color:black; }';
+		echo "\n". 'div.ctn { position:relative; padding:0 1.3em; min-height:8em; border-radius:1.5em; border:1px solid #111; background-color:black; background-clip:padding-box; }';
+		echo "\n". 'object { display:block; }';
+		echo "\n". 'p { padding:1em 0; }';
+		echo "\n". 'p.first { border-bottom:1px dashed #111; }';
+		echo "\n". 'p.last { border-top:1px dashed #111; }';
 		echo "\n". 'p span { font-size:0.8em; font-style:italic; }';
-		echo "\n". 'pre { margin:1.7em 0; padding:0 1em; font:0.8em "DejaVu Sans", Verdana, sans-serif; line-height:1.4em; white-space:pre-wrap; }';
+		echo "\n". 'pre { padding:1.4em 0; font:0.8em Verdana, sans-serif; line-height:1.4em; white-space:pre-wrap; }';
 		echo "\n". 'pre code { display:inline-block; margin:0.3em 0 0; font:1.1em monospace; line-height:1.5em; font-style:italic; color:#333; }';
 		echo "\n". 'pre code span { color:#555; }';
 		echo "\n". 'pre span.notice { font-size:0.85em; font-style:italic; color:#888; }';
@@ -90,8 +92,9 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 		echo "\n".'</head>';
 
 		echo "\n".'<body>';
-		echo "\n".'<div><object data="'.Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg.php').'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
+		echo "\n".'<div class="obj"><object data="'.Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg.php').'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
 
+		echo "\n".'<div class="ctn">';
 		echo "\n".'<p class="first"><strong>'.$this->__('Starting upgrade (revision %s)', $revision).'</strong>';
 		echo "\n".'<br /><span>'.$this->__('Do not touch anything / Do not try to cancel this operation').'</span></p>'."\n";
 
@@ -115,6 +118,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 
 		echo "\n".'<p class="last"><strong>'.$data['title'].'</strong>';
 		echo "\n".'<br /><span>'.$this->__('Back to Magento in one second').'</span></p>';
+		echo "\n".'</div>';
 
 		echo "\n".'<script type="text/javascript">';
 		echo "\n". '// clear disableClose function, go to Magento backend, re-reregister disableClose function';
@@ -135,31 +139,31 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 
 
 	// #### Gestion de la mise à jour ############################# debug ## i18n ## private ### //
-	// = révision : 58
+	// = révision : 69
 	// » Log les informations du processus de mise à jour
-	// » Met à jour le code appliation et régénère les fichiers minifiés si possible
+	// » Met à jour le code application, purge le cache et régénère les fichiers minifiés lorsque nécessaire
 	// » Informe l'utiliseur en cas de changement de version
 	private function processUpgrade($targetRevision) {
 
 		try {
 			// *** Préparation ********************************* //
+			$helper = Mage::helper('versioning');
 			$type = Mage::getStoreConfig('versioning/scm/type');
-			$lock = Mage::helper('versioning')->getLock();
-			$log = Mage::helper('versioning')->getLastlogFile();
+
+			$lock = $helper->getLock();
+			$flag = $helper->getUpgradeFlag();
+			$log = $helper->getLastlogFile();
 
 			$repository = Mage::getModel('versioning/scm_'.$type);
 			$currentRevision = $repository->getCurrentRevision();
 
-			if (is_file($log))
-				unlink($log);
-
 			$status = array();
-			$status['url'] = 'versioning/repository';
+			$status['url'] = '*/versioning_repository';
 
 			$logger = array();
 			$logger['date'] = date('c', time());
-			$logger['current_revision'] = $currentRevision;
-			$logger['target_revision'] = $targetRevision;
+			$logger['current_rev'] = $currentRevision;
+			$logger['target_rev'] = $targetRevision;
 			$logger['remote_addr'] = (getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown';
 			$logger['user'] = Mage::getSingleton('admin/session')->getUser()->getUsername();
 			$logger['duration'] = microtime(true);
@@ -168,6 +172,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 			// *** Numéro de version *************************** //
 			$file = file_get_contents(Mage::getBaseDir('code').'/community/Luigifab/Versioning/etc/config.xml');
 			preg_match('#<version>([0-9\.]+)<\/version>#', $file, $version);
+
 			$version = array_pop($version);
 
 			// *** ÉTAPE 1 ************************************* //
@@ -185,7 +190,16 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 			if (is_file($lock))
 				throw new Exception('An upgrade is already underway');
 
-			file_put_contents($lock, $logger['current_revision'].' » '.$logger['target_revision'].' from '.$logger['remote_addr'].' by '.$logger['user']);
+			if (is_file($log))
+				unlink($log);
+
+			if (Mage::getStoreConfig('versioning/scm/maintenance') === '1') {
+				file_put_contents($lock, $logger['current_rev'].' » '.$logger['target_rev'].' from '.$logger['remote_addr'].' by '.$logger['user']);
+				file_put_contents($flag, $logger['current_rev'].' » '.$logger['target_rev'].' from '.$logger['remote_addr'].' by '.$logger['user']);
+			}
+			else {
+				file_put_contents($lock, $logger['current_rev'].' » '.$logger['target_rev'].' from '.$logger['remote_addr'].' by '.$logger['user']);
+			}
 
 			// *** ÉTAPE 2 ************************************* //
 			$this->writeTitle($this->__('2) Upgrading'));
@@ -193,13 +207,9 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 
 			// *** ÉTAPE 3 ************************************* //
 			$this->writeTitle($this->__('3) Cache'));
-			$this->clearAllCache();
+			$cacheMessages = array();
 
-			$cacheMessages = array('<span>rm -rf var/cache var/full_page_cache media/css media/js media/compressor includes/src</span>');
-
-			// mise à jour du code application et régénération des fichiers minifiés
-			// uniquement si le module Luigifab/Compressor est disponible
-			if (class_exists('Luigifab_Compressor_Block_Head')) {
+			if ($helper->isCompressorInstalled()) {
 
 				// mise à jour du code application
 				if ($this->getRequest()->getParam('code') === 'true') {
@@ -215,6 +225,10 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 					}
 				}
 
+				// nettoyage du cache
+				$cacheMessages[] = $this->__('cleaning all cache');
+				$this->clearAllCache();
+
 				// régénération des fichiers minifiés
 				try {
 					$cacheMessages[] = $this->__('regeneration of minified files');
@@ -227,6 +241,10 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 					Mage::log($e->getMessage());
 				}
 			}
+			else {
+				$cacheMessages[] = $this->__('cleaning all cache');
+				$this->clearAllCache();
+			}
 
 			$this->writeCommand(implode("\n", $cacheMessages));
 
@@ -234,13 +252,23 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 			$this->writeTitle($this->__('4) Unlocking'));
 			unlink($lock);
 
+			if (is_file($flag)) {
+				if ($this->getRequest()->getParam('flag') !== 'true')
+					unlink($flag);
+			}
+
 			// *** Numéro de version *************************** //
 			$file = file_get_contents(Mage::getBaseDir('code').'/community/Luigifab/Versioning/etc/config.xml');
 			preg_match('#<version>([0-9\.]+)<\/version>#', $file, $newVersion);
+
 			$newVersion = array_pop($newVersion);
 
-			if ($newVersion != $version)
-				Mage::getSingleton('adminhtml/session')->addNotice($this->__('Please note that this module (Luigifab/Versioning) has been updated during upgrade process.<br />It changes from version %s to version %s.', $newVersion, $version));
+			if ($newVersion !== $version) {
+				if (version_compare($newVersion, $version, '<'))
+					Mage::getSingleton('adminhtml/session')->addNotice($this->__('Please note that this module (Luigifab/Versioning) has been updated during upgrade process.<br />It changes from version %s to version %s.', $newVersion, $version));
+				else
+					Mage::getSingleton('adminhtml/session')->addNotice($this->__('Please note that this module (Luigifab/Versioning) has been updated during upgrade process.<br />It changes from version %s to version %s.', $version, $newVersion));
+			}
 
 			// *** Finalisation ******************************** //
 			$status['exclam'] = 'blue'; $status['losange'] = 'orange';
@@ -250,7 +278,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 			$logger['status'] = 'Upgrade completed'."\n".trim(file_get_contents($log));
 
 			if ((Mage::getStoreConfig('versioning/tweak/showlog') === '1') && (Mage::getStoreConfig('versioning/tweak/deletelog') !== '1'))
-				$status['url'] = 'versioning/repository/lastlog';
+				$status['url'] = '*/versioning_repository/lastlog';
 
 			if ((Mage::getStoreConfig('versioning/tweak/showlog') !== '1') && (Mage::getStoreConfig('versioning/tweak/deletelog') === '1'))
 				unlink($log);
@@ -264,17 +292,20 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 			$status['title'] = $this->__('Upgrade error (revision %s)', $targetRevision);
 
 			$logger['duration'] = ceil(microtime(true) - $logger['duration']);
-			$logger['status'] = trim(file_get_contents($log));
+			$logger['status'] = (is_file($log) && is_readable($log)) ? trim(file_get_contents($log)) : $e->getMessage();
 
 			if ($e->getMessage() !== 'An upgrade is already underway') {
 
-				$status['url'] = 'versioning/repository/lastlog';
+				$status['url'] = '*/versioning_repository/lastlog';
 
 				$this->writeError($e->getMessage());
 				Mage::getSingleton('adminhtml/session')->addError(nl2br($e->getMessage()));
 
 				$this->writeTitle($this->__('4) Unlocking'));
 				unlink($lock);
+
+				if (is_file($flag))
+					unlink($flag);
 			}
 			else {
 				$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
@@ -314,7 +345,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 
 
 	// #### Désactivation des buffers ##################################### debug ## private ### //
-	// = révision : 7
+	// = révision : 8
 	// » Met fin à la temporisation de sortie (buffer) de Magento
 	// » Est incapable de mettre fin à la temporisation de zlib.output_compression
 	private function disableAllBuffer() {
@@ -330,7 +361,7 @@ class Luigifab_Versioning_UpgradeController extends Mage_Adminhtml_Controller_ac
 
 		try {
 			for ($i = 0; $i < ob_get_level(); $i++)
-				ob_end_flush();
+				ob_end_clean();
 		}
 		catch (Exception $e) {
 			Mage::log($e->getMessage(), Zend_Log::ERR);

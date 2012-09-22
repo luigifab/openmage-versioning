@@ -1,7 +1,7 @@
 /**
  * Created J/22/12/2011
- * Updated V/11/05/2012
- * Version 10
+ * Updated J/20/09/2012
+ * Version 15
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -15,6 +15,10 @@
  * but without any warranty, without even the implied warranty of
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
+ *
+ * JSLint
+ * - Prototype $ $$ Event Element Position SKIN_URL apijs luigifab startVersioning
+ * - jslint sloppy: true, white: true, browser: true, devel: true, plusplus: true, maxerr: 1000
  */
 
 // initialisation des traductions
@@ -22,26 +26,33 @@ function luigifabVersioningInit() {
 
 	apijs.i18n.data.en.versioning_uptitle = "Upgrade to revision §";
 	apijs.i18n.data.en.versioning_uptext = "Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.";
-	apijs.i18n.data.en.versioning_uptext_code = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][p][label][input type='checkbox' name='code' value='true'] Update the application code[/label][/p]";
+
+	apijs.i18n.data.en.versioning_uptext_compressor_upgradeflag = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Update the application code (?§)[/label][/li][li][label][input type='checkbox' name='flag' value='true'] Do not leave the website maintenance mode (upgrade.flag)[/label][/li][/ul]";
+
+	apijs.i18n.data.en.versioning_uptext_compressor = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Update the application code (?§)[/label][/li][/ul]";
+	apijs.i18n.data.en.versioning_uptext_upgradeflag = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='flag' value='true'] Do not leave the website maintenance mode (upgrade.flag)[/label][/li][/ul]";
 
 	apijs.i18n.data.fr.versioning_uptitle = "Mise à jour vers la révision §";
-	apijs.i18n.data.fr.versioning_uptext_code = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][p][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application[/label][/p]";
 	apijs.i18n.data.fr.versioning_uptext = "Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.";
+
+	apijs.i18n.data.fr.versioning_uptext_compressor_upgradeflag = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application (?§)[/label][/li][li][label][input type='checkbox' name='flag' value='true'] Ne pas sortir du mode de maintenance (upgrade.flag)[/label][/li][/ul]";
+
+	apijs.i18n.data.fr.versioning_uptext_compressor = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application (?§)[/label][/li][/ul]";
+	apijs.i18n.data.fr.versioning_uptext_upgradeflag = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='flag' value='true'] Ne pas sortir du mode de maintenance (upgrade.flag)[/label][/li][/ul]";
 
 	apijs.i18n.data.en.versioning_deltitle = "Deleting";
 	apijs.i18n.data.en.versioning_deltext = "Are you sure you want to delete this log?[br]Be careful, you can't cancel this operation.";
-
 	apijs.i18n.data.fr.versioning_deltitle = "Suppression";
 	apijs.i18n.data.fr.versioning_deltext = "Êtes-vous sûr de vouloir supprimer cet historique ?[br]Attention, cette opération ne peut pas être annulée.";
 }
 
 // demande de confirmation (livraison)
-function luigifabVersioningUpgrade(url, go, compressor) {
+function luigifabVersioningUpgrade(url, go, compressor, upgradeflag) {
 
 	if (url === true)
 		return true;
 
-	if ((typeof apijs !== 'undefined') && (typeof apijs !== null)) {
+	if ((typeof apijs !== null) && (typeof apijs.core === 'object')) {
 
 		luigifabVersioningInit();
 
@@ -49,19 +60,38 @@ function luigifabVersioningUpgrade(url, go, compressor) {
 			location.href = url;
 		}
 		else {
+			var date = new Date();
 			url.match(/revision\/([0-9a-z]+)\//);
 
-			if (compressor === true) {
-				apijs.dialogue.dialogFormOptions(
+			if ((compressor === true) && (upgradeflag === true)) {
+				apijs.dialog.dialogFormOptions(
 					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate('versioning_uptext_code'),
+					apijs.i18n.translate('versioning_uptext_compressor_upgradeflag', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
 					luigifabVersioningUpgrade, true, url, 'versioning'
 				);
 				$('box').setAttribute('method', 'get');
-				$$('#box button')[0].focus();
+				$$('#box button').first().focus();
+			}
+			else if (compressor === true) {
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate('versioning_uptext_compressor', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
+					luigifabVersioningUpgrade, true, url, 'versioning'
+				);
+				$('box').setAttribute('method', 'get');
+				$$('#box button').first().focus();
+			}
+			else if (upgradeflag === true) {
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate('versioning_uptext_upgradeflag'),
+					luigifabVersioningUpgrade, true, url, 'versioning'
+				);
+				$('box').setAttribute('method', 'get');
+				$$('#box button').first().focus();
 			}
 			else {
-				apijs.dialogue.dialogConfirmation(
+				apijs.dialog.dialogConfirmation(
 					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
 					apijs.i18n.translate('versioning_uptext'),
 					luigifabVersioningUpgrade, url, 'versioning'
@@ -73,14 +103,14 @@ function luigifabVersioningUpgrade(url, go, compressor) {
 	}
 	else {
 		url.match(/revision\/([0-9a-z]+)\//);
-		return confirm('Are you sure (revision ' + RegExp.$1 + ')?');
+		return confirm('Are you sure (revision ' + RegExp.$1 + ') ?');
 	}
 }
 
 // demande de confirmation (suppression des historiques)
 function luigifabVersioningDelete(url, go) {
 
-	if ((typeof apijs !== 'undefined') && (typeof apijs !== null)) {
+	if ((typeof apijs !== null) && (typeof apijs.core === 'object')) {
 
 		luigifabVersioningInit();
 
@@ -88,7 +118,7 @@ function luigifabVersioningDelete(url, go) {
 			location.href = url;
 		}
 		else {
-			apijs.dialogue.dialogConfirmation(
+			apijs.dialog.dialogConfirmation(
 				apijs.i18n.translate('versioning_deltitle'),
 				apijs.i18n.translate('versioning_deltext'),
 				luigifabVersioningUpgrade, url, 'versioning'
@@ -104,89 +134,84 @@ function luigifabVersioningDelete(url, go) {
 
 
 // génération du graphique SVG pour BZR et GIT
-// testé avec Chrome 18 / Chromium 18 / Firefox 12 / Opera 11.62 / Safari 5.1 / IE 9
+// testé avec Magento Community 1.4 1.5 1.6 1.7 / Magento Enterprise 1.10 1.11
+// testé avec Firefox 15 / Chromium 21 / Safari 5.1 / Opera 12 / IE 9
 // ne fonctionne pas avec IE 8 même avec l'extension Adobe SVG Viewer
-String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); };
+String.prototype.trim = function () {
+	return this.replace(/^\s+|\s+$/g, '');
+};
+Array.prototype.remove = function (obj) {
+	var a = [], i;
+	for (i = 0; i < this.length; i++) {
+		if (this[i] !== obj)
+			a.push(this[i]);
+	}
+	return a;
+};
 
 if ((typeof luigifab !== 'object') || (luigifab === null))
-	var luigifab = {};
+	var luigifab = { core: {} };
 
 Event.observe(window, 'load', startVersioning);
 
 function startVersioning() {
 
-	if ($('versioningGrid') && ($$('#versioningGrid td.branch').length > 0)) {
-		luigifab.branchmanager = new TheBranchManager();
+	if ($('versioningGrid') && ($$('#versioningGrid td.graph').length > 0)) {
+		luigifab.branchmanager = new luigifab.core.branchmanager();
 		luigifab.branchmanager.init();
 	}
 }
 
 
 // #### Gestion de la représentation des branches BZR/GIT ################### //
-// = révision : 30
-// » Crée une une balise object qui contiendra la représentation des branches grâce à une image SVG
-// » Construit l'image SVG en fonction de la liste de commits
+// = révision : 41
+// » Crée une balise object qui contiendra la représentation des branches grâce à une image SVG
+// » Construit l'image SVG en fonction de la liste de commits, des tags et des branches
 // » En cas de pépin retour à l'état initial
-function TheBranchManager() {
+luigifab.core.branchmanager = function () {
 
 	this.init = function () {
 
 		var elem = document.createElement('object');
-		elem.setAttribute('data', SKIN_URL.replace('enterprise/','default/') + 'images/luigifab/versioning/branch.svg.php');
+		elem.setAttribute('data', SKIN_URL.substr(0, SKIN_URL.indexOf('adminhtml/')) + 'adminhtml/default/default/images/luigifab/versioning/branch.svg.php');
 		elem.setAttribute('type', 'image/svg+xml');
-		elem.setAttribute('width', '97px');
-		elem.setAttribute('style', 'display:none;');
+		elem.setAttribute('width', 120);
+		elem.setAttribute('style', 'position:absolute;');
 		elem.setAttribute('onload', 'luigifab.branchmanager.create();');
-		elem.setAttribute('id', 'svgbranch');
+		elem.setAttribute('id', 'svggraph');
 
 		$('page:main-container').appendChild(elem);
+		luigifab.cache = {};
 	};
 
 	this.create = function () {
 
 		try {
 			// recherche de l'accès au graphique SVG
-			// initilisation des variables
-			var svgdoc = $('svgbranch').getSVGDocument().getElementById('root'),
-				scm = $('scmtype').firstChild.nodeValue,
-				allbranches = $$('td.branch').pluck('innerHTML').uniq(),
-				size = 20 * allbranches.length + 50,
-				elemText, elemTspan, elemCircle, elemLine,
-				currentBranch, currentCommit, currentHeight, currentParents, currentColumn,
-				testBranch, testCommit,
-				fullHeight = 0,
-				points = { },
-				branchNames = [ ],
-				branchColors = [ '', 'black', 'blue', 'red', 'limegreen', 'chocolate', 'orange', 'hotpink', 'silver', 'khaki']; // '' car column comme à 1
+			// et initialisation de toutes les variables
+			var svgdoc = $('svggraph').getSVGDocument().getElementById('root'),
+				allbranches = $$('input.branch').pluck('value').uniq(),
+				scm = $('scmtype').firstChild.nodeValue.trim(),
+				elemText, elemSpan, elemCircle, elemLine,
+				currentBranch, currentColumn, currentCommit, currentTag, currentHeight, currentParents, elemTD, testBranch, testCommit,
+				colors = ['', 'black', 'blue', 'red', 'limegreen', 'chocolate', 'orange', 'hotpink', 'silver', 'khaki'],
+				points = {}, branchNames = [], fullHeight = 0;
 
-			// largeur du graphique SVG et de la colonne du tableau
-			if (size > 97) {
-				$$('col')[1].width = size + 3;
-				$('svgbranch').setAttribute('width', size + 'px');
-			}
+			if (scm === 'git')
+				allbranches = allbranches.remove('');
 
-			if (Prototype.Browser.Opera)
-				$('svgbranch').setAttribute('width', parseInt($('svgbranch').getAttribute('width'), 10) + 10 + 'px');
+			// mise à jour de la taille du graphique
+			this.setSize(20 * allbranches.length + 90);
 
-			// hauteur du graphqiue SVG
-			var firstTD = new Element.Layout($$('td.branch').first(), true), lastTD = new Element.Layout($$('td.branch').last(), true);
-			$('svgbranch').setAttribute('height', (lastTD.get('top') - firstTD.get('top') + lastTD.get('height') + 3) + 'px');
-
-			if (Prototype.Browser.WebKit)
-				$('svgbranch').setAttribute('style', 'position:absolute; top:' + (firstTD.get('top') + 1) + 'px; left:' + (firstTD.get('left') + 2) + 'px;');
-			else
-				$('svgbranch').setAttribute('style', 'position:absolute; top:' + firstTD.get('top') + 'px; left:' + (firstTD.get('left') + 1) + 'px;');
-
-			// création des points et des lignes
-			// pour chaque commit
+			// création des points et des lignes, pour chaque commit
+			// utilise une seule ligne par branche
 			$$('#versioningGrid tbody tr').each(function (elemTR) {
 
-				currentBranch = elemTR.down('td.branch').firstChild.nodeValue;
-				currentCommit = (elemTR.down('td.revision').firstChild.nodeName !== '#text') ? elemTR.down('td.revision').firstChild.firstChild.nodeValue.trim() : elemTR.down('td.revision').firstChild.nodeValue.trim();
-
-				currentHeight = elemTR.getHeight();
+				currentBranch = (scm === 'git') ? luigifab.branchmanager.findBranch(elemTR) : elemTR.down('input.branch').getAttribute('value');
 				currentColumn = allbranches.indexOf(currentBranch) + 1;
-				currentBranch = currentBranch.trim();
+				currentCommit = elemTR.down('input.revision').getAttribute('value').replace(/\./g, '-');
+				currentTag    = elemTR.down('input.tags').getAttribute('value');
+				currentHeight = elemTR.getHeight();
 
 				// point au millieu de la case courante
 				points.circleX = 20 * currentColumn;
@@ -197,25 +222,42 @@ function TheBranchManager() {
 				points.lineY = fullHeight + currentHeight / 2;
 
 				fullHeight += currentHeight;
-				elemTR.down('td.branch').style.color = 'transparent';
+				elemTR.down('td.graph').style.color = 'transparent';
 
 				// texte (nom de la branche)
-				if ((branchNames[currentColumn] !== true) && (scm !== 'bzr')) {
+				if ((branchNames[currentColumn] !== true) && (scm === 'git')) {
 
 					elemText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 					elemText.setAttribute('x', points.circleX + 7);
 					elemText.setAttribute('y', points.circleY + 2);
-					elemText.setAttribute('fill', branchColors[currentColumn]);
+					elemText.setAttribute('fill', colors[currentColumn]);
 					elemText.setAttribute('class', 'branch-' + currentBranch);
 					elemText.setAttribute('style', 'font:0.65em sans-serif;');
 
-						elemTspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-						elemTspan.appendChild(document.createTextNode(currentBranch));
+						elemSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+						elemSpan.appendChild(document.createTextNode(currentBranch));
 
-					elemText.appendChild(elemTspan);
+					elemText.appendChild(elemSpan);
 					svgdoc.appendChild(elemText);
 
 					branchNames[currentColumn] = true;
+				}
+
+				// texte (tags)
+				if (currentTag.length > 0) {
+
+					elemText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+					elemText.setAttribute('x', points.circleX + 7 + 50);
+					elemText.setAttribute('y', points.circleY + 2);
+					elemText.setAttribute('fill', colors[currentColumn]);
+					elemText.setAttribute('class', 'tag');
+					elemText.setAttribute('style', 'font:0.65em sans-serif; font-style:italic;');
+
+						elemSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+						elemSpan.appendChild(document.createTextNode(currentTag));
+
+					elemText.appendChild(elemSpan);
+					svgdoc.appendChild(elemText);
 				}
 
 				// point
@@ -223,13 +265,15 @@ function TheBranchManager() {
 				elemCircle.setAttribute('cx', points.circleX);
 				elemCircle.setAttribute('cy', points.circleY);
 				elemCircle.setAttribute('r', 3.2);
-				elemCircle.setAttribute('fill', branchColors[currentColumn]);
+				elemCircle.setAttribute('fill', colors[currentColumn]);
 				elemCircle.setAttribute('class', 'branch-' + currentBranch); // pour connaître à quelle branche appartient ce commit
 				elemCircle.setAttribute('id', 'commit-' + currentCommit);    // pour connaître le nom du commit
 				svgdoc.appendChild(elemCircle);
 
 				// ligne
-				if (elemLine = svgdoc.getElementById('branch-' + currentBranch)) {
+				elemLine = svgdoc.getElementById('branch-' + currentBranch);
+
+				if (elemLine !== null) {
 					elemLine.setAttribute('class', 'branch commit-' + currentCommit); // pour connaître le dernier (plus ancien) commit de la branche
 					elemLine.setAttribute('x2', points.lineX);
 					elemLine.setAttribute('y2', points.lineY);
@@ -240,7 +284,7 @@ function TheBranchManager() {
 					elemLine.setAttribute('y1', points.lineY);
 					elemLine.setAttribute('x2', points.lineX);
 					elemLine.setAttribute('y2', points.lineY);
-					elemLine.setAttribute('stroke', branchColors[currentColumn]);
+					elemLine.setAttribute('stroke', colors[currentColumn]);
 					elemLine.setAttribute('stroke-width', 2);
 					elemLine.setAttribute('class', 'branch commit-' + currentCommit); // pour connaître le dernier (plus ancien) commit de la branche
 					elemLine.setAttribute('id', 'branch-' + currentBranch);           // pour connaître le nom de la branche
@@ -248,35 +292,37 @@ function TheBranchManager() {
 				}
 			});
 
-			// création des lignes interbranches
-			// pour chaque commit
+			// création des lignes interbranches, pour chaque commit
 			$$('#versioningGrid tbody tr').each(function (elemTR) {
 
 				currentParents = elemTR.down('input.parents').value;
 
 				if (currentParents.length > 0) {
 
-					currentParents = currentParents.split(' ');
-					currentBranch = elemTR.down('td.branch').firstChild.nodeValue.trim();
-					currentCommit = (elemTR.down('td.revision').firstChild.nodeName !== '#text') ? elemTR.down('td.revision').firstChild.firstChild.nodeValue.trim() : elemTR.down('td.revision').firstChild.nodeValue.trim();
+					currentBranch = (scm === 'git') ? luigifab.branchmanager.findBranch(elemTR) : elemTR.down('input.branch').getAttribute('value');
+					currentCommit = elemTR.down('input.revision').getAttribute('value').replace(/\./g, '-');
 
 					// pour chaque commit dit parent
-					currentParents.each(function (currentParent) {
-						$$('#versioningGrid tbody tr td.revision:contains("' + currentParent + '")').each(function (elemTD) {
+					// et dans le cas ou l'on n'est pas sur la même branche
+					currentParents.split(' ').each(function (currentParent) {
 
-							testBranch = elemTD.up().down('td.branch').firstChild.nodeValue.trim();
-							testCommit = (elemTD.firstChild.nodeName !== '#text') ? elemTD.firstChild.firstChild.nodeValue.trim() : elemTD.firstChild.nodeValue.trim();
+						currentParent = currentParent.replace(/\./g, '-');
+						elemTD = $$('input.parents.rev-' + currentParent);
 
-							// dans le cas ou on n'est pas sur la même branche
-							if ((testCommit === currentParent) && (testBranch !== currentBranch)) {
+						if (elemTD.length > 0) {
+
+							elemTR = elemTD.first().up().up();
+							testBranch = (scm === 'git') ? luigifab.branchmanager.findBranch(elemTR) : elemTR.down('input.branch').getAttribute('value');
+
+							if (testBranch !== currentBranch) {
 
 								// ligne du point du commit courant vers le point du commit parent
 								points.lineAx = svgdoc.getElementById('commit-' + currentCommit).getAttribute('cx');
 								points.lineAy = svgdoc.getElementById('commit-' + currentCommit).getAttribute('cy');
 								points.lineAcolor = svgdoc.getElementById('commit-' + currentCommit).getAttribute('fill');
-								points.lineBcolor = svgdoc.getElementById('commit-' + testCommit).getAttribute('fill');
-								points.lineBx = svgdoc.getElementById('commit-' + testCommit).getAttribute('cx');
-								points.lineBy = svgdoc.getElementById('commit-' + testCommit).getAttribute('cy');
+								points.lineBcolor = svgdoc.getElementById('commit-' + currentParent).getAttribute('fill');
+								points.lineBx = svgdoc.getElementById('commit-' + currentParent).getAttribute('cx');
+								points.lineBy = svgdoc.getElementById('commit-' + currentParent).getAttribute('cy');
 
 								// ligne
 								elemLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -285,32 +331,100 @@ function TheBranchManager() {
 								elemLine.setAttribute('stroke-width', 2);
 								svgdoc.appendChild(elemLine);
 							}
-						});
+						}
 					});
 				}
 			});
 
-			// prolongation des lignes sans parent
-			// pour chaque branche
+			// prolongation des lignes sans parent, pour chaque branche
 			allbranches.each(function (branch) {
 
-				elemLine = svgdoc.getElementById('branch-' + branch.trim());
+				elemLine = svgdoc.getElementById('branch-' + branch);
 				currentCommit = elemLine.getAttribute('class');
 				currentCommit = currentCommit.substring(currentCommit.indexOf('-') + 1);
 
-				testCommit = $$('#versioningGrid tbody tr td.revision:contains("' + currentCommit + '")')[0].up().down('input.parents').value;
+				testCommit = $$('input.parents.rev-' + currentCommit);
+				testCommit = (testCommit.length > 0) ? testCommit.first().value : false;
 
 				// dans le cas ou le commit parent n'existe pas
-				if ($$('#versioningGrid tbody tr td.revision:contains("' + testCommit + '")').length < 1)
-					elemLine.setAttribute('y2', $('svgbranch').getHeight());
+				if ((testCommit !== false) && (testCommit.length > 0) && ($$('input.parents.rev-' + testCommit).length < 1))
+					elemLine.setAttribute('y2', $('svggraph').getHeight());
 			});
 		}
 		catch (e) {
-			$('svgbranch').remove();
-			$$('#versioningGrid tbody tr td.branch').each(function (elemTD) {
-				elemTD.removeAttribute('style');
-			});
-			alert(e);
+			$('svggraph').remove();
+			alert('Woups! ' + e);
 		}
 	};
-}
+
+	this.setSize = function (width) {
+
+		var firstTD, lastTD, height, style;
+
+		// largeur du graphique SVG et de la colonne du tableau
+		if (width > 120) {
+			$$('col')[1].width = width + 3;
+			$('svggraph').setAttribute('width', width);
+		}
+
+		if (Prototype.Browser.Opera) {
+			$('svggraph').setAttribute('width', parseInt($('svggraph').getAttribute('width'), 10) + 10);
+		}
+
+		// hauteur du graphique SVG par rapport au tableau
+		// avec prototype 1.7+ (pour Element.Layout) ou non
+		if (typeof Element.Layout === 'function') {
+
+			firstTD = new Element.Layout($$('td.graph').first(), true);
+			lastTD = new Element.Layout($$('td.graph').last(), true);
+			height = lastTD.get('height');
+
+			$('svggraph').setAttribute('height', (lastTD.get('top') - firstTD.get('top') + height + 3));
+
+			if (Prototype.Browser.WebKit)
+				style = 'position:absolute; top:' + (firstTD.get('top') + 1) + 'px; left:' + (firstTD.get('left') + 2) + 'px;';
+			else
+				style = 'position:absolute; top:' + firstTD.get('top') + 'px; left:' + (firstTD.get('left') + 1) + 'px;';
+		}
+		else {
+			firstTD = Position.positionedOffset($$('td.graph').first());
+			lastTD = Position.positionedOffset($$('td.graph').last());
+			height = $$('td.graph').last().getDimensions();
+
+			$('svggraph').setAttribute('height', (lastTD[1] - firstTD[1] + height.height - 2));
+
+			if (Prototype.Browser.WebKit)
+				style = 'position:absolute; top:' + (firstTD[1] + 1) + 'px; left:' + (firstTD[0] + 2) + 'px;';
+			else
+				style = 'position:absolute; top:' + firstTD[1] + 'px; left:' + (firstTD[0] + 1) + 'px;';
+		}
+
+		$('svggraph').setAttribute('style', style);
+	};
+
+	this.findBranch = function (elemTR) {
+
+		var branch = elemTR.down('input.branch').getAttribute('value'), commit = elemTR.down('input.revision').getAttribute('value').replace(/\./g, '-');
+
+		// si le nom de la branche n'est pas disponible
+		// on va chercher le nom dans le commit « précédent » jusqu'à le trouver
+		// sauf s'il est en cache
+		if (branch.length < 1) {
+
+			if (typeof luigifab.cache[commit] === 'string')
+				return luigifab.cache[commit];
+
+			$$('#versioningGrid tbody tr input.parent-' + commit).each(function (parent) {
+
+				branch = parent.up().down('input.branch').value;
+
+				if (branch.length < 1)
+					branch = luigifab.branchmanager.findBranch(parent.up().up());
+			});
+
+			luigifab.cache[commit] = branch;
+		}
+
+		return branch;
+	};
+};

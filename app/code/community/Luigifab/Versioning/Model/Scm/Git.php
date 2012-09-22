@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 14
+ * Updated V/21/09/2012
+ * Version 18
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -27,11 +27,11 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Initialisation ############################################# exception ## public ### //
-	// = révision : 25
+	// = révision : 26
 	// » Indique si le gestionnaire de version est installé ou pas ainsi que sa version
 	public function _construct() {
 
-		if (Mage::app()->getRequest()->getModuleName() !== 'versioning')
+		if (Mage::app()->getRequest()->getControllerName() !== 'versioning_repository')
 			return;
 
 		if ((Mage::getStoreConfig('versioning/scm/enabled') !== '1') || (Mage::getStoreConfig('versioning/scm/type') !== 'git'))
@@ -59,23 +59,25 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 35
+	// = révision : 45
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande git log
 	// » Utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitCollection() {
 
 		$bugtracker = trim(Mage::getStoreConfig('versioning/tweak/bugtracker'));
-		$moduleName = Mage::app()->getRequest()->getModuleName();
+		$controller = Mage::app()->getRequest()->getControllerName();
 		$network = 'ssh: Could not resolve hostname';
 
 		// données du cache
 		if (!is_null($this->commitCollection))
 			return $this->commitCollection;
 
-		// lecture de l'historique
-		// en cas de problème d'encodage dans /etc/apache2/envvars décommenter '. /etc/default/locale' ou utiliser 'export LANG=fr_FR.utf-8;'
-		$configsh = realpath('.git/ssh/config.sh');
+		// lecture de l'historique des commits
+		// à noter qu'en cas de problème d'encodage avec le contenu des commits :
+		// » dans /etc/apache2/envvars décommenter '. /etc/default/locale'
+		// » ou utiliser 'export LANG=fr_FR.utf-8'
+		$configsh = realpath('./.git/ssh/config.sh');
 
 		if (!is_string($configsh))
 			$configsh = realpath('../.git/ssh/config.sh');
@@ -84,15 +86,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		if (is_string($configsh) && is_executable($configsh)) {
 			exec('
-				export GIT_SSH="'.$configsh.'"
-				git fetch 2>&1
-				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' 2>&1
+				export GIT_SSH="'.$configsh.'";
+				git fetch 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <branch> %d </branch> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 		else {
 			exec('
-				git fetch 2>&1
-				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' 2>&1
+				git fetch 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <branch> %d </branch> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 
@@ -102,10 +104,10 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		// traitement de la réponse
 		if (($val !== 0) || (strpos($data, '</log>') === false) ||
-		    ((strpos($data, 'error: ') !== false) && (strpos($data, $network) !== 0) && ($moduleName === 'versioning')) ||
-		    ((strpos($data, 'fatal: ') !== false) && (strpos($data, $network) !== 0) && ($moduleName === 'versioning')) ||
-		    ((strpos($data, 'error: ') !== false) && ($moduleName !== 'versioning')) ||
-		    ((strpos($data, 'fatal: ') !== false) && ($moduleName !== 'versioning'))) {
+		    ((strpos($data, 'error: ') !== false) && (strpos($data, $network) !== 0) && ($controller === 'versioning_repository')) ||
+		    ((strpos($data, 'fatal: ') !== false) && (strpos($data, $network) !== 0) && ($controller === 'versioning_repository')) ||
+		    ((strpos($data, 'error: ') !== false) && ($controller !== 'versioning_repository')) ||
+		    ((strpos($data, 'fatal: ') !== false) && ($controller !== 'versioning_repository'))) {
 
 			$data = is_array($data) ? implode("\n", $data) : $data;
 			$data = (strpos($data, '<log') !== false) ? substr($data, 0, strpos($data, '<log')) : $data;
@@ -113,10 +115,11 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data));
 		}
 		else {
-			if ((strpos($data, $network) === 0) && ($moduleName === 'versioning'))
+			if ((strpos($data, $network) === 0) && ($controller === 'versioning_repository'))
 				Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('versioning')->__('Unable to update the commit history from the remote repository.<br />This list corresponds to the history of the local repository.'));
 
 			$data = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
+
 			$xml = new DOMDocument();
 			$xml->loadXML('<root>'.$data.'</root>');
 
@@ -125,11 +128,32 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			foreach ($xml->getElementsByTagName('log') as $logentry) {
 
 				$revision = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
+				$branch = trim($logentry->getElementsByTagName('branch')->item(0)->firstChild->nodeValue);
 				$parents = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
 				$author = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
 				$timestamp = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
 				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
+				// tags
+				$tags = array();
+				exec('git tag --points-at '.$revision, $tags);
+
+				// branche et parents
+				$parents = explode(' ', $parents);
+
+				if (strlen($branch) > 0) {
+					if (strpos($branch, ',') !== false)
+						$branch = str_replace('origin/', '', substr($branch, strrpos($branch, ',') + 2, -1));
+					else if (strpos($branch, 'origin/') !== false)
+						$branch = substr($branch, strrpos($branch, 'origin/') + 7, -1);
+					else
+						$branch = '';
+				}
+				else {
+					$branch = '';
+				}
+
+				// bug tracker
 				if (strlen($bugtracker) > 0) {
 					$author = preg_replace('#<[^>]+>#', '', $author);
 					$description = preg_replace('#\#([0-9]+)#', '<a href="'.$bugtracker.'$1" class="issue" onclick="window.open(this.href); return false;">$1</a>', $description);
@@ -139,28 +163,14 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 					$description = preg_replace('#\#([0-9]+)#', '<span class="issue">$1</span>', $description);
 				}
 
-				if (Mage::getStoreConfig('versioning/tweak/svgbranch') === '1') {
-
-					$branch = array();
-					exec('perl lib/luigifab/git-what-branch/git-what-branch --quiet --allbranches '.$revision, $branch);
-					$branch = array_pop($branch);
-					$branch = (strrpos($branch, ' ') !== false) ? substr($branch, strrpos($branch, ' ') + 1, -1) : $branch;
-					$branch = (strrpos($branch, '/') !== false) ? substr($branch, strrpos($branch, '/') + 1) : $branch;
-
-					$commitEntry = new Varien_Object();
-					$commitEntry->setRevision($revision);
-					$commitEntry->setAuthor($author);
-					$commitEntry->setBranch($branch);
-					$commitEntry->setDate(date('c', strtotime($timestamp)));
-					$commitEntry->setDescription(nl2br($description).' <input type="hidden" value="'.trim($parents).'" class="parents" />');
-				}
-				else {
-					$commitEntry = new Varien_Object();
-					$commitEntry->setRevision($revision);
-					$commitEntry->setAuthor($author);
-					$commitEntry->setDate(date('c', strtotime($timestamp)));
-					$commitEntry->setDescription(nl2br($description));
-				}
+				$commitEntry = new Varien_Object();
+				$commitEntry->setRevision($revision);
+				$commitEntry->setTags($tags);
+				$commitEntry->setBranchName($branch);
+				$commitEntry->setParents($parents);
+				$commitEntry->setAuthor($author);
+				$commitEntry->setDate(date('c', strtotime($timestamp)));
+				$commitEntry->setDescription(nl2br($description));
 
 				$this->commitCollection->addItem($commitEntry);
 			}
@@ -217,21 +227,21 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Mise à jour ############################################################# public ### //
-	// = révision : 8
+	// = révision : 9
 	// » Met à jour la copie locale avec git reset (après avoir annulé les éventuelles modifications avec git clean)
 	// » Prend soin de vérifier le code de retour de la commande git reset et d'enregistrer les détails de la mise à jour
 	// » N'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
 	public function upgradeToRevision($obj, $log, $revision) {
 
 		exec('
-			echo "<span>git fetch</span>" >> '.$log.'
-			git fetch
+			echo "<span>git fetch</span>" >> '.$log.';
+			git fetch;
 
-			echo "<span>git clean -f -d</span>" >> '.$log.'
-			git clean -f -d >> '.$log.' 2>&1
+			echo "<span>git clean -f -d</span>" >> '.$log.';
+			git clean -f -d >> '.$log.' 2>&1;
 
-			echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.'
-			git reset --hard '.$revision.' >> '.$log.' 2>&1
+			echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
+			git reset --hard '.$revision.' >> '.$log.' 2>&1;
 		', $data, $val);
 
 		$data = trim(file_get_contents($log));

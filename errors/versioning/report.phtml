@@ -1,8 +1,8 @@
 <?php
 /**
- * Created S/03/03/2012
- * Updated J/17/05/2012
- * Version 2
+ * Created W/30/05/2012
+ * Updated D/03/06/2012
+ * Version 6
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -17,17 +17,18 @@
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
  */
+?>
 
-class Luigifab_Versioning_Model_Source_Number {
+<div class="box report">
+	<div class="number"><span>5</span><span>0</span><span>3</span></div>
+	<h1><?php echo $this->overload->translate('report_title') ?></h1>
+	<?php echo $this->overload->translate('report_content') ?>
 
-	public function toOptionArray() {
+	<?php if ($this->reportId): ?>
+		<p><?php echo $this->overload->translate('Error number: §', $this->reportId) ?></p>
+	<?php endif ?>
+</div>
 
-		return array(
-			array('value' => '20', 'label' => '20'),
-			array('value' => '30', 'label' => '30'),
-			array('value' => '50', 'label' => '50'),
-			array('value' => '100', 'label' => '100'),
-			array('value' => '200', 'label' => '200')
-		);
-	}
-}
+<?php if ($this->reportAction == 'print'): ?>
+	<pre class="up"><?php echo '<strong>',$this->reportData[0],'</strong>',"\n\n",htmlspecialchars($this->reportData[1]) ?></pre>
+<?php endif ?>

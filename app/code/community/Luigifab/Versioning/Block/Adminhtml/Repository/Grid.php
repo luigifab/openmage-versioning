@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 14
+ * Updated W/12/09/2012
+ * Version 20
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,15 +52,16 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'column_css_class' => 'revision'
 		));
 
-		if (in_array(Mage::getStoreConfig('versioning/scm/type'), array('bzr','git')) && (Mage::getStoreConfig('versioning/tweak/svgbranch') === '1')) {
-			$this->addColumn('branch', array(
-				'header'   => $this->__('Branch'),
+		if (in_array(Mage::getStoreConfig('versioning/scm/type'), array('bzr','git')) && (Mage::getStoreConfig('versioning/tweak/svggraph') === '1')) {
+			$this->addColumn('graph', array(
+				'header'   => $this->__('Graph'),
 				'align'    => 'center',
-				'width'    => '100px',
-				'index'    => 'branch',
+				'width'    => '123px',
+				'index'    => 'graph',
 				'sortable' => false,
 				'filter'   => false,
-				'column_css_class' => 'branch'
+				'renderer' => 'versioning/adminhtml_widget_graph',
+				'column_css_class' => 'graph'
 			));
 		}
 
@@ -101,9 +102,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'actions' => array(
 				array(
 					'caption' => $this->__('Deliver'),
-					'url'     => array('base' => 'versioning/upgrade/run'),
+					'url'     => array('base' => '*/versioning_upgrade/run'),
 					'field'   => 'revision',
-					'onclick' => 'return luigifabVersioningUpgrade(this.href, false, '.((class_exists('Luigifab_Compressor_Block_Head')) ? 'true' : 'false').');'
+					'onclick' => 'return luigifabVersioningUpgrade(this.href, false, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->checkUseUpgradeFlag()) ? 'true' : 'false').');'
 				)
 			),
 			'sortable'  => false,
@@ -116,5 +117,13 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 	public function getRowUrl($row) {
 		// rien à faire
+	}
+
+	private function checkUseUpgradeFlag() {
+
+		if (!is_bool($this->upgradeFlag))
+			$this->upgradeFlag = ($this->helper('versioning')->checkIndexPhp() && $this->helper('versioning')->checkLocalXml() && (Mage::getStoreConfig('versioning/scm/maintenance') === '1')) ? true : false;
+
+		return $this->upgradeFlag;
 	}
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 9
+ * Updated J/26/07/2012
+ * Version 11
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -32,7 +32,7 @@
 			</action>
 		</reference>
 	</default>
-	<versioning_repository_index>
+	<adminhtml_versioning_repository_index>
 		<reference name="head">
 			<action method="setTitle" translate="title">
 				<title>Versioning / Tools / Magento Admin</title>
@@ -41,8 +41,8 @@
 		<reference name="content">
 			<block type="versioning/adminhtml_repository" name="versioning_repository" />
 		</reference>
-	</versioning_repository_index>
-	<versioning_repository_history>
+	</adminhtml_versioning_repository_index>
+	<adminhtml_versioning_repository_history>
 		<reference name="head">
 			<action method="setTitle" translate="title">
 				<title>Versioning / Tools / Magento Admin</title>
@@ -51,8 +51,8 @@
 		<reference name="content">
 			<block type="versioning/adminhtml_history" name="versioning_history" />
 		</reference>
-	</versioning_repository_history>
-	<versioning_repository_lastlog>
+	</adminhtml_versioning_repository_history>
+	<adminhtml_versioning_repository_lastlog>
 		<reference name="head">
 			<action method="setTitle" translate="title">
 				<title>Versioning / Tools / Magento Admin</title>
@@ -61,8 +61,8 @@
 		<reference name="content">
 			<block type="versioning/adminhtml_lastlog" name="versioning_lastlog" />
 		</reference>
-	</versioning_repository_lastlog>
-	<versioning_repository_status>
+	</adminhtml_versioning_repository_lastlog>
+	<adminhtml_versioning_repository_status>
 		<reference name="head">
 			<action method="setTitle" translate="title">
 				<title>Versioning / Tools / Magento Admin</title>
@@ -71,5 +71,15 @@
 		<reference name="content">
 			<block type="versioning/adminhtml_status" name="versioning_status" />
 		</reference>
-	</versioning_repository_status>
+	</adminhtml_versioning_repository_status>
+	<adminhtml_versioning_downtime_index>
+		<reference name="head">
+			<action method="setTitle" translate="title">
+				<title>Downtime / Tools / Magento Admin</title>
+			</action>
+		</reference>
+		<reference name="content">
+			<block type="versioning/adminhtml_downtime" name="versioning_downtime" />
+		</reference>
+	</adminhtml_versioning_downtime_index>
 </layout>

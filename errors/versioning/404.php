@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
-<!--
- * Created S/03/12/2011
- * Updated M/18/09/2012
- * Version 3
+<?php
+/**
+ * Created W/30/05/2012
+ * Updated J/31/05/2012
+ * Version 2
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -16,15 +16,10 @@
  * but without any warranty, without even the implied warranty of
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
--->
+ */
 
-<config>
-	<modules>
-		<Luigifab_Versioning>
-			<active>true</active>
-			<codePool>community</codePool>
-			<!-- see https://redmine.luigifab.info/projects/magento/wiki/modules for more information -->
-			<update>http://www.luigifab.info/magento/rss.xml</update>
-		</Luigifab_Versioning>
-	</modules>
-</config>
+require_once('./errors/processor.php');
+require_once('./errors/versioning/processor.php');
+
+$processor = new Versioning_Processor();
+$processor->process404();

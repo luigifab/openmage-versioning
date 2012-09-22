@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/07/04/2012
- * Updated S/07/04/2012
- * Version 1
+ * Updated S/09/06/2012
+ * Version 2
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -21,6 +21,6 @@
 class Luigifab_Versioning_Block_Adminhtml_Widget_Duration extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
 
 	public function render(Varien_Object $row) {
-		return $this->helper('versioning')->__('%d seconds', $row->getDuration());
+		return $this->__('%d seconds', $row->getDuration());
 	}
 }

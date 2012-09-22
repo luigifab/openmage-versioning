@@ -1,8 +1,8 @@
 @charset "utf-8";
 /**
  * Created J/22/12/2011
- * Updated M/08/05/2012
- * Version 12
+ * Updated W/01/08/2012
+ * Version 18
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,13 +18,14 @@
  * GNU General Public License (GPL) for more details.
  */
 
-body.versioning-repository-index h3.icon-head, body.versioning-repository-history h3.icon-head,
-body.versioning-repository-lastlog h3, body.versioning-repository-status h3 {
+body.adminhtml-versioning-repository-index h3.icon-head, body.adminhtml-versioning-repository-history h3.icon-head,
+body.adminhtml-versioning-repository-lastlog h3, body.adminhtml-versioning-repository-status h3, body.adminhtml-versioning-downtime-index h3 {
 	min-height:18px; padding-left:22px;
 	background:url("../../../images/fam_server_database.gif") no-repeat left center;
 }
 
-body.versioning-repository-history tbody tr td.last { padding:2px 6px; }
+body.adminhtml-versioning-repository-history tbody tr td.last { padding:2px 6px; }
+body.adminhtml-versioning-repository-index div.content-header td { width:auto !important; }
 
 #versioningGrid_table thead tr.headings { background-position:left -18px; }
 #versioningGrid_table thead tr.headings th.no-link { padding-bottom:5px; text-align:center; color:#666; }
@@ -43,9 +44,37 @@ body.versioning-repository-history tbody tr td.last { padding:2px 6px; }
 #versioningLog span { color:black; }
 #versioningLog em { color:#444; }
 
+#row_versioning_scm_maintenance p.note { padding-top:3px; line-height:1.35em; }
 #row_versioning_tweak_bugtracker td a { color:#2F2F2F; }
-#box.confirmation.versioning h1 { font-size:1.5em; white-space:nowrap; }
-#box.options.versioning h1 { font-size:1.5em; white-space:nowrap; background-position:0 -132px; }
-#box.options.versioning div.bbcode input { margin-right:0.1em; vertical-align:text-top; }
+
+#box.confirmation.versioning h1 { white-space:nowrap; }
+#box.options.versioning { min-height:12.1em; }
+#box.options.versioning h1 { white-space:nowrap; background-position:0 -132px; }
+#box.options.versioning div.bbcode input { margin-right:0.1em; vertical-align:text-top; cursor:pointer; }
 #box.options.versioning div.bbcode label { cursor:pointer; }
+#box.options.versioning div.bbcode ul { margin-top:1em; }
+#box.options.versioning div.bbcode ul li + li { margin-top:0.1em; }
+#box.options.versioning p.reload { display:none; }
+#box.options.versioning p.saving { bottom:7em; }
+
+#downtime li {
+	display:inline-block; margin:0.2em 0.3em 1.4em; width:25em; height:8em; padding:0.7em 1em; vertical-align:middle;
+	border-radius:1em; -khtml-border-radius:1em; -moz-border-radius:1em; -webkit-border-radius:1em;
+	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
+	border:1px solid #DDD; background-color:#EFEFEF;
+}
+
+#downtime li h3 { padding-left:20px; background:url("../../../images/fam_page_white.gif") no-repeat left center; }
+
+#versioning_downtime ul li { margin:0; line-height:1.4em; }
+#versioning_downtime ul li.doc { float:right; }
+#versioning_downtime ul li.ok, #versioning_downtime ul li.ok a { color:green; }
+#versioning_downtime ul li.ko, #versioning_downtime ul li.ko a { color:red; }
+
+#row_versioning_downtime_upgrade td { padding-top:14px; }
+
+#versioning_downtime_upgrade_title, #versioning_downtime_report_title,
+#versioning_downtime_error404_title, #versioning_downtime_error503_title { width:400px; }
+#versioning_downtime_upgrade_content, #versioning_downtime_report_content,
+#versioning_downtime_error404_content, #versioning_downtime_error503_content { width:400px; height:10em; }
 

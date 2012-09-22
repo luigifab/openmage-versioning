@@ -1,0 +1,11 @@
+`error404_title`,`Page not found`
+`error404_content`,`<p>The requested page does not exist.</p>`
+
+`error503_title`,`Service Temporarily Unavailable`
+`error503_content`,`<p>The server is temporarily unable to service your request due to maintenance downtime or technical problem.</p>`
+
+`upgrade_title`,`Service Temporarily Unavailable`
+`upgrade_content`,`<p>The server is temporarily unable to service your request due to maintenance downtime.</p>`
+
+`report_title`,`There has been an error processing your request`
+`report_content`,`<p>The server is temporarily unable to service your request due to technical problem.</p>`

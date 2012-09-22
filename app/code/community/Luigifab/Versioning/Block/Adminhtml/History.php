@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/07/04/2012
- * Version 4
+ * Updated D/29/07/2012
+ * Version 6
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -32,13 +32,21 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 		$this->_addButton('back', array(
 			'label'   => $this->helper('adminhtml')->__('Back'),
-			'onclick' => "location.href = '".$this->getUrl('versioning/repository')."';",
+			'onclick' => "location.href = '".$this->getUrl('*/*/index')."';",
 			'class'   => 'back'
 		));
 
+		if (is_file($this->helper('versioning')->getLastlogFile())) {
+			$this->_addButton('lastlog', array(
+				'label'   => $this->__('Upgrade log'),
+				'onclick' => "location.href = '".$this->getUrl('*/*/lastlog')."';",
+				'class'   => 'go'
+			));
+		}
+
 		$this->_addButton('delete', array(
 			'label'   => $this->helper('adminhtml')->__('Delete'),
-			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('versioning/repository/deletehistory')."', false);",
+			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletehistory')."', false);",
 			'class'   => 'delete'
 		));
 	}

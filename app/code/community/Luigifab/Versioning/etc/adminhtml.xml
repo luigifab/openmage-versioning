@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created J/22/12/2011
- * Updated D/29/04/2012
- * Version 7
+ * Updated J/26/07/2012
+ * Version 10
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -31,9 +31,14 @@
 				</configuration>
 				<versioning translate="title">
 					<title>Version control</title>
-					<action>versioning/repository</action>
-					<sort_order>97</sort_order>
+					<action>adminhtml/versioning_repository</action>
+					<sort_order>86</sort_order>
 				</versioning>
+				<downtime translate="title">
+					<title>Downtime</title>
+					<action>adminhtml/versioning_downtime</action>
+					<sort_order>87</sort_order>
+				</downtime>
 			</children>
 		</tools>
 	</menu>
@@ -51,8 +56,12 @@
 							</configuration>
 							<versioning translate="title">
 								<title>Version control</title>
-								<sort_order>97</sort_order>
+								<sort_order>86</sort_order>
 							</versioning>
+							<downtime translate="title">
+								<title>Downtime</title>
+								<sort_order>87</sort_order>
+							</downtime>
 						</children>
 					</tools>
 					<system>
@@ -65,7 +74,7 @@
 										<children-->
 											<versioning translate="title">
 												<title>Version control</title>
-												<sort_order>103097</sort_order>
+												<sort_order>103086</sort_order>
 											</versioning>
 										<!--/children>
 									</luigifab-->

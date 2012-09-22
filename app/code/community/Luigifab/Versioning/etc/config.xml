@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 11
+ * Updated J/26/07/2012
+ * Version 16
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>1.2.0</version>
+			<version>2.0.0</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -43,16 +43,26 @@
 	</global>
 	<admin>
 		<routers>
-			<versioning>
-				<use>admin</use>
+			<adminhtml>
 				<args>
-					<module>Luigifab_Versioning</module>
-					<frontName>versioning</frontName>
+					<modules>
+						<luigifab_versioning before="Mage_Adminhtml">Luigifab_Versioning</luigifab_versioning>
+					</modules>
 				</args>
-			</versioning>
+			</adminhtml>
 		</routers>
 	</admin>
 	<adminhtml>
+		<events>
+			<admin_system_config_changed_section_versioning>
+				<observers>
+					<versioning_observer>
+						<class>versioning/observer</class>
+						<method>updateTranslations</method>
+					</versioning_observer>
+				</observers>
+			</admin_system_config_changed_section_versioning>
+		</events>
 		<layout>
 			<updates>
 				<versioning>
@@ -73,10 +83,10 @@
 	<default>
 		<versioning>
 			<scm>
-				<number>50</number>
+				<number>30</number>
 			</scm>
 			<tweak>
-				<svgbranch>1</svgbranch>
+				<svggraph>1</svggraph>
 			</tweak>
 		</versioning>
 	</default>

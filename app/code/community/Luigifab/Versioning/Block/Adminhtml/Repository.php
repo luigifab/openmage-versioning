@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 10
+ * Updated D/29/07/2012
+ * Version 14
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,7 +28,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_blockGroup = 'versioning';
 
 		if (Mage::getStoreConfig('versioning/scm/type') === 'git')
-			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>/%s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
+			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
 		else
 			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
@@ -37,7 +37,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		if (is_file($this->helper('versioning')->getHistoryFile())) {
 			$this->_addButton('history', array(
 				'label'   => $this->__('Upgrades log'),
-				'onclick' => "location.href = '".$this->getUrl('versioning/repository/history')."';",
+				'onclick' => "location.href = '".$this->getUrl('*/*/history')."';",
 				'class'   => 'go'
 			));
 		}
@@ -45,14 +45,20 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		if (is_file($this->helper('versioning')->getLastlogFile())) {
 			$this->_addButton('lastlog', array(
 				'label'   => $this->__('Upgrade log'),
-				'onclick' => "location.href = '".$this->getUrl('versioning/repository/lastlog')."';",
+				'onclick' => "location.href = '".$this->getUrl('*/*/lastlog')."';",
 				'class'   => 'go'
 			));
 		}
 
 		$this->_addButton('status', array(
 			'label'   => $this->__('Current repository status'),
-			'onclick' => "location.href = '".$this->getUrl('versioning/repository/status')."';",
+			'onclick' => "location.href = '".$this->getUrl('*/*/status')."';",
+			'class'   => 'go'
+		));
+
+		$this->_addButton('downtime', array(
+			'label'   => $this->__('Downtime'),
+			'onclick' => "location.href = '".$this->getUrl('*/versioning_downtime/index')."';",
 			'class'   => 'go'
 		));
 	}

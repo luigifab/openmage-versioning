@@ -1,8 +1,8 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated M/08/05/2012
- * Version 2
+ * Updated J/26/07/2012
+ * Version 3
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -32,7 +32,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 
 		$this->_addButton('back', array(
 			'label'   => $this->helper('adminhtml')->__('Back'),
-			'onclick' => "location.href = '".$this->getUrl('versioning/repository')."';",
+			'onclick' => "location.href = '".$this->getUrl('*/*/index')."';",
 			'class'   => 'back'
 		));
 	}

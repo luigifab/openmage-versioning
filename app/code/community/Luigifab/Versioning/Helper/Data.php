@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/05/2012
- * Version 16
+ * Updated V/03/08/2012
+ * Version 20
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -24,8 +24,20 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return (string) Mage::getConfig()->getModuleConfig('Luigifab_Versioning')->version;
 	}
 
+	public function isCompressorInstalled() {
+		return (is_file(Mage::getBaseDir('code').'/community/Luigifab/Compressor/Block/Head.php')) ? true : false;
+	}
+
 	public function getLock() {
 		return Mage::getBaseDir('var').'/versioning.lock';
+	}
+
+	public function getUpgradeFlag() {
+		return Mage::getBaseDir().'/upgrade.flag';
+	}
+
+	public function getMaintenanceFlag() {
+		return Mage::getBaseDir().'/maintenance.flag';
 	}
 
 	public function getStatusContent() {
@@ -62,63 +74,19 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return Mage::getBaseDir('log').'/versioning.csv';
 	}
 
-	public function getHistoryCollection() {
+	public function checkIndexPhp() {
+		$content = file_get_contents('./index.php');
+		return (strpos($content, 'upgrade.flag') !== false) ? true : false;
+	}
 
-		$file = $this->getHistoryFile();
+	public function checkLocalXml() {
 
-		if (is_file($file) && is_readable($file)) {
-
-			$items = array();
-			$ressource = fopen($file, 'r');
-
-			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
-
-				if (strlen($line[0]) > 1) {
-					$item = new Varien_Object();
-					$item->setDate($line[0]);
-					$item->setCurrentRevision($line[1]);
-					$item->setTargetRevision($line[2]);
-					$item->setRemoteAddr($line[3]);
-					$item->setUser($line[4]);
-					$item->setDuration($line[5]);
-
-					// modifié en version 1.1.0
-					// la 7ème case contient désormais le statut suivi d'un saut de ligne suivi des détails de la mise à jour
-					if (strpos($line[6], "\n") !== false) {
-
-						$text = substr($line[6], strpos($line[6], "\n") + 1);
-						$text = strip_tags($text);
-						$text = addslashes($text);
-						$text = str_replace("\n", '\n', $text);
-
-						$item->setStatus($this->__(substr($line[6], 0, strpos($line[6], "\n"))));
-						$item->setDetails('<a href="#" onclick="alert(\''.$text.'\'); return false;">'.Mage::helper('adminhtml')->__('Details').'</a>');
-					}
-					else {
-						$item->setStatus($this->__($line[6]));
-						$item->setDetails('');
-					}
-
-					// ajouté en version 1.1.0
-					// la 8ème case contient l'éventuel nom de la branche actuelle
-					$item->setBranch((isset($line[7])) ? $line[7] : '');
-
-					$items[] = $item;
-				}
-			}
-
-			fclose($ressource);
-
-			$items = array_reverse($items);
-			$collection = new Varien_Data_Collection();
-
-			foreach ($items as $item)
-				$collection->addItem($item);
+		if (is_file('./errors/local.xml')) {
+			$content = file_get_contents('./errors/local.xml');
+			return (strpos($content, '<skin>versioning</skin>') !== false) ? true : false;
 		}
 		else {
-			$collection = new Varien_Data_Collection();
+			return false;
 		}
-
-		return $collection;
 	}
 }
