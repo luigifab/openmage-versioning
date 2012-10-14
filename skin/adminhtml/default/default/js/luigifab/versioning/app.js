@@ -1,7 +1,7 @@
 /**
  * Created J/22/12/2011
- * Updated J/20/09/2012
- * Version 15
+ * Updated S/13/10/2012
+ * Version 16
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,91 +52,94 @@ function luigifabVersioningUpgrade(url, go, compressor, upgradeflag) {
 	if (url === true)
 		return true;
 
-	if ((typeof apijs !== null) && (typeof apijs.core === 'object')) {
+	try {
+		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
 
-		luigifabVersioningInit();
+			luigifabVersioningInit();
 
-		if (go !== false) {
-			location.href = url;
-		}
-		else {
-			var date = new Date();
-			url.match(/revision\/([0-9a-z]+)\//);
-
-			if ((compressor === true) && (upgradeflag === true)) {
-				apijs.dialog.dialogFormOptions(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate('versioning_uptext_compressor_upgradeflag', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
-					luigifabVersioningUpgrade, true, url, 'versioning'
-				);
-				$('box').setAttribute('method', 'get');
-				$$('#box button').first().focus();
-			}
-			else if (compressor === true) {
-				apijs.dialog.dialogFormOptions(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate('versioning_uptext_compressor', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
-					luigifabVersioningUpgrade, true, url, 'versioning'
-				);
-				$('box').setAttribute('method', 'get');
-				$$('#box button').first().focus();
-			}
-			else if (upgradeflag === true) {
-				apijs.dialog.dialogFormOptions(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate('versioning_uptext_upgradeflag'),
-					luigifabVersioningUpgrade, true, url, 'versioning'
-				);
-				$('box').setAttribute('method', 'get');
-				$$('#box button').first().focus();
+			if (go !== false) {
+				location.href = url;
 			}
 			else {
-				apijs.dialog.dialogConfirmation(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate('versioning_uptext'),
-					luigifabVersioningUpgrade, url, 'versioning'
-				);
-			}
-		}
+				var date = new Date();
+				url.match(/revision\/([0-9a-z]+)\//);
 
-		return false;
+				if ((compressor === true) && (upgradeflag === true)) {
+					apijs.dialog.dialogFormOptions(
+						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+						apijs.i18n.translate('versioning_uptext_compressor_upgradeflag', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
+						luigifabVersioningUpgrade, true, url, 'versioning'
+					);
+					$('box').setAttribute('method', 'get');
+					$$('#box button').first().focus();
+				}
+				else if (compressor === true) {
+					apijs.dialog.dialogFormOptions(
+						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+						apijs.i18n.translate('versioning_uptext_compressor', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
+						luigifabVersioningUpgrade, true, url, 'versioning'
+					);
+					$('box').setAttribute('method', 'get');
+					$$('#box button').first().focus();
+				}
+				else if (upgradeflag === true) {
+					apijs.dialog.dialogFormOptions(
+						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+						apijs.i18n.translate('versioning_uptext_upgradeflag'),
+						luigifabVersioningUpgrade, true, url, 'versioning'
+					);
+					$('box').setAttribute('method', 'get');
+					$$('#box button').first().focus();
+				}
+				else {
+					apijs.dialog.dialogConfirmation(apijs.i18n.translate('versioning_uptitle', RegExp.$1), apijs.i18n.translate('versioning_uptext'), luigifabVersioningUpgrade, url, 'versioning');
+				}
+			}
+
+			return false;
+		}
+		else {
+			url.match(/revision\/([0-9a-z]+)\//);
+			return confirm('Do you want to upgrade to revision ' + RegExp.$1 + '?');
+		}
 	}
-	else {
+	catch (e) {
 		url.match(/revision\/([0-9a-z]+)\//);
-		return confirm('Are you sure (revision ' + RegExp.$1 + ') ?');
+		return confirm('Do you want to upgrade to revision ' + RegExp.$1 + '?');
 	}
 }
 
 // demande de confirmation (suppression des historiques)
 function luigifabVersioningDelete(url, go) {
 
-	if ((typeof apijs !== null) && (typeof apijs.core === 'object')) {
+	try {
+		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
 
-		luigifabVersioningInit();
+			luigifabVersioningInit();
 
-		if (go !== false) {
-			location.href = url;
+			if (go !== false) {
+				location.href = url;
+			}
+			else {
+				apijs.dialog.dialogConfirmation(apijs.i18n.translate('versioning_deltitle'), apijs.i18n.translate('versioning_deltext'), luigifabVersioningUpgrade, url, 'versioning');
+			}
+
+			return false;
 		}
 		else {
-			apijs.dialog.dialogConfirmation(
-				apijs.i18n.translate('versioning_deltitle'),
-				apijs.i18n.translate('versioning_deltext'),
-				luigifabVersioningUpgrade, url, 'versioning'
-			);
+			return confirm('Are you sure ?');
 		}
-
-		return false;
 	}
-	else {
-		return confirm('Are you sure?');
+	catch (e) {
+		return confirm('Are you sure ?');
 	}
 }
 
 
-// génération du graphique SVG pour BZR et GIT
-// testé avec Magento Community 1.4 1.5 1.6 1.7 / Magento Enterprise 1.10 1.11
-// testé avec Firefox 15 / Chromium 21 / Safari 5.1 / Opera 12 / IE 9
-// ne fonctionne pas avec IE 8 même avec l'extension Adobe SVG Viewer
+// Génération du graphique SVG pour BZR et GIT
+// Testé avec Magento Community 1.4 1.5 1.6 1.7 / Magento Enterprise 1.11 1.12
+// Testé avec Firefox 15 / Chromium 21 / Safari 5.1 / Opera 12 / IE 9
+// Ne fonctionne pas avec IE 8 même avec l'extension Adobe SVG Viewer
 String.prototype.trim = function () {
 	return this.replace(/^\s+|\s+$/g, '');
 };
@@ -149,7 +152,7 @@ Array.prototype.remove = function (obj) {
 	return a;
 };
 
-if ((typeof luigifab !== 'object') || (luigifab === null))
+if ((luigifab === null) && (typeof luigifab !== 'object'))
 	var luigifab = { core: {} };
 
 Event.observe(window, 'load', startVersioning);

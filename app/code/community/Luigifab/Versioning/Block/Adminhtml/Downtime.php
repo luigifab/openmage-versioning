@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/02/06/2012
- * Updated M/31/07/2012
- * Version 7
+ * Updated V/12/10/2012
+ * Version 8
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -31,11 +31,13 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 		$this->_removeButton('edit');
 		$this->_removeButton('back');
 
-		$this->_addButton('versioning', array(
-			'label'   => $this->__('Versioning'),
-			'onclick' => "location.href = '".$this->getUrl('*/versioning_repository/index')."';",
-			'class'   => 'back'
-		));
+		if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning')) {
+			$this->_addButton('versioning', array(
+				'label'   => $this->__('Versioning'),
+				'onclick' => "location.href = '".$this->getUrl('*/versioning_repository/index')."';",
+				'class'   => 'back'
+			));
+		}
 
 		$this->_addButton('config', array(
 			'label'   => $this->__('Configuration'),

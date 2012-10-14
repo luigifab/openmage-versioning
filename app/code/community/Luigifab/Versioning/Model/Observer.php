@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated V/01/06/2012
- * Version 2
+ * Updated S/13/10/2012
+ * Version 3
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -19,6 +19,30 @@
  */
 
 class Luigifab_Versioning_Model_Observer {
+
+	// event admin_versioning_upgrade_before
+	public function beforeUpgradeEvent($observer) {
+
+		//array('repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision)
+		$event = $observer->getEvent();
+
+		Mage::log('Luigifab_Versioning_Model_Observer::beforeUpgradeEvent, revision: '.$event->getRevision());
+	}
+
+	// event admin_versioning_upgrade_after
+	public function afterUpgradeEvent($observer) {
+
+		//array('repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision, 'exception' => $e)
+		$event = $observer->getEvent();
+
+		if (!is_null($event->getException())) {
+			Mage::log('Luigifab_Versioning_Model_Observer::afterUpgradeEvent, revision: '.$event->getRevision().', exception: '.$event->getException()->getMessage());
+		}
+		else {
+			Mage::log('Luigifab_Versioning_Model_Observer::afterUpgradeEvent, revision: '.$event->getRevision());
+		}
+	}
+
 
 	// met à jour les fichiers de traduction pour chaque langue
 	// donc pour chaque vue magasin (pour chaque langue)

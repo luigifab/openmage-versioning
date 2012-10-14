@@ -1,8 +1,8 @@
 <?php
 /**
  * Created W/21/12/2011
- * Updated V/03/08/2012
- * Version 25
+ * Updated V/12/10/2012
+ * Version 26
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -23,6 +23,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	protected function _initAction() {
 		$this->loadLayout()->_setActiveMenu('tools/versioning');
 		return $this;
+	}
+
+	protected function _isAllowed() {
+		return Mage::getSingleton('admin/session')->isAllowed('tools/versioning');
 	}
 
 	public function indexAction() {

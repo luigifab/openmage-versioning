@@ -9,6 +9,8 @@
 "Number of commits per page","Nombre de commits par page"
 "Enable maintenance page","Activer la page de maintenance"
 "If yes, customers will show a maintenance page during upgrade process (see below).","Si oui, les clients verront une page de maintenance lors du processus de mise à jour (voir ci-dessous)."
+"Enable events","Activer les événements"
+"For developers (before and after events).","Pour les développeurs (événements before et after)."
 "Bug tracker","Gestionnaire de projet"
 "Example: <a href=""https://redmine.luigifab.info/issues/"" onclick=""window.open(this.href); return false;"">https://redmine.luigifab.info/issues/</a>","Exemple : <a href=""https://redmine.luigifab.info/issues/"" onclick=""window.open(this.href); return false;"">https://redmine.luigifab.info/issues/</a>"
 "Show upgrade log on success","Afficher l'historique de mise à jour en cas de succès"

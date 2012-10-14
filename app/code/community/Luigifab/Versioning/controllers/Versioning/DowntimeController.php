@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/02/06/2012
- * Updated J/26/07/2012
- * Version 4
+ * Updated V/12/10/2012
+ * Version 5
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -23,6 +23,10 @@ class Luigifab_Versioning_Versioning_DowntimeController extends Mage_Adminhtml_C
 	protected function _initAction() {
 		$this->loadLayout()->_setActiveMenu('tools/downtime');
 		return $this;
+	}
+
+	protected function _isAllowed() {
+		return Mage::getSingleton('admin/session')->isAllowed('tools/downtime');
 	}
 
 	public function indexAction() {

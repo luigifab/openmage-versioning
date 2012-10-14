@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/29/07/2012
- * Version 14
+ * Updated V/12/10/2012
+ * Version 15
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -56,10 +56,12 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			'class'   => 'go'
 		));
 
-		$this->_addButton('downtime', array(
-			'label'   => $this->__('Downtime'),
-			'onclick' => "location.href = '".$this->getUrl('*/versioning_downtime/index')."';",
-			'class'   => 'go'
-		));
+		if (Mage::getSingleton('admin/session')->isAllowed('tools/downtime')) {
+			$this->_addButton('downtime', array(
+				'label'   => $this->__('Downtime'),
+				'onclick' => "location.href = '".$this->getUrl('*/versioning_downtime/index')."';",
+				'class'   => 'go'
+			));
+		}
 	}
 }

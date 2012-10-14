@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/11/09/2012
- * Version 24
+ * Updated S/13/10/2012
+ * Version 26
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -19,6 +19,11 @@
  */
 
 class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Controller_action {
+
+	protected function _isAllowed() {
+		return Mage::getSingleton('admin/session')->isAllowed('tools/versioning');
+	}
+
 
 	// #### Gestion de la mise à jour ############################## debug ## i18n ## public ### //
 	// = révision : 52
@@ -139,7 +144,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Gestion de la mise à jour ############################# debug ## i18n ## private ### //
-	// = révision : 69
+	// = révision : 71
 	// » Log les informations du processus de mise à jour
 	// » Met à jour le code application, purge le cache et régénère les fichiers minifiés lorsque nécessaire
 	// » Informe l'utiliseur en cas de changement de version
@@ -175,6 +180,13 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 			$version = array_pop($version);
 
+			// *** Événement before **************************** //
+			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
+				Mage::dispatchEvent('admin_versioning_upgrade_before', array(
+					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision
+				));
+			}
+
 			// *** ÉTAPE 1 ************************************* //
 			$this->writeTitle($this->__('1) Locking and configuration check'));
 
@@ -187,11 +199,13 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 				$this->writeNotice($this->__('Repository: %s / Current revision: %s / Requested revision: %s', $type, $currentRevision, $targetRevision));
 			}
 
-			if (is_file($lock))
+			if (is_file($lock)) {
 				throw new Exception('An upgrade is already underway');
+			}
 
-			if (is_file($log))
+			if (is_file($log)) {
 				unlink($log);
+			}
 
 			if (Mage::getStoreConfig('versioning/scm/maintenance') === '1') {
 				file_put_contents($lock, $logger['current_rev'].' » '.$logger['target_rev'].' from '.$logger['remote_addr'].' by '.$logger['user']);
@@ -207,14 +221,14 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 			// *** ÉTAPE 3 ************************************* //
 			$this->writeTitle($this->__('3) Cache'));
-			$cacheMessages = array();
+			$messages = array();
 
 			if ($helper->isCompressorInstalled()) {
 
 				// mise à jour du code application
 				if ($this->getRequest()->getParam('code') === 'true') {
 
-					$cacheMessages[] = $this->__('upgrading application code');
+					array_push($messages, $this->__('upgrading application code'));
 
 					foreach (array('css', 'js') as $type) {
 						$resource = Mage::getSingleton('core/resource');
@@ -226,13 +240,12 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 				}
 
 				// nettoyage du cache
-				$cacheMessages[] = $this->__('cleaning all cache');
+				array_push($messages, $this->__('cleaning all cache'));
 				$this->clearAllCache();
 
 				// régénération des fichiers minifiés
 				try {
-					$cacheMessages[] = $this->__('regeneration of minified files');
-
+					array_push($messages, $this->__('regeneration of minified files'));
 					$compressor = Mage::getBlockSingleton('compressor/head');
 					$compressor->start('css');
 					$compressor->start('js');
@@ -242,11 +255,11 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 				}
 			}
 			else {
-				$cacheMessages[] = $this->__('cleaning all cache');
+				array_push($messages, $this->__('cleaning all cache'));
 				$this->clearAllCache();
 			}
 
-			$this->writeCommand(implode("\n", $cacheMessages));
+			$this->writeCommand(implode("\n", $messages));
 
 			// *** ÉTAPE 5 ************************************* //
 			$this->writeTitle($this->__('4) Unlocking'));
@@ -273,7 +286,6 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 			// *** Finalisation ******************************** //
 			$status['exclam'] = 'blue'; $status['losange'] = 'orange';
 			$status['title'] = $this->__('Upgrade completed (revision %s)', $targetRevision);
-
 			$logger['duration'] = ceil(microtime(true) - $logger['duration']);
 			$logger['status'] = 'Upgrade completed'."\n".trim(file_get_contents($log));
 
@@ -284,13 +296,19 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 				unlink($log);
 
 			Mage::getSingleton('adminhtml/session')->addSuccess($this->__('Upgrade to revision %s completed.', $targetRevision));
+
+			// *** Événement after ***************************** //
+			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
+				Mage::dispatchEvent('admin_versioning_upgrade_after', array(
+					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision
+				));
+			}
 		}
 		catch (Exception $e) {
 
 			// *** Gestion des erreurs ************************* //
 			$status['exclam'] = 'red'; $status['losange'] = 'red';
 			$status['title'] = $this->__('Upgrade error (revision %s)', $targetRevision);
-
 			$logger['duration'] = ceil(microtime(true) - $logger['duration']);
 			$logger['status'] = (is_file($log) && is_readable($log)) ? trim(file_get_contents($log)) : $e->getMessage();
 
@@ -310,6 +328,13 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 			else {
 				$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
 				Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an upgrade is already underway.'));
+			}
+
+			// *** Événement after ***************************** //
+			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
+				Mage::dispatchEvent('admin_versioning_upgrade_after', array(
+					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision, 'exception' => $e
+				));
 			}
 		}
 
@@ -372,7 +397,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Nettoyage du cache ############################################ debug ## private ### //
-	// = révision : 24
+	// = révision : 25
 	// » Tente de vider totalement le cache de Magento (du moins essaye)
 	// » Utilise les méthodes et événements de Magento puis supprime tous les répertoires
 	private function clearAllCache() {
@@ -417,7 +442,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		// fichiers minifiés du module luigifab/compressor
 		if (is_dir(Mage::getBaseDir('media').'/compressor') && is_writable(Mage::getBaseDir('media').'/compressor')) {
 
-			system('rm -rf '.Mage::getBaseDir('media').'/compressor');
+			system('rm -rf '.Mage::getBaseDir('media').'/compressor/*');
 
 			Mage::log(sprintf('Minified files deleted from %s by %s', ((getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown'), Mage::getSingleton('admin/session')->getUser()->getUsername()), Zend_Log::INFO);
 		}

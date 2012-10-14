@@ -1,8 +1,8 @@
 @charset "utf-8";
 /**
  * Created D/03/06/2012
- * Updated D/03/06/2012
- * Version 2
+ * Updated D/23/09/2012
+ * Version 3
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,7 +18,6 @@
  * GNU General Public License (GPL) for more details.
  */
 
-/* ############################################################ Document ### */
 * { margin:0; padding:0; }
 
 body {
@@ -28,8 +27,6 @@ body {
 
 abbr[title], span[title] { border-bottom:none; }
 
-
-/* ############################################################### Texte ### */
 div.box { margin:5% auto 0; width:38em; }
 div.box div.number { margin:0 0 0.5em -0.1em; font-size:4em; font-weight:bold; color:#CCC; }
 
