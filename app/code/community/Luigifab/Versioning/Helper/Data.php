@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/03/08/2012
- * Version 20
+ * Updated S/27/10/2012
+ * Version 22
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -26,6 +26,10 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function isCompressorInstalled() {
 		return (is_file(Mage::getBaseDir('code').'/community/Luigifab/Compressor/Block/Head.php')) ? true : false;
+	}
+
+	public function isCompressorEnabled() {
+		return ((Mage::getStoreConfig('css/general/enabled') === '1') || (Mage::getStoreConfig('js/general/enabled') === '1')) ? true : false;
 	}
 
 	public function getLock() {
@@ -76,7 +80,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function checkIndexPhp() {
 		$content = file_get_contents('./index.php');
-		return (strpos($content, 'upgrade.flag') !== false) ? true : false;
+		return ((strpos($content, 'upgrade.flag') !== false) && (strpos($content, '$ipFile') !== false)) ? true : false;
 	}
 
 	public function checkLocalXml() {

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated S/13/10/2012
- * Version 3
+ * Updated D/28/10/2012
+ * Version 4
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -43,20 +43,42 @@ class Luigifab_Versioning_Model_Observer {
 		}
 	}
 
+	// vérification des dossiers
+	private function checkAllDir() {
 
-	// met à jour les fichiers de traduction pour chaque langue
-	// donc pour chaque vue magasin (pour chaque langue)
-	public function updateTranslations() {
+		$dir = Mage::getBaseDir().'/errors/versioning/locale';
 
+		if (!is_writeable($dir))
+			@chmod($dir, 0755);
+		if (!is_dir($dir) || !is_writeable($dir))
+			Throw new Exception(Mage::helper('versioning')->__('Directory <em>errors/versioning/locale</em> is not writable.'));
+
+		$dir = Mage::getBaseDir().'/errors/versioning/config';
+
+		if (!is_dir($dir))
+			@mkdir($dir, 0755);
+		if (!is_dir($dir) || !is_writeable($dir))
+			Throw new Exception(Mage::helper('versioning')->__('Directory <em>errors/versioning/config</em> does not exist or is not writable.'));
+	}
+
+
+	// #### Mise à jour de la configuration ######################################### public ### //
+	// = révision : 5
+	// » Met à jour les fichiers de traduction pour chaque langue
+	// » Met aussi à jour les adresses IP à exclure
+	public function updateConfig() {
+
+		$this->checkAllDir();
+
+		// traductions (vue magasin par vue magasin)
 		$storeids = array();
-		$app = Mage::app();
 
-		if (strlen($store = $app->getRequest()->getParam('store')) > 0) {
+		if (strlen($store = Mage::app()->getRequest()->getParam('store')) > 0) {
 			$storeid = Mage::getModel('core/store')->load($store)->getStoreId();
 			$this->updateStoreTranslation(Mage::getStoreConfig('general/locale/code', $storeid), $storeid);
 		}
 		else {
-			foreach ($app->getStores() as $store) {
+			foreach (Mage::app()->getStores() as $store) {
 				if ($store->getIsActive() === '1')
 					$storeids[Mage::getStoreConfig('general/locale/code', $store->getStoreId())] = $store->getStoreId();
 			}
@@ -64,10 +86,31 @@ class Luigifab_Versioning_Model_Observer {
 				$this->updateStoreTranslation($lang, $storeid);
 			}
 		}
+
+		// adresses IP page upgrade
+		$target = './errors/versioning/config/upgrade.ip';
+		$ips = trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'));
+
+		if (strlen($ips) > 0)
+			file_put_contents($target, '-'.str_replace(' ', "-\n-", $ips).'-');
+		else if (is_file($target))
+			unlink($target);
+
+		// adresses IP page 503
+		$target = './errors/versioning/config/503.ip';
+		$ips = trim(Mage::getStoreConfig('versioning/downtime/error503_byip'));
+
+		if (strlen($ips) > 0)
+			file_put_contents($target, '-'.str_replace(' ', "-\n-", $ips).'-');
+		else if (is_file($target))
+			unlink($target);
 	}
 
-	// met à jour le fichier de traduction à partir des données du backend
-	// formate le texte de la description au fomat HTML
+
+	// #### Génération des fichiers CSV ############################################ private ### //
+	// = révision : 10
+	// » Met à jour le fichier de traduction à partir des données du backend
+	// » Formate le texte de la description au fomat HTML
 	private function updateStoreTranslation($lang, $storeid) {
 
 		$text = array();
@@ -92,10 +135,11 @@ class Luigifab_Versioning_Model_Observer {
 			if ((strlen($content) > 0) && (strpos($content, '<') === 0))
 				$text[] = '`'.$key.'_content`,`'.$content.'`';
 			else if (strlen($content) > 0)
-				$text[] =  '`'.$key.'_content`,`<p>'.str_replace("\n",'<br />',$content).'</p>`';
+				$text[] =  '`'.$key.'_content`,`<p>'.str_replace("\n", '<br />', $content).'</p>`';
 		}
 
 		// sauvegarde des données
+		// ou suppression du fichier
 		if (count($text) > 0)
 			file_put_contents($target, implode("\n", $text));
 		else if (is_file($target))

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated W/12/09/2012
- * Version 20
+ * Updated V/26/10/2012
+ * Version 21
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -104,7 +104,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => '*/versioning_upgrade/run'),
 					'field'   => 'revision',
-					'onclick' => 'return luigifabVersioningUpgrade(this.href, false, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->checkUseUpgradeFlag()) ? 'true' : 'false').');'
+					'onclick' => 'return luigifabVersioningUpgrade(this.href, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->helper('versioning')->isCompressorEnabled()) ? 'true' : 'false').', '.(($this->checkUseUpgradeFlag()) ? 'true' : 'false').');'
 				)
 			),
 			'sortable'  => false,

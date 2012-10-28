@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/02/06/2012
- * Updated V/12/10/2012
- * Version 8
+ * Updated D/28/10/2012
+ * Version 10
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -51,34 +51,90 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 		$html = array();
 		$html[] = '<ul id="downtime">';
 
-		if (!is_file(Mage::helper('versioning')->getMaintenanceFlag())) {
-			$html[] = '<li>';
-			$html[] = '<h3>maintenance.flag</h3>';
-			$html[] = '<p>'.$this->__('Flag <em>not present</em>: <a href="%s">lock website</a>.', $this->getUrl('*/*/addMaintenanceFlag')).'</p>';
-			$html[] = '</li>';
-		}
-		else {
+		// préparation
+		$maintenanceFlag = is_file(Mage::helper('versioning')->getMaintenanceFlag());
+		$upgradeFlag = is_file(Mage::helper('versioning')->getUpgradeFlag());
+
+		$ipFile = './errors/versioning/config/503.ip';
+		$maintenanceIp = (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$maintenanceNobody = (strlen(trim(Mage::getStoreConfig('versioning/downtime/error503_byip'))) < 1);
+
+		$ipFile = './errors/versioning/config/upgrade.ip';
+		$upgradeIp = (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$upgradeNobody = (strlen(trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'))) < 1);
+
+		// code html pour le drapeau maintenance.flag
+		if ($maintenanceFlag) {
 			$html[] = '<li>';
 			$html[] = '<h3>maintenance.flag</h3>';
 			$html[] = '<p>'.$this->__('Flag <strong>present</strong>: <a href="%s">unlock website</a>.', $this->getUrl('*/*/delMaintenanceFlag')).'</p>';
+			if ($maintenanceNobody) {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+				$html[] = '<br />'.$this->__('Nobody have access to the frontend.').'</p>';
+			}
+			else if ($maintenanceIp) {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+				$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->getBaseUrl().'" onclick="window.open(this.href); return false;"').'</p>';
+			}
+			else {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+				$html[] = '<br />'.$this->__('You haven\'t access to the frontend.').'</p>';
+			}
+			$html[] = '</li>';
+		}
+		else {
+			$html[] = '<li>';
+			$html[] = '<h3>maintenance.flag</h3>';
+			$html[] = '<p>'.$this->__('Flag <em>not present</em>: <a href="%s">lock website</a>.', $this->getUrl('*/*/addMaintenanceFlag')).'</p>';
+			if ($upgradeFlag) {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR')).'</p>';
+			}
+			else {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+				$html[] = '<br />'.$this->__('Everybody have access to the frontend.').'</p>';
+			}
 			$html[] = '</li>';
 		}
 
-		if (!is_file(Mage::helper('versioning')->getUpgradeFlag())) {
+		// code html pour le drapeau upgrade.flag
+		if ($upgradeFlag) {
 			$html[] = '<li>';
 			$html[] = '<h3>upgrade.flag</h3>';
-			$html[] = '<p>'.$this->__('Flag <em>not present</em>: <a href="%s">lock website</a>.', $this->getUrl('*/*/addUpgradeFlag')).'</p>';
+			$html[] = '<p>'.$this->__('Flag <strong>present</strong>: <a href="%s">unlock website</a>.', $this->getUrl('*/*/delUpgradeFlag')).'</p>';
+			if ($maintenanceFlag) {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR')).'</p>';
+			}
+			else {
+				if ($upgradeNobody) {
+					$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+					$html[] = '<br />'.$this->__('Nobody have access to the frontend.').'</p>';
+				}
+				else if ($upgradeIp) {
+					$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+					$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->getBaseUrl().'" onclick="window.open(this.href); return false;"').'</p>';
+				}
+				else {
+					$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+					$html[] = '<br />'.$this->__('You haven\'t access to the frontend.').'</p>';
+				}
+			}
 			$html[] = '</li>';
 		}
 		else {
 			$html[] = '<li>';
 			$html[] = '<h3>upgrade.flag</h3>';
-			$html[] = '<p>'.$this->__('Flag <strong>present</strong>: <a href="%s">unlock website</a>.', $this->getUrl('*/*/delUpgradeFlag')).'</p>';
+			$html[] = '<p>'.$this->__('Flag <em>not present</em>: <a href="%s">lock website</a>.', $this->getUrl('*/*/addUpgradeFlag')).'</p>';
+			if ($maintenanceFlag) {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR')).'</p>';
+			}
+			else {
+				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
+				$html[] = '<br />'.$this->__('Everybody have access to the frontend.').'</p>';
+			}
 			$html[] = '</li>';
 		}
 
 		$html[] = '</ul>';
-
 		return implode("\n", $html);
 	}
 

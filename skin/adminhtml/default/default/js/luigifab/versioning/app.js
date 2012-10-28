@@ -1,24 +1,14 @@
 /**
- * Created J/22/12/2011
- * Updated S/13/10/2012
- * Version 16
+ * Created J/22/12/2011, Updated V/26/10/2012, Version 19
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
- * it under the terms of the GNU General Public License (GPL) as published
- * by the free software foundation, either version 2 of the license, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL).
  *
- * This program is distributed in the hope that it will be useful,
- * but without any warranty, without even the implied warranty of
- * merchantability or fitness for a particular purpose. See the
- * GNU General Public License (GPL) for more details.
- *
- * JSLint
- * - Prototype $ $$ Event Element Position SKIN_URL apijs luigifab startVersioning
- * - jslint sloppy: true, white: true, browser: true, devel: true, plusplus: true, maxerr: 1000
+ * JSLint: Prototype $ $$ Event Element Position SKIN_URL apijs luigifab startVersioning
+ * sloppy: true, white: true, browser: true, devel: true, plusplus: true, maxerr: 1000
  */
 
 // initialisation des traductions
@@ -28,7 +18,6 @@ function luigifabVersioningInit() {
 	apijs.i18n.data.en.versioning_uptext = "Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.";
 
 	apijs.i18n.data.en.versioning_uptext_compressor_upgradeflag = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Update the application code (?§)[/label][/li][li][label][input type='checkbox' name='flag' value='true'] Do not leave the website maintenance mode (upgrade.flag)[/label][/li][/ul]";
-
 	apijs.i18n.data.en.versioning_uptext_compressor = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Update the application code (?§)[/label][/li][/ul]";
 	apijs.i18n.data.en.versioning_uptext_upgradeflag = "[p]Are you sure you want to run the upgrade process?[br]Be careful, you can't cancel this operation.[/p][ul][li][label][input type='checkbox' name='flag' value='true'] Do not leave the website maintenance mode (upgrade.flag)[/label][/li][/ul]";
 
@@ -36,7 +25,6 @@ function luigifabVersioningInit() {
 	apijs.i18n.data.fr.versioning_uptext = "Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.";
 
 	apijs.i18n.data.fr.versioning_uptext_compressor_upgradeflag = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application (?§)[/label][/li][li][label][input type='checkbox' name='flag' value='true'] Ne pas sortir du mode de maintenance (upgrade.flag)[/label][/li][/ul]";
-
 	apijs.i18n.data.fr.versioning_uptext_compressor = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='code' value='true'] Mettre à jour le code application (?§)[/label][/li][/ul]";
 	apijs.i18n.data.fr.versioning_uptext_upgradeflag = "[p]Êtes-vous sûr de vouloir lancer le processus de mise à jour ?[br]Attention, cette opération ne peut pas être annulée.[/p][ul][li][label][input type='checkbox' name='flag' value='true'] Ne pas sortir du mode de maintenance (upgrade.flag)[/label][/li][/ul]";
 
@@ -46,83 +34,75 @@ function luigifabVersioningInit() {
 	apijs.i18n.data.fr.versioning_deltext = "Êtes-vous sûr de vouloir supprimer cet historique ?[br]Attention, cette opération ne peut pas être annulée.";
 }
 
-// demande de confirmation (livraison)
-function luigifabVersioningUpgrade(url, go, compressor, upgradeflag) {
-
-	if (url === true)
-		return true;
+// Demande de confirmation (livraison)
+// apijs.dialog.dialogFormOptions(string title, string text, function callback, object params, string action, string icon)
+function luigifabVersioningUpgrade(url, compressorInstalled, compressorEnabled, flagEnabled) {
 
 	try {
+		url.match(/revision\/([0-9a-z]+)\//);
+
 		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
 
 			luigifabVersioningInit();
 
-			if (go !== false) {
-				location.href = url;
+			var date = new Date(), text = '', appcode = '';
+
+			if ((compressorInstalled === true) && (flagEnabled === true))
+				text = 'versioning_uptext_compressor_upgradeflag';
+			else if (compressorInstalled === true)
+				text = 'versioning_uptext_compressor';
+			else if (flagEnabled === true)
+				text = 'versioning_uptext_upgradeflag';
+
+			if (text.length < 1) {
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1), apijs.i18n.translate('versioning_uptext'),
+					function (param) { return true; }, null, url, 'versioning'
+				);
 			}
 			else {
-				var date = new Date();
-				url.match(/revision\/([0-9a-z]+)\//);
+				appcode += date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '';
+				appcode += date.getHours() + '' + date.getMinutes() + '' + date.getSeconds();
 
-				if ((compressor === true) && (upgradeflag === true)) {
-					apijs.dialog.dialogFormOptions(
-						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-						apijs.i18n.translate('versioning_uptext_compressor_upgradeflag', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
-						luigifabVersioningUpgrade, true, url, 'versioning'
-					);
-					$('box').setAttribute('method', 'get');
-					$$('#box button').first().focus();
-				}
-				else if (compressor === true) {
-					apijs.dialog.dialogFormOptions(
-						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-						apijs.i18n.translate('versioning_uptext_compressor', date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds()),
-						luigifabVersioningUpgrade, true, url, 'versioning'
-					);
-					$('box').setAttribute('method', 'get');
-					$$('#box button').first().focus();
-				}
-				else if (upgradeflag === true) {
-					apijs.dialog.dialogFormOptions(
-						apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-						apijs.i18n.translate('versioning_uptext_upgradeflag'),
-						luigifabVersioningUpgrade, true, url, 'versioning'
-					);
-					$('box').setAttribute('method', 'get');
-					$$('#box button').first().focus();
-				}
-				else {
-					apijs.dialog.dialogConfirmation(apijs.i18n.translate('versioning_uptitle', RegExp.$1), apijs.i18n.translate('versioning_uptext'), luigifabVersioningUpgrade, url, 'versioning');
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate(text, appcode),
+					function (param) { return true; }, null, url, 'versioning big'
+				);
+
+				if (!compressorEnabled) {
+					$$('#box input[name="code"]').first().setAttribute('disabled', 'disabled');
+					$$('#box input[name="code"]').first().up().addClassName('disabled');
 				}
 			}
+
+			$('box').setAttribute('method', 'get');
+			$$('#box button').first().focus();
 
 			return false;
 		}
 		else {
-			url.match(/revision\/([0-9a-z]+)\//);
-			return confirm('Do you want to upgrade to revision ' + RegExp.$1 + '?');
+			return confirm('Do you want to upgrade to revision ' + RegExp.$1 + ' ?');
 		}
 	}
 	catch (e) {
-		url.match(/revision\/([0-9a-z]+)\//);
-		return confirm('Do you want to upgrade to revision ' + RegExp.$1 + '?');
+		return confirm('Do you want to upgrade to revision ' + RegExp.$1 + ' ?');
 	}
 }
 
-// demande de confirmation (suppression des historiques)
-function luigifabVersioningDelete(url, go) {
+// Demande de confirmation (suppression des historiques)
+// apijs.dialog.dialogConfirmation(string title, string text, function callback, object params, string icon)
+function luigifabVersioningDelete(url) {
 
 	try {
 		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
 
 			luigifabVersioningInit();
 
-			if (go !== false) {
-				location.href = url;
-			}
-			else {
-				apijs.dialog.dialogConfirmation(apijs.i18n.translate('versioning_deltitle'), apijs.i18n.translate('versioning_deltext'), luigifabVersioningUpgrade, url, 'versioning');
-			}
+			apijs.dialog.dialogConfirmation(
+				apijs.i18n.translate('versioning_deltitle'), apijs.i18n.translate('versioning_deltext'),
+				function (param) { location.href = param; }, url, 'versioning'
+			);
 
 			return false;
 		}
@@ -152,7 +132,7 @@ Array.prototype.remove = function (obj) {
 	return a;
 };
 
-if ((luigifab === null) && (typeof luigifab !== 'object'))
+if ((typeof luigifab !== 'object') || (luigifab === null))
 	var luigifab = { core: {} };
 
 Event.observe(window, 'load', startVersioning);
@@ -167,7 +147,7 @@ function startVersioning() {
 
 
 // #### Gestion de la représentation des branches BZR/GIT ################### //
-// = révision : 41
+// = révision : 42
 // » Crée une balise object qui contiendra la représentation des branches grâce à une image SVG
 // » Construit l'image SVG en fonction de la liste de commits, des tags et des branches
 // » En cas de pépin retour à l'état initial
@@ -179,7 +159,7 @@ luigifab.core.branchmanager = function () {
 		elem.setAttribute('data', SKIN_URL.substr(0, SKIN_URL.indexOf('adminhtml/')) + 'adminhtml/default/default/images/luigifab/versioning/branch.svg.php');
 		elem.setAttribute('type', 'image/svg+xml');
 		elem.setAttribute('width', 120);
-		elem.setAttribute('style', 'position:absolute;');
+		elem.setAttribute('style', 'position:absolute; opacity:0;');
 		elem.setAttribute('onload', 'luigifab.branchmanager.create();');
 		elem.setAttribute('id', 'svggraph');
 
@@ -372,6 +352,7 @@ luigifab.core.branchmanager = function () {
 
 		if (Prototype.Browser.Opera) {
 			$('svggraph').setAttribute('width', parseInt($('svggraph').getAttribute('width'), 10) + 10);
+			$('svggraph').getSVGDocument().getElementById('root').setAttribute('style', 'background-color:rgba(0, 0, 0, 0.05);');
 		}
 
 		// hauteur du graphique SVG par rapport au tableau
@@ -385,9 +366,9 @@ luigifab.core.branchmanager = function () {
 			$('svggraph').setAttribute('height', (lastTD.get('top') - firstTD.get('top') + height + 3));
 
 			if (Prototype.Browser.WebKit)
-				style = 'position:absolute; top:' + (firstTD.get('top') + 1) + 'px; left:' + (firstTD.get('left') + 2) + 'px;';
+				style = 'position:absolute; pointer-events:none; top:' + (firstTD.get('top') + 1) + 'px; left:' + (firstTD.get('left') + 2) + 'px;';
 			else
-				style = 'position:absolute; top:' + firstTD.get('top') + 'px; left:' + (firstTD.get('left') + 1) + 'px;';
+				style = 'position:absolute; pointer-events:none; top:' + firstTD.get('top') + 'px; left:' + (firstTD.get('left') + 1) + 'px;';
 		}
 		else {
 			firstTD = Position.positionedOffset($$('td.graph').first());

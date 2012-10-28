@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/13/10/2012
+ * Updated V/26/10/2012
  * Version 26
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -26,7 +26,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Gestion de la mise à jour ############################## debug ## i18n ## public ### //
-	// = révision : 52
+	// = révision : 53
 	// » Affiche l'état d'avancement de la mise à jour sous la forme d'une page html
 	// » Désactive toutes les touches du clavier et empèche la fermeture de la page
 	// » S'assure de ne pas intervernir juste après l'identification
@@ -68,12 +68,13 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n". 'p.first { border-bottom:1px dashed #111; }';
 		echo "\n". 'p.last { border-top:1px dashed #111; }';
 		echo "\n". 'p span { font-size:0.8em; font-style:italic; }';
-		echo "\n". 'pre { padding:1.4em 0; font:0.8em Verdana, sans-serif; line-height:1.4em; white-space:pre-wrap; }';
-		echo "\n". 'pre code { display:inline-block; margin:0.3em 0 0; font:1.1em monospace; line-height:1.5em; font-style:italic; color:#333; }';
+		echo "\n". 'pre { padding:1.4em 0; font:0.8em Verdana, sans-serif; line-height:140%; white-space:pre-wrap; }';
+		echo "\n". 'pre code { display:inline-block; margin:0.3em 0 0; font:11px monospace; line-height:16px; font-style:italic; color:#333; }';
 		echo "\n". 'pre code span { color:#555; }';
 		echo "\n". 'pre span.notice { font-size:0.85em; font-style:italic; color:#888; }';
 		echo "\n". 'pre span.error { font-size:0.85em; font-style:italic; color:red; }';
 		echo "\n".'</style>';
+		echo "\n".'<!--[if lt IE 9]><style type="text/css">object { display:none; }</style><![endif]-->';
 		echo "\n".'<script type="text/javascript">';
 		echo "\n". '// disable keys of keyboard';
 		echo "\n". 'function disableKeyboard(ev) {';
@@ -116,7 +117,15 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n".  'document.getElementById("state").getSVGDocument().getElementById("exclamA").setAttribute("fill", "'.$data['exclam'].'");';
 		echo "\n".  'document.getElementById("state").getSVGDocument().getElementById("exclamB").setAttribute("fill", "'.$data['exclam'].'");';
 		echo "\n". '}';
-		echo "\n". 'catch (ee) { }';
+		echo "\n". 'catch (ee) {';
+		echo "\n".  'if (!document.getElementById("state").getSVGDocument()) {';
+		echo "\n".   'document.getElementById("state").onload = function () {';
+		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("losange").setAttribute("fill", "'.$data['losange'].'");';
+		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("exclamA").setAttribute("fill", "'.$data['exclam'].'");';
+		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("exclamB").setAttribute("fill", "'.$data['exclam'].'");';
+		echo "\n".   '};';
+		echo "\n".  '}';
+		echo "\n". '}';
 		echo "\n".'</script>';
 
 		sleep(1);
@@ -346,7 +355,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 	// #### Gestion des commandes ########################################### public/private ### //
 	// = révision : 15
 	// » Affiche une commande ou une information pour savoir ce qu'il se passe
-	// » Ajoute un peu de code HTML pour faire jolie
+	// » Ajoute un peu de code HTML pour faire plus jolie
 	private function writeLog($data) {
 		file_put_contents(Mage::helper('versioning')->getHistoryFile(), '`'.implode('`,`', $data).'`'."\n", FILE_APPEND | LOCK_EX);
 	}

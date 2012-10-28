@@ -1,8 +1,8 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated D/29/07/2012
- * Version 8
+ * Updated V/26/10/2012
+ * Version 9
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -46,7 +46,7 @@ class Luigifab_Versioning_Block_Adminhtml_Lastlog extends Mage_Adminhtml_Block_W
 
 		$this->_addButton('delete', array(
 			'label'   => $this->helper('adminhtml')->__('Delete'),
-			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletelastlog')."', false);",
+			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletelastlog')."');",
 			'class'   => 'delete'
 		));
 	}

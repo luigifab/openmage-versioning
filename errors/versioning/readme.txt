@@ -12,13 +12,19 @@ if (file_exists($maintenanceFile)) {
 # by
 // https://redmine.luigifab.info/projects/magento/wiki/versioning
 // update /admin/ by your admin key
-if (file_exists('maintenance.flag') && (strpos($_SERVER['REQUEST_URI'], '/admin/') === false)) {
-    include_once(dirname(__FILE__).'/errors/versioning/503.php');
-    exit;
+if (file_exists('maintenance.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
+    $ipFile = './errors/versioning/config/503.ip';
+    if (!is_file($ipFile) || (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/versioning/503.php');
+        exit;
+    }
 }
-if (file_exists('upgrade.flag') && (strpos($_SERVER['REQUEST_URI'], '/admin/') === false)) {
-    include_once(dirname(__FILE__).'/errors/versioning/upgrade.php');
-    exit;
+if (file_exists('upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
+    $ipFile = './errors/versioning/config/upgrade.ip';
+    if (!is_file($ipFile) || (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/versioning/upgrade.php');
+        exit;
+    }
 }
 
 Secondly, copy errors/local.xml.sample to errors/local.xml.

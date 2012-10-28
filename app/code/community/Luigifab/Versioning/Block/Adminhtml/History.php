@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated D/29/07/2012
- * Version 6
+ * Updated V/26/10/2012
+ * Version 7
  *
  * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -46,7 +46,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 		$this->_addButton('delete', array(
 			'label'   => $this->helper('adminhtml')->__('Delete'),
-			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletehistory')."', false);",
+			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletehistory')."');",
 			'class'   => 'delete'
 		));
 	}

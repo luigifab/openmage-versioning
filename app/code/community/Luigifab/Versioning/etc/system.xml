@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated D/14/10/2012
- * Version 22
+ * Updated J/25/10/2012
+ * Version 23
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -176,6 +176,15 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</upgrade_content>
+						<upgrade_byip translate="label comment">
+							<label>Disable page from these IP addresses</label>
+							<comment>Addresses separated by space.</comment>
+							<sort_order>13</sort_order>
+							<frontend_type>text</frontend_type>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</upgrade_byip>
 						<report translate="label">
 							<label>Report</label>
 							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
@@ -224,6 +233,15 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</error503_content>
+						<error503_byip translate="label comment">
+							<label>Disable page from these IP addresses</label>
+							<comment>Addresses separated by space.</comment>
+							<sort_order>33</sort_order>
+							<frontend_type>text</frontend_type>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</error503_byip>
 						<error404 translate="label">
 							<label>Error 404</label>
 							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
