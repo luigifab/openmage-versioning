@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/21/09/2012
- * Version 18
+ * Updated L/29/09/2012
+ * Version 19
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 45
+	// = révision : 46
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande git log
 	// » Utilise GIT_SSH si le fichier de configuration existe
@@ -119,6 +119,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('versioning')->__('Unable to update the commit history from the remote repository.<br />This list corresponds to the history of the local repository.'));
 
 			$data = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
+			$count = 0;
 
 			$xml = new DOMDocument();
 			$xml->loadXML('<root>'.$data.'</root>');
@@ -141,12 +142,19 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				// branche et parents
 				$parents = explode(' ', $parents);
 
-				if (strlen($branch) > 0) {
+				if ($count++ < 1) {
+					$branch = $this->getCurrentBranch();
+				}
+				else if (strlen($branch) > 0) {
+
 					if (strpos($branch, ',') !== false)
-						$branch = str_replace('origin/', '', substr($branch, strrpos($branch, ',') + 2, -1));
+						$branch = trim(str_replace('origin/', '', substr($branch, strrpos($branch, ',') + 2, -1)));
 					else if (strpos($branch, 'origin/') !== false)
-						$branch = substr($branch, strrpos($branch, 'origin/') + 7, -1);
+						$branch = trim(substr($branch, strrpos($branch, 'origin/') + 7, -1));
 					else
+						$branch = '';
+
+					if (($branch === 'HEAD') || ($branch === 'head'))
 						$branch = '';
 				}
 				else {
@@ -213,7 +221,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Branche ################################################################# public ### //
-	// = révision : 9
+	// = révision : 10
 	// » Renvoie la branche actuelle
 	// » Extrait la branche à partir de la réponse de la commande git branch
 	public function getCurrentBranch() {
@@ -222,7 +230,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		$data = implode($data);
 		$data = (strpos($data, '*') !== false) ? trim(substr($data, 1)) : null;
 
-		return $data;
+		return trim($data);
 	}
 
 
