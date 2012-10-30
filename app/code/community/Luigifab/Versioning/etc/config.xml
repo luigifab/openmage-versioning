@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated L/29/09/2012
- * Version 19
+ * Updated M/30/10/2012
+ * Version 20
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>2.2.1</version>
+			<version>2.2.2</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated D/28/10/2012
- * Version 4
+ * Updated M/30/10/2012
+ * Version 5
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -23,8 +23,11 @@ class Luigifab_Versioning_Model_Observer {
 	// event admin_versioning_upgrade_before
 	public function beforeUpgradeEvent($observer) {
 
-		//array('repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision)
+		//array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this)
 		$event = $observer->getEvent();
+
+		$event->getController()->writeTitle('X) Before event');
+		$event->getController()->writeCommand('before event');
 
 		Mage::log('Luigifab_Versioning_Model_Observer::beforeUpgradeEvent, revision: '.$event->getRevision());
 	}
@@ -32,13 +35,17 @@ class Luigifab_Versioning_Model_Observer {
 	// event admin_versioning_upgrade_after
 	public function afterUpgradeEvent($observer) {
 
-		//array('repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision, 'exception' => $e)
+		//array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e)
 		$event = $observer->getEvent();
 
 		if (!is_null($event->getException())) {
+			$event->getController()->writeTitle('X) After event');
+			$event->getController()->writeCommand('after event');
 			Mage::log('Luigifab_Versioning_Model_Observer::afterUpgradeEvent, revision: '.$event->getRevision().', exception: '.$event->getException()->getMessage());
 		}
 		else {
+			$event->getController()->writeTitle('X) After event');
+			$event->getController()->writeCommand('after event');
 			Mage::log('Luigifab_Versioning_Model_Observer::afterUpgradeEvent, revision: '.$event->getRevision());
 		}
 	}
@@ -63,9 +70,9 @@ class Luigifab_Versioning_Model_Observer {
 
 
 	// #### Mise à jour de la configuration ######################################### public ### //
-	// = révision : 5
-	// » Met à jour les fichiers de traduction pour chaque langue
-	// » Met aussi à jour les adresses IP à exclure
+	// = révision : 6
+	// » Met à jour les fichiers de traduction par rapport à la configuration
+	// » Met aussi à jour les adresses IP à exclure (en ajoutant un tiret avant et après chaque adresse)
 	public function updateConfig() {
 
 		$this->checkAllDir();

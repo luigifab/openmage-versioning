@@ -1,5 +1,5 @@
 /**
- * Created J/22/12/2011, Updated V/26/10/2012, Version 19
+ * Created J/22/12/2011, Updated L/29/10/2012, Version 19
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -57,17 +57,17 @@ function luigifabVersioningUpgrade(url, compressorInstalled, compressorEnabled, 
 			if (text.length < 1) {
 				apijs.dialog.dialogFormOptions(
 					apijs.i18n.translate('versioning_uptitle', RegExp.$1), apijs.i18n.translate('versioning_uptext'),
-					function (param) { return true; }, null, url, 'versioning'
+					function () { return true; }, null, url, 'versioning'
 				);
 			}
 			else {
-				appcode += date.getFullYear() + '' + date.getMonth() + '' + date.getDate() + '';
-				appcode += date.getHours() + '' + date.getMinutes() + '' + date.getSeconds();
+				appcode = appcode.concat(date.getFullYear(), '', date.getMonth(), '', date.getDate(), '');
+				appcode = appcode.concat(appcode, date.getHours(), '', date.getMinutes(), '', date.getSeconds());
 
 				apijs.dialog.dialogFormOptions(
 					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
 					apijs.i18n.translate(text, appcode),
-					function (param) { return true; }, null, url, 'versioning big'
+					function () { return true; }, null, url, 'versioning big'
 				);
 
 				if (!compressorEnabled) {

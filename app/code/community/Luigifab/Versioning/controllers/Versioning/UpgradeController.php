@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/26/10/2012
- * Version 26
+ * Updated M/30/10/2012
+ * Version 27
  *
  * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -152,8 +152,8 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 	}
 
 
-	// #### Gestion de la mise à jour ############################# debug ## i18n ## private ### //
-	// = révision : 71
+	// #### Gestion de la mise à jour ################# dispatch ## debug ## i18n ## private ### //
+	// = révision : 72
 	// » Log les informations du processus de mise à jour
 	// » Met à jour le code application, purge le cache et régénère les fichiers minifiés lorsque nécessaire
 	// » Informe l'utiliseur en cas de changement de version
@@ -189,13 +189,6 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 			$version = array_pop($version);
 
-			// *** Événement before **************************** //
-			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
-				Mage::dispatchEvent('admin_versioning_upgrade_before', array(
-					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision
-				));
-			}
-
 			// *** ÉTAPE 1 ************************************* //
 			$this->writeTitle($this->__('1) Locking and configuration check'));
 
@@ -222,6 +215,12 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 			}
 			else {
 				file_put_contents($lock, $logger['current_rev'].' » '.$logger['target_rev'].' from '.$logger['remote_addr'].' by '.$logger['user']);
+			}
+
+			// *** Événement before **************************** //
+			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
+				Mage::dispatchEvent('admin_versioning_upgrade_before',
+					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
 			}
 
 			// *** ÉTAPE 2 ************************************* //
@@ -270,6 +269,12 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 			$this->writeCommand(implode("\n", $messages));
 
+			// *** Événement after ***************************** //
+			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
+				Mage::dispatchEvent('admin_versioning_upgrade_after',
+					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
+			}
+
 			// *** ÉTAPE 5 ************************************* //
 			$this->writeTitle($this->__('4) Unlocking'));
 			unlink($lock);
@@ -305,13 +310,6 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 				unlink($log);
 
 			Mage::getSingleton('adminhtml/session')->addSuccess($this->__('Upgrade to revision %s completed.', $targetRevision));
-
-			// *** Événement after ***************************** //
-			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
-				Mage::dispatchEvent('admin_versioning_upgrade_after', array(
-					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision
-				));
-			}
 		}
 		catch (Exception $e) {
 
@@ -330,9 +328,6 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 				$this->writeTitle($this->__('4) Unlocking'));
 				unlink($lock);
-
-				if (is_file($flag))
-					unlink($flag);
 			}
 			else {
 				$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
@@ -341,9 +336,8 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 			// *** Événement after ***************************** //
 			if (Mage::getStoreConfig('versioning/scm/events') === '1') {
-				Mage::dispatchEvent('admin_versioning_upgrade_after', array(
-					'repository' => $repository, 'logger' => $logger, 'status' => $status, 'revision' => $targetRevision, 'exception' => $e
-				));
+				Mage::dispatchEvent('admin_versioning_upgrade_after',
+					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e));
 			}
 		}
 
@@ -353,14 +347,14 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Gestion des commandes ########################################### public/private ### //
-	// = révision : 15
+	// = révision : 16
 	// » Affiche une commande ou une information pour savoir ce qu'il se passe
 	// » Ajoute un peu de code HTML pour faire plus jolie
 	private function writeLog($data) {
 		file_put_contents(Mage::helper('versioning')->getHistoryFile(), '`'.implode('`,`', $data).'`'."\n", FILE_APPEND | LOCK_EX);
 	}
 
-	private function writeTitle($data) {
+	public function writeTitle($data) {
 		sleep(1);
 		echo "\n",$data,"\n";
 	}
