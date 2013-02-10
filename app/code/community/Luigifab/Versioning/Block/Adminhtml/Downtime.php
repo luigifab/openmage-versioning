@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/02/06/2012
- * Updated D/28/10/2012
- * Version 10
+ * Updated S/09/02/2013
+ * Version 13
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -27,7 +27,7 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 		$this->_controller = 'adminhtml_downtime';
 		$this->_blockGroup = 'versioning';
 
-		$this->_headerText = $this->__('Downtime');
+		$this->_headerText = '<span class="'.Mage::getStoreConfig('versioning/scm/type').'">'.$this->__('Downtime').'</span>';
 		$this->_removeButton('edit');
 		$this->_removeButton('back');
 
@@ -35,7 +35,7 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 			$this->_addButton('versioning', array(
 				'label'   => $this->__('Versioning'),
 				'onclick' => "location.href = '".$this->getUrl('*/versioning_repository/index')."';",
-				'class'   => 'back'
+				'class'   => 'go'
 			));
 		}
 
@@ -55,11 +55,11 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 		$maintenanceFlag = is_file(Mage::helper('versioning')->getMaintenanceFlag());
 		$upgradeFlag = is_file(Mage::helper('versioning')->getUpgradeFlag());
 
-		$ipFile = './errors/versioning/config/503.ip';
+		$ipFile = BP.'/errors/versioning/config/503.ip';
 		$maintenanceIp = (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') !== false));
 		$maintenanceNobody = (strlen(trim(Mage::getStoreConfig('versioning/downtime/error503_byip'))) < 1);
 
-		$ipFile = './errors/versioning/config/upgrade.ip';
+		$ipFile = BP.'/errors/versioning/config/upgrade.ip';
 		$upgradeIp = (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') !== false));
 		$upgradeNobody = (strlen(trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'))) < 1);
 
@@ -74,7 +74,7 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 			}
 			else if ($maintenanceIp) {
 				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
-				$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->getBaseUrl().'" onclick="window.open(this.href); return false;"').'</p>';
+				$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->helper('versioning')->getFrontendUrl().'" onclick="window.open(this.href); return false;"').'</p>';
 			}
 			else {
 				$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
@@ -111,7 +111,7 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 				}
 				else if ($upgradeIp) {
 					$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));
-					$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->getBaseUrl().'" onclick="window.open(this.href); return false;"').'</p>';
+					$html[] = '<br />'.$this->__('You have access to the <a %s>frontend</a>.', 'href="'.$this->helper('versioning')->getFrontendUrl().'" onclick="window.open(this.href); return false;"').'</p>';
 				}
 				else {
 					$html[] = '<p class="ip">'.$this->__('Your IP address: <strong>%s</strong>.', getenv('REMOTE_ADDR'));

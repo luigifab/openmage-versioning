@@ -1,10 +1,10 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated V/26/10/2012
- * Version 9
+ * Updated D/03/02/2013
+ * Version 10
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -27,7 +27,7 @@ class Luigifab_Versioning_Block_Adminhtml_Lastlog extends Mage_Adminhtml_Block_W
 		$this->_controller = 'adminhtml_lastlog';
 		$this->_blockGroup = 'versioning';
 
-		$this->_headerText = $this->__('Upgrade log');
+		$this->_headerText = '<span class="'.Mage::getStoreConfig('versioning/scm/type').'">'.$this->__('Upgrade log').'</span>';
 		$this->_removeButton('edit');
 
 		$this->_addButton('back', array(

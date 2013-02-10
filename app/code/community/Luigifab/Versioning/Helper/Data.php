@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/27/10/2012
- * Version 22
+ * Updated S/09/02/2013
+ * Version 24
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -24,8 +24,13 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return (string) Mage::getConfig()->getModuleConfig('Luigifab_Versioning')->version;
 	}
 
+	public function getFrontendUrl() {
+		return Mage::getUrl('', array('_store' => Mage::app()->getDefaultStoreView()->getStoreId(), '_type' => 'direct_link'));
+	}
+
 	public function isCompressorInstalled() {
-		return (is_file(Mage::getBaseDir('code').'/community/Luigifab/Compressor/Block/Head.php')) ? true : false;
+		return (is_file(Mage::getBaseDir('code').'/community/Luigifab/Compressor/Block/Head.php') &&
+		        (Mage::getConfig()->getNode('modules/Luigifab_Compressor') !== false)) ? true : false;
 	}
 
 	public function isCompressorEnabled() {
@@ -79,14 +84,14 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	public function checkIndexPhp() {
-		$content = file_get_contents('./index.php');
+		$content = file_get_contents(BP.'/index.php');
 		return ((strpos($content, 'upgrade.flag') !== false) && (strpos($content, '$ipFile') !== false)) ? true : false;
 	}
 
 	public function checkLocalXml() {
 
-		if (is_file('./errors/local.xml')) {
-			$content = file_get_contents('./errors/local.xml');
+		if (is_file(BP.'/errors/local.xml')) {
+			$content = file_get_contents(BP.'/errors/local.xml');
 			return (strpos($content, '<skin>versioning</skin>') !== false) ? true : false;
 		}
 		else {

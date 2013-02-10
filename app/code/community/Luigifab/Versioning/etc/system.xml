@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!--
  * Created S/03/12/2011
- * Updated J/25/10/2012
- * Version 23
+ * Updated S/09/02/2013
+ * Version 25
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -78,7 +78,7 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
 						</maintenance>
-						<events translate="label comment">
+						<events translate="label comment" module="versioning">
 							<label>Enable events</label>
 							<comment>For developers (before and after events).</comment>
 							<frontend_type>select</frontend_type>
@@ -146,7 +146,7 @@
 					<show_in_store>1</show_in_store>
 					<fields>
 						<header>
-							<frontend_model>versioning/notice</frontend_model>
+							<frontend_model>versioning/adminhtml_config_notice</frontend_model>
 							<sort_order>-1</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
@@ -154,7 +154,7 @@
 						</header>
 						<upgrade translate="label">
 							<label>Upgrade</label>
-							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+							<frontend_model>versioning/adminhtml_config_heading</frontend_model>
 							<sort_order>10</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
@@ -176,7 +176,7 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</upgrade_content>
-						<upgrade_byip translate="label comment">
+						<upgrade_byip translate="label comment" module="versioning">
 							<label>Disable page from these IP addresses</label>
 							<comment>Addresses separated by space.</comment>
 							<sort_order>13</sort_order>
@@ -187,7 +187,7 @@
 						</upgrade_byip>
 						<report translate="label">
 							<label>Report</label>
-							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+							<frontend_model>versioning/adminhtml_config_heading</frontend_model>
 							<sort_order>20</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
@@ -211,7 +211,7 @@
 						</report_content>
 						<error503 translate="label">
 							<label>Error 503</label>
-							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+							<frontend_model>versioning/adminhtml_config_heading</frontend_model>
 							<sort_order>30</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
@@ -233,7 +233,7 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</error503_content>
-						<error503_byip translate="label comment">
+						<error503_byip translate="label comment" module="versioning">
 							<label>Disable page from these IP addresses</label>
 							<comment>Addresses separated by space.</comment>
 							<sort_order>33</sort_order>
@@ -244,7 +244,7 @@
 						</error503_byip>
 						<error404 translate="label">
 							<label>Error 404</label>
-							<frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+							<frontend_model>versioning/adminhtml_config_heading</frontend_model>
 							<sort_order>40</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>

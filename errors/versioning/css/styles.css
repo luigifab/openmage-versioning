@@ -1,8 +1,8 @@
 @charset "utf-8";
 /**
- * Created D/03/06/2012, Updated J/25/10/2012, Version 5
+ * Created D/03/06/2012, Updated J/06/02/2013, Version 6
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,9 +18,9 @@ div.box div.number { margin:0 0 0.5em -0.1em; font-size:4em; font-weight:bold; c
 
 div.box div.number span {
 	display:inline-block; margin-right:0.1em; width:1.3em; height:1.3em; line-height:135%; text-align:center;
-	border-radius:50%; -khtml-border-radius:50%; -moz-border-radius:50%; -webkit-border-radius:50%;
-	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
 	border-bottom:1px solid #CACACA; background-color:#EEE;
+	border-radius:50%; -moz-border-radius:50%; -webkit-border-radius:50%;
+	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
 }
 
 div.box h1 { margin:0 0 1em; font-size:1.2em; font-weight:bold; color:black; }
@@ -28,14 +28,13 @@ div.box p { margin:1em auto; line-height:140%; color:#111; }
 
 pre {
 	position:absolute; bottom:-1px; left:0; right:0; margin:auto; padding:1em 1em 0; width:80%; height:20%; overflow:auto; z-index:175;
-	font:0.85em "DejaVu Sans", Verdana, sans-serif; white-space:pre-wrap; word-wrap:break-word; line-height:160%;
+	font:0.85em "DejaVu Sans", Verdana, sans-serif; line-height:160%; white-space:pre-wrap; word-wrap:break-word;
 	border:1px solid #CCC; color:#777; background-color:#E8E8E8;
-	border-radius:0.9em 0.9em 0 0; -khtml-border-radius:0.9em 0.9em 0 0; -moz-border-radius:0.9em 0.9em 0 0; -webkit-border-radius:0.9em 0.9em 0 0;
+	transition:height 0.8s; -moz-transition:height 0.8s; -o-transition:height 0.8s; -webkit-transition:height 0.8s;
+	border-radius:0.9em 0.9em 0 0; -moz-border-radius:0.9em 0.9em 0 0; -webkit-border-radius:0.9em 0.9em 0 0;
 	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
-	transition-duration:1s; -moz-transition-duration:1s; -ms-transition-duration:1s; -o-transition-duration:1s; -webkit-transition-duration:1s;
-	transition-property:height; -moz-transition-property:height; -ms-transition-property:height; -o-transition-property:height; -webkit-transition-property:height;
 }
 
-pre.up:hover { height:95%; }
+pre.up:hover { height:92%; }
 pre a { color:#333; }
 

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/26/10/2012
- * Version 21
+ * Updated J/07/02/2013
+ * Version 22
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -93,6 +93,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'filter'   => false
 		));
 
+		$upgradeFlag = ($this->helper('versioning')->checkIndexPhp() && $this->helper('versioning')->checkLocalXml() && (Mage::getStoreConfig('versioning/scm/maintenance') === '1')) ? true : false;
+
 		$this->addColumn('action', array(
 			'header'  =>  $this->helper('adminhtml')->__('Action'),
 			'width'   => '60px',
@@ -104,7 +106,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => '*/versioning_upgrade/run'),
 					'field'   => 'revision',
-					'onclick' => 'return luigifabVersioningUpgrade(this.href, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->helper('versioning')->isCompressorEnabled()) ? 'true' : 'false').', '.(($this->checkUseUpgradeFlag()) ? 'true' : 'false').');'
+					'onclick' => 'return luigifabVersioningUpgrade(this.href, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->helper('versioning')->isCompressorEnabled()) ? 'true' : 'false').', '.(($upgradeFlag) ? 'true' : 'false').');'
 				)
 			),
 			'sortable'  => false,
@@ -117,13 +119,5 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 	public function getRowUrl($row) {
 		// rien à faire
-	}
-
-	private function checkUseUpgradeFlag() {
-
-		if (!is_bool($this->upgradeFlag))
-			$this->upgradeFlag = ($this->helper('versioning')->checkIndexPhp() && $this->helper('versioning')->checkLocalXml() && (Mage::getStoreConfig('versioning/scm/maintenance') === '1')) ? true : false;
-
-		return $this->upgradeFlag;
 	}
 }

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated L/29/09/2012
- * Version 19
+ * Updated D/03/02/2013
+ * Version 20
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -59,13 +59,12 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 46
+	// = révision : 47
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande git log
 	// » Utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitCollection() {
 
-		$bugtracker = trim(Mage::getStoreConfig('versioning/tweak/bugtracker'));
 		$controller = Mage::app()->getRequest()->getControllerName();
 		$network = 'ssh: Could not resolve hostname';
 
@@ -161,24 +160,14 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 					$branch = '';
 				}
 
-				// bug tracker
-				if (strlen($bugtracker) > 0) {
-					$author = preg_replace('#<[^>]+>#', '', $author);
-					$description = preg_replace('#\#([0-9]+)#', '<a href="'.$bugtracker.'$1" class="issue" onclick="window.open(this.href); return false;">$1</a>', $description);
-				}
-				else {
-					$author = preg_replace('#<[^>]+>#', '', $author);
-					$description = preg_replace('#\#([0-9]+)#', '<span class="issue">$1</span>', $description);
-				}
-
 				$commitEntry = new Varien_Object();
 				$commitEntry->setRevision($revision);
 				$commitEntry->setTags($tags);
 				$commitEntry->setBranchName($branch);
 				$commitEntry->setParents($parents);
-				$commitEntry->setAuthor($author);
+				$commitEntry->setAuthor(preg_replace('#<[^>]+>#', '', $author));
 				$commitEntry->setDate(date('c', strtotime($timestamp)));
-				$commitEntry->setDescription(nl2br($description));
+				$commitEntry->setDescription($description);
 
 				$this->commitCollection->addItem($commitEntry);
 			}
@@ -221,7 +210,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Branche ################################################################# public ### //
-	// = révision : 10
+	// = révision : 11
 	// » Renvoie la branche actuelle
 	// » Extrait la branche à partir de la réponse de la commande git branch
 	public function getCurrentBranch() {
@@ -230,7 +219,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		$data = implode($data);
 		$data = (strpos($data, '*') !== false) ? trim(substr($data, 1)) : null;
 
-		return trim($data);
+		return $data;
 	}
 
 

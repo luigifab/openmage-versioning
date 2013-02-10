@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/08/06/2012
- * Updated J/20/09/2012
- * Version 6
+ * Updated D/03/02/2013
+ * Version 7
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,10 +22,14 @@ class Luigifab_Versioning_Block_Adminhtml_Widget_Graph extends Mage_Adminhtml_Bl
 
 	public function render(Varien_Object $row) {
 
+		$parents = implode(' ', $row->getParents());
+		$revision = str_replace('.', '-', $row->getRevision());
+		$tags = implode(' ', $row->getTags());
+
 		$graph = array(
-			'<input type="hidden" value="'.implode(' ', $row->getParents()).'" class="parents rev-'.str_replace('.', '-', $row->getRevision()).' parent-'.implode(' parent-', $row->getParents()).'" />',
-			'<input type="hidden" value="'.implode(' ', $row->getTags()).'" class="tags rev-'.str_replace('.', '-', $row->getRevision()).'" />',
-			'<input type="hidden" value="'.$row->getRevision().'" class="revision rev-'.str_replace('.', '-', $row->getRevision()).'" />',
+			'<input type="hidden" value="'.$parents.'" class="parents rev-'.$revision.' parent-'.implode(' parent-', $row->getParents()).'" />',
+			'<input type="hidden" value="'.$tags.'" class="tags rev-'.$revision.'" />',
+			'<input type="hidden" value="'.$row->getRevision().'" class="revision rev-'.$revision.'" />',
 			'<input type="hidden" value="'.$row->getBranchName().'" class="branch" />'
 		);
 

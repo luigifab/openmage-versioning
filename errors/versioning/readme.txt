@@ -3,13 +3,12 @@ To do this, you must update your index.php file and configure errors template.
 
 First, open index.php file:
 
-# replace
+## replace ##
 if (file_exists($maintenanceFile)) {
     include_once dirname(__FILE__).'/errors/503.php';
     exit;
 }
-
-# by
+## by ##
 // https://redmine.luigifab.info/projects/magento/wiki/versioning
 // update /admin/ by your admin key
 if (file_exists('maintenance.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
@@ -26,8 +25,10 @@ if (file_exists('upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') ===
         exit;
     }
 }
+## end ##
 
 Secondly, copy errors/local.xml.sample to errors/local.xml.
 Open it, replace <skin>default</skin> by <skin>versioning</skin> and save it.
 
 That's it.
+To change CSS, write your rules into 'errors/versioning/config/user.css' file.

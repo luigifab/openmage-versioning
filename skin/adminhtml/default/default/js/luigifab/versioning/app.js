@@ -1,13 +1,13 @@
 /**
- * Created J/22/12/2011, Updated L/29/10/2012, Version 19
+ * Created J/22/12/2011, Updated S/09/02/2013, Version 24
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
  *
- * JSLint: Prototype $ $$ Event Element Position SKIN_URL apijs luigifab startVersioning
+ * JSLint: Prototype $ $$ Event Element Position Translator SKIN_URL apijs luigifab startVersioning
  * sloppy: true, white: true, browser: true, devel: true, plusplus: true, maxerr: 1000
  */
 
@@ -34,64 +34,10 @@ function luigifabVersioningInit() {
 	apijs.i18n.data.fr.versioning_deltext = "Êtes-vous sûr de vouloir supprimer cet historique ?[br]Attention, cette opération ne peut pas être annulée.";
 }
 
-// Demande de confirmation (livraison)
-// apijs.dialog.dialogFormOptions(string title, string text, function callback, object params, string action, string icon)
-function luigifabVersioningUpgrade(url, compressorInstalled, compressorEnabled, flagEnabled) {
-
-	try {
-		url.match(/revision\/([0-9a-z]+)\//);
-
-		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
-
-			luigifabVersioningInit();
-
-			var date = new Date(), text = '', appcode = '';
-
-			if ((compressorInstalled === true) && (flagEnabled === true))
-				text = 'versioning_uptext_compressor_upgradeflag';
-			else if (compressorInstalled === true)
-				text = 'versioning_uptext_compressor';
-			else if (flagEnabled === true)
-				text = 'versioning_uptext_upgradeflag';
-
-			if (text.length < 1) {
-				apijs.dialog.dialogFormOptions(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1), apijs.i18n.translate('versioning_uptext'),
-					function () { return true; }, null, url, 'versioning'
-				);
-			}
-			else {
-				appcode = appcode.concat(date.getFullYear(), '', date.getMonth(), '', date.getDate(), '');
-				appcode = appcode.concat(appcode, date.getHours(), '', date.getMinutes(), '', date.getSeconds());
-
-				apijs.dialog.dialogFormOptions(
-					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
-					apijs.i18n.translate(text, appcode),
-					function () { return true; }, null, url, 'versioning big'
-				);
-
-				if (!compressorEnabled) {
-					$$('#box input[name="code"]').first().setAttribute('disabled', 'disabled');
-					$$('#box input[name="code"]').first().up().addClassName('disabled');
-				}
-			}
-
-			$('box').setAttribute('method', 'get');
-			$$('#box button').first().focus();
-
-			return false;
-		}
-		else {
-			return confirm('Do you want to upgrade to revision ' + RegExp.$1 + ' ?');
-		}
-	}
-	catch (e) {
-		return confirm('Do you want to upgrade to revision ' + RegExp.$1 + ' ?');
-	}
-}
 
 // Demande de confirmation (suppression des historiques)
-// apijs.dialog.dialogConfirmation(string title, string text, function callback, object params, string icon)
+// apijs.dialog.dialogConfirmation(string title, string text, function callback, mixed callbackParams, string icon)
+// confirm(string text)
 function luigifabVersioningDelete(url) {
 
 	try {
@@ -106,13 +52,88 @@ function luigifabVersioningDelete(url) {
 
 			return false;
 		}
-		else {
-			return confirm('Are you sure ?');
+
+		return confirm('Are you sure ?');
+	}
+	catch (e) {
+		console.log('luigifabVersioningDelete: ' + e);
+		return confirm('Are you sure ?');
+	}
+}
+
+// Demande de confirmation (mise à jour)
+// apijs.dialog.dialogFormOptions(string title, string text, string action, function callback, mixed callbackParams, string icon)
+function luigifabVersioningUpgrade(url, compressorInstalled, compressorEnabled, flagEnabled) {
+
+	try {
+		if ((apijs !== null) && (typeof apijs === 'object') && (typeof apijs.core === 'object')) {
+
+			luigifabVersioningInit();
+
+			var text, appcode = '', date = new Date();
+			appcode = appcode.concat(date.getFullYear());
+			appcode = appcode.concat((date.getMonth() < 10) ? '0' + date.getMonth() : date.getMonth());
+			appcode = appcode.concat((date.getDate() < 10) ? '0' + date.getDate() : date.getDate());
+			appcode = appcode.concat((date.getHours() < 10) ? '0' + date.getHours() : date.getHours());
+			appcode = appcode.concat((date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes());
+			appcode = appcode.concat((date.getSeconds() < 10) ? '0' + date.getSeconds() : date.getSeconds());
+
+			url.match(/revision\/([0-9a-z]+)\//);
+
+			if ((compressorInstalled === true) && (flagEnabled === true)) {
+				text = apijs.i18n.translate('versioning_uptext_compressor_upgradeflag', appcode);
+			}
+			else if (compressorInstalled === true) {
+				text = apijs.i18n.translate('versioning_uptext_compressor', appcode);
+			}
+			else if (flagEnabled === true) {
+				text = apijs.i18n.translate('versioning_uptext_upgradeflag');
+			}
+			else {
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1),
+					apijs.i18n.translate('versioning_uptext') + " [input type='hidden' name='confirm' value='true']",
+					url, function () { return true; }, null, 'versioning'
+				);
+			}
+
+			if ((compressorInstalled === true) || (flagEnabled === true)) {
+
+				apijs.dialog.dialogFormOptions(
+					apijs.i18n.translate('versioning_uptitle', RegExp.$1), text + " [input type='hidden' name='confirm' value='true']",
+					url, function () { return true; }, null, 'versioning big'
+				);
+
+				if (!compressorEnabled) {
+					$$('#box input[name="code"]').first().setAttribute('disabled', 'disabled');
+					$$('#box input[name="code"]').first().up().addClassName('disabled');
+				}
+			}
+
+			$('box').setAttribute('method', 'get');
+			$$('#box button').first().focus();
+
+			return false;
 		}
 	}
 	catch (e) {
-		return confirm('Are you sure ?');
+		console.log('luigifabVersioningUpgrade: ' + e);
 	}
+}
+
+// Validation de la demande de confirmation sans apijs
+function luigifabConfirmUpgrade(text) {
+
+	$('confirmForm').down('p').style.visibility = 'hidden';
+	$('confirmForm').down('ul').style.visibility = 'hidden';
+	$('confirmForm').select('button').invoke('addClassName', 'disabled');
+	$('confirmForm').select('button').invoke('setAttribute', 'disabled', 'disabled');
+
+	var elem = document.createElement('p');
+	elem.setAttribute('class', 'saving');
+	elem.appendChild(document.createTextNode(text));
+
+	$('confirmForm').appendChild(elem);
 }
 
 
@@ -139,7 +160,7 @@ Event.observe(window, 'load', startVersioning);
 
 function startVersioning() {
 
-	if ($('versioningGrid') && ($$('#versioningGrid td.graph').length > 0)) {
+	if ($('versioningGrid') && ($$('td.graph').length > 0) && (navigator.userAgent.indexOf('MSIE 8') < 0)) {
 		luigifab.branchmanager = new luigifab.core.branchmanager();
 		luigifab.branchmanager.init();
 	}

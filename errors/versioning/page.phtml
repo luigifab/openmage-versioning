@@ -1,10 +1,10 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated D/03/06/2012
- * Version 3
+ * Updated S/09/02/2013
+ * Version 6
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -31,14 +31,20 @@ else {
 <head>
 	<title><?php echo $this->overload->translate('Oups!') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo substr($_SESSION['lang'], 0, 2) ?>" />
 
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl() ?>css/styles.css" />
-	<link rel="icon" type="image/x-icon" href="<?php echo $this->getBaseUrl() ?>favicon.ico" />
+	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getUrl('errors/versioning/css/styles.css') ?>" />
+	<?php if ($this->hasUserCssFile()): ?>
+		<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getUrl('errors/versioning/config/user.css') ?>" />
+	<?php endif ?>
+
+	<link rel="icon" type="image/x-icon" href="<?php echo $this->getUrl('favicon.ico') ?>" />
 </head>
 
 <body>
 	<?php require_once($contentTemplate) ?>
+
 </body>
 </html>

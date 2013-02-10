@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/01/04/2012
- * Version 2
+ * Updated D/03/02/2013
+ * Version 3
  *
- * Copyright 2011-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,6 +21,18 @@
 class Luigifab_Versioning_Block_Adminhtml_Widget_Description extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
 
 	public function render(Varien_Object $row) {
-		return $row->getDescription();
+
+		$bugtracker = trim(Mage::getStoreConfig('versioning/tweak/bugtracker'));
+		$description = nl2br($row->getDescription());
+
+		if (strlen($bugtracker) > 0) {
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" onclick="window.open(this.href); return false;">$1</a>', $description);
+			$description = preg_replace('#\#([0-9]+)#', '<a href="'.$bugtracker.'$1" class="issue" onclick="window.open(this.href); return false;">$1</a>', $description);
+		}
+		else {
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" onclick="window.open(this.href); return false;">$1</a>', $description);
+		}
+
+		return $description;
 	}
 }

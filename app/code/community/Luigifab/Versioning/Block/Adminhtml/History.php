@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated V/26/10/2012
- * Version 7
+ * Updated D/03/02/2013
+ * Version 8
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -49,5 +49,9 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletehistory')."');",
 			'class'   => 'delete'
 		));
+	}
+
+	public function getHeaderCssClass() {
+		return 'icon-head '.parent::getHeaderCssClass().' '.Mage::getStoreConfig('versioning/scm/type');
 	}
 }

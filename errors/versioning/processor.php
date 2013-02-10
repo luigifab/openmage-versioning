@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/20/09/2012
- * Version 7
+ * Updated S/09/02/2013
+ * Version 11
  *
- * Copyright 2010-2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2010-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  * http://www.luigifab.info/apijs
  *
@@ -22,24 +22,26 @@
 class Versioning_Processor extends Error_Processor {
 
 	// définition des attributs
-	private $debug = false;
+	private $preview = false;
 	private $dataReady = false;
-
 	private $dataSource = array();
 	private $dataTranslated = array();
 
 
 	// #### Initialisation ############################################### rewrite ## public ### //
-	// = révision : 11
-	// » Éxécute la fonction construct de Magento
+	// = révision : 15
 	// » Charge le fichier de traduction en fonction de la langue du navigateur
+	// » Prend en charge un appel direct pour prévisualisation (détection via le fichier ./readme.txt)
 	public function __construct() {
 
 		parent::__construct();
 
-		// gestion de la langue à partir du navigateur (si la langue n'est pas encore définie)
+		if (is_file('./readme.txt'))
+			$this->preview = true;
+
 		$list = array('fr_FR', 'en_US');
 
+		// gestion de la langue à partir du navigateur (si la langue n'est pas encore définie)
 		if (strlen($_SERVER['HTTP_ACCEPT_LANGUAGE']) === 5)
 			$lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)).'_'.strtoupper(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 3, 2));
 		else
@@ -53,47 +55,94 @@ class Versioning_Processor extends Error_Processor {
 			$_SESSION['lang'] = 'en_US';
 
 		// chargement des traductions
-		// le premier contient les traductions par défaut du module
-		// le second contient les traductions configurées dans le backend (s'il est disponible)
-		$this->loadCSV('./errors/versioning/locale/'.$_SESSION['lang'].'2.csv');
-		$this->loadCSV('./errors/versioning/locale/'.$_SESSION['lang'].'.csv');
+		// le premier contient les traductions configurées dans le backend
+		// le second contient les traductions par défaut
+		$this->loadCSV($this->preview ? './locale/'.$_SESSION['lang'].'2.csv' : './errors/versioning/locale/'.$_SESSION['lang'].'2.csv');
+		$this->loadCSV($this->preview ? './locale/'.$_SESSION['lang'].'.csv'  : './errors/versioning/locale/'.$_SESSION['lang'].'.csv');
 	}
 
+
+	// #### Définition des pages #################################################### public ### //
+	// = révision : 12
+	// » Déclare les pages upgrade, report, 503 et 404
+	// » Charge les templates et affiche le résultat après avoir supprimé les espaces inutiles
 	public function processUpgrade() {
+
 		$this->_sendHeaders(503);
-		$this->_renderPage('upgrade.phtml');
+
+		$baseTemplate = $this->_getTemplatePath('page.phtml');
+		$contentTemplate = str_replace('page.phtml', 'upgrade.phtml', $baseTemplate);
+
+		$this->renderPage($baseTemplate, $contentTemplate);
+	}
+
+	public function processReport() {
+
+		$this->_sendHeaders(503);
+
+		$baseTemplate = $this->_getTemplatePath('page.phtml');
+		$contentTemplate = str_replace('page.phtml', 'report.phtml', $baseTemplate);
+
+		$this->renderPage($baseTemplate, $contentTemplate);
+	}
+
+	public function process503() {
+
+		$this->_sendHeaders(503);
+
+		$baseTemplate = $this->_getTemplatePath('page.phtml');
+		$contentTemplate = str_replace('page.phtml', '503.phtml', $baseTemplate);
+
+		$this->renderPage($baseTemplate, $contentTemplate);
+	}
+
+	public function process404() {
+
+		$this->_sendHeaders(404);
+
+		$baseTemplate = $this->_getTemplatePath('page.phtml');
+		$contentTemplate = str_replace('page.phtml', '404.phtml', $baseTemplate);
+
+		$this->renderPage($baseTemplate, $contentTemplate);
+	}
+
+	private function renderPage($baseTemplate, $contentTemplate) {
+
+		ob_start();
+		require_once($baseTemplate);
+		$html = ob_get_flush();
+		ob_end_clean();
+
+		echo str_replace(array("\n\n","\t",'  ',"\n\n",'  '), array("\n",'',' ',"\n",' '), $html);
 	}
 
 
-	// #### Chargement d'un fichier de traduction ################################## private ### //
-	// = révision : 11
-	// » Récupère le contenu du fichier de traduction et le sauvegarde dans deux tableaux
-	// » Le premier tableau contient le mot anglais et le deuxième contient la traduction
-	// » Prend soin de vérifier si le fichier existe avant de faire n'importe quoi
-	private function loadCSV($file) {
+	// #### Adresse des fichiers ############################### rewrite ## protected/public ### //
+	// = révision : 6
+	// » Recherche les adresses des fichiers
+	// » Permet une prévisualisation des pages via un appel direct
+	protected function _getFilePath($file, $directories = null) {
 
-		if (is_file($file)) {
+		if ($this->preview)
+			return str_replace('default', 'versioning', parent::_getFilePath($file, $directories));
+		else
+			return parent::_getFilePath($file, $directories);
+	}
 
-			$ressource = fopen($file, 'r');
+	public function getUrl($file) {
+		return str_replace(array('errors/', 'versioning/'), '', $this->getBaseUrl()).$file;
+	}
 
-			while (($line = fgetcsv($ressource, 1500, ',', '`')) !== false) {
-
-				if (strlen($line[0]) > 1) {
-					array_push($this->dataSource, $line[0]);
-					array_push($this->dataTranslated, $line[1]);
-				}
-			}
-
-			fclose($ressource);
-			$this->dataReady = true;
-		}
+	public function hasUserCssFile() {
+		$file = str_replace('page.phtml', 'config/user.css', $this->_getTemplatePath('page.phtml'));
+		return (is_file($file)) ? true : false;
 	}
 
 
 	// #### Traduction par phrase clef ############################################## public ### //
-	// = révision : 22
+	// = révision : 23
 	// » Recherche le numéro d'index de la phrase à traduire dans les tableaux de traduction
-	// » Renvoie la phrase à traduire inchangée si aucun fichier de traduction n'est chargé ou si la phrase n'est pas trouvée
+	// » Renvoie la phrase à traduire inchangée si aucun fichier de traduction n'est chargé ou si la phrase n'a pas été trouvée
 	public function translate($data) {
 
 		// préparation
@@ -110,7 +159,6 @@ class Versioning_Processor extends Error_Processor {
 			foreach ($array as $value)
 				$translation .= ($i < $args) ? $value.func_get_arg($i++) : $value;
 		}
-
 		// chaine de caractères simple
 		else {
 			$translation = ($index !== false) ? $this->dataTranslated[$index] : $data;
@@ -122,10 +170,31 @@ class Versioning_Processor extends Error_Processor {
 		$translation = str_replace('« ', '«&nbsp;', $translation);
 		$translation = str_replace(' »', '&nbsp;»', $translation);
 
-		$translation = preg_replace('# ([0-9])#', '&nbsp;$1', $translation);
-		$translation = str_replace('de&nbsp;', 'de ', $translation);
-		$translation = str_replace('of&nbsp;', 'of ', $translation);
+		return $translation;
+	}
 
-		return ($this->debug) ? '§'.$translation.'§' : $translation;
+
+	// #### Chargement d'un fichier de traduction ################################## private ### //
+	// = révision : 12
+	// » Récupère le contenu du fichier de traduction et le sauvegarde dans deux tableaux
+	// » Le premier tableau contient le mot anglais et le deuxième contient la traduction
+	// » Prend soin de vérifier que le fichier existe avant de faire n'importe quoi
+	private function loadCSV($file) {
+
+		if (is_file($file)) {
+
+			$ressource = fopen($file, 'r');
+
+			while (($line = fgetcsv($ressource, 2000, ',', '`')) !== false) {
+
+				if (strlen($line[0]) > 1) {
+					array_push($this->dataSource, $line[0]);
+					array_push($this->dataTranslated, $line[1]);
+				}
+			}
+
+			fclose($ressource);
+			$this->dataReady = true;
+		}
 	}
 }

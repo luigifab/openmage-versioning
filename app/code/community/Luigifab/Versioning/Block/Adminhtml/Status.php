@@ -1,10 +1,10 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated J/26/07/2012
- * Version 3
+ * Updated D/03/02/2013
+ * Version 4
  *
- * Copyright 2012 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -27,7 +27,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$this->_controller = 'adminhtml_status';
 		$this->_blockGroup = 'versioning';
 
-		$this->_headerText = $this->__('Current repository status');
+		$this->_headerText = '<span class="'.Mage::getStoreConfig('versioning/scm/type').'">'.$this->__('Current repository status').'</span>';
 		$this->_removeButton('edit');
 
 		$this->_addButton('back', array(
