@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated S/09/02/2013
- * Version 4
+ * Updated M/26/02/2013
+ * Version 5
  *
  * Copyright 2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -47,7 +47,7 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
 <body onload="$('submit').focus();">
 
-<form action="<?php echo $this->getUrl('*/*/run', array('revision' => $this->getRequest()->getParam('revision'))) ?>" method="get" onsubmit="luigifabConfirmUpgrade('<?php echo $this->helper('versioning')->__('Operation in progress...') ?>');" id="confirmForm">
+<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/run', array('revision' => $this->getRequest()->getParam('revision'))) ?>" method="get" onsubmit="luigifabConfirmUpgrade('<?php echo $this->helper('versioning')->__('Operation in progress...') ?>');" id="confirmForm">
 
 	<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->helper('versioning')->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
 
@@ -70,7 +70,7 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 	<div class="buttons">
 		<input type="hidden" name="confirm" value="true" />
 		<button type="submit" id="submit"><?php echo $this->helper('versioning')->__('Confirm') ?></button>
-		<button type="button" class="back" onclick="location.href='<?php echo $this->getUrl('*/versioning_repository/index') ?>';"><?php echo $this->helper('core')->__('Cancel') ?></button>
+		<button type="button" class="back" onclick="location.href='<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>';"><?php echo $this->helper('core')->__('Cancel') ?></button>
 	</div>
 </form>
 

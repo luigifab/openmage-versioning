@@ -1,8 +1,8 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated S/09/02/2013
- * Version 6
+ * Updated M/26/02/2013
+ * Version 7
  *
  * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -35,12 +35,12 @@ else {
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo substr($_SESSION['lang'], 0, 2) ?>" />
 
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getUrl('errors/versioning/css/styles.css') ?>" />
-	<?php if ($this->hasUserCssFile()): ?>
-		<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getUrl('errors/versioning/config/user.css') ?>" />
+	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->overload->getUrl('errors/versioning/css/styles.css') ?>" />
+	<?php if ($this->overload->hasUserCssFile()): ?>
+		<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->overload->getUrl('errors/versioning/config/user.css') ?>" />
 	<?php endif ?>
 
-	<link rel="icon" type="image/x-icon" href="<?php echo $this->getUrl('favicon.ico') ?>" />
+	<link rel="icon" type="image/x-icon" href="<?php echo $this->overload->getUrl('favicon.ico') ?>" />
 </head>
 
 <body>

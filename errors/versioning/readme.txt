@@ -31,4 +31,4 @@ Secondly, copy errors/local.xml.sample to errors/local.xml.
 Open it, replace <skin>default</skin> by <skin>versioning</skin> and save it.
 
 That's it.
-To change CSS, write your rules into 'errors/versioning/config/user.css' file.
+To change CSS, write your CSS rules into 'errors/versioning/config/user.css' file.

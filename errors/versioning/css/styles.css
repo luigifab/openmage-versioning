@@ -1,6 +1,6 @@
 @charset "utf-8";
 /**
- * Created D/03/06/2012, Updated J/06/02/2013, Version 6
+ * Created D/03/06/2012, Updated M/26/02/2013, Version 7
  *
  * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -30,7 +30,7 @@ pre {
 	position:absolute; bottom:-1px; left:0; right:0; margin:auto; padding:1em 1em 0; width:80%; height:20%; overflow:auto; z-index:175;
 	font:0.85em "DejaVu Sans", Verdana, sans-serif; line-height:160%; white-space:pre-wrap; word-wrap:break-word;
 	border:1px solid #CCC; color:#777; background-color:#E8E8E8;
-	transition:height 0.8s; -moz-transition:height 0.8s; -o-transition:height 0.8s; -webkit-transition:height 0.8s;
+	transition:height 0.4s; -moz-transition:height 0.4s; -o-transition:height 0.4s; -webkit-transition:height 0.4s;
 	border-radius:0.9em 0.9em 0 0; -moz-border-radius:0.9em 0.9em 0 0; -webkit-border-radius:0.9em 0.9em 0 0;
 	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
 }
