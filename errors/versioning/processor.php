@@ -1,12 +1,11 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated S/09/02/2013
- * Version 11
+ * Updated S/23/03/2013
+ * Version 12
  *
  * Copyright 2010-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
- * http://www.luigifab.info/apijs
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -29,7 +28,7 @@ class Versioning_Processor extends Error_Processor {
 
 
 	// #### Initialisation ############################################### rewrite ## public ### //
-	// = révision : 15
+	// = révision : 18
 	// » Charge le fichier de traduction en fonction de la langue du navigateur
 	// » Prend en charge un appel direct pour prévisualisation (détection via le fichier ./readme.txt)
 	public function __construct() {
@@ -40,30 +39,43 @@ class Versioning_Processor extends Error_Processor {
 			$this->preview = true;
 
 		$list = array('fr_FR', 'en_US');
+		$lang = 'en_US';
 
-		// gestion de la langue à partir du navigateur (si la langue n'est pas encore définie)
-		if (strlen($_SERVER['HTTP_ACCEPT_LANGUAGE']) === 5)
-			$lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)).'_'.strtoupper(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 3, 2));
-		else
-			$lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)).'_'.strtoupper(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+		// gestion de la langue
+		if (isset($_GET['lang']) && in_array($_GET['lang'], $list)) {
+			$lang = $_GET['lang'];
+		}
+		else if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 
-		if (isset($_GET['lang']) && in_array($_GET['lang'], $list))
-			$_SESSION['lang'] = $_GET['lang'];
-		else if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && in_array($lang, $list))
-			$_SESSION['lang'] = $lang;
-		else if (!isset($_SESSION['lang']))
-			$_SESSION['lang'] = 'en_US';
+			$languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+
+			foreach ($languages as $language) {
+
+				$language = (strpos($language, ';') !== false) ? substr($language, 0, strpos($language, ';')) : $language;
+				$language = (strlen($language) > 5) ? substr($language, 0, 5) : $language;
+
+				$language = (strlen($language) === 5) ? strtolower(substr($language, 0, 2)).'_'.strtoupper(substr($language, 3, 2)) :
+					strtolower(substr($language, 0, 2)).'_'.strtoupper(substr($language, 0, 2));
+
+				if (in_array($language, $list)) {
+					$lang = $language;
+					break;
+				}
+			}
+		}
 
 		// chargement des traductions
 		// le premier contient les traductions configurées dans le backend
 		// le second contient les traductions par défaut
-		$this->loadCSV($this->preview ? './locale/'.$_SESSION['lang'].'2.csv' : './errors/versioning/locale/'.$_SESSION['lang'].'2.csv');
-		$this->loadCSV($this->preview ? './locale/'.$_SESSION['lang'].'.csv'  : './errors/versioning/locale/'.$_SESSION['lang'].'.csv');
+		$this->loadCSV($this->preview ? './locale/'.$lang.'2.csv' : './errors/versioning/locale/'.$lang.'2.csv');
+		$this->loadCSV($this->preview ? './locale/'.$lang.'.csv'  : './errors/versioning/locale/'.$lang.'.csv');
+
+		$_SESSION['lang'] = $lang;
 	}
 
 
 	// #### Définition des pages #################################################### public ### //
-	// = révision : 12
+	// = révision : 14
 	// » Déclare les pages upgrade, report, 503 et 404
 	// » Charge les templates et affiche le résultat après avoir supprimé les espaces inutiles
 	public function processUpgrade() {
@@ -110,7 +122,7 @@ class Versioning_Processor extends Error_Processor {
 
 		ob_start();
 		require_once($baseTemplate);
-		$html = ob_get_flush();
+		$html = ob_get_contents();
 		ob_end_clean();
 
 		echo str_replace(array("\n\n","\t",'  ',"\n\n",'  '), array("\n",'',' ',"\n",' '), $html);

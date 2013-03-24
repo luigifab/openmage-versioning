@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/03/02/2013
+ * Updated D/24/03/2013
  * Version 20
  *
  * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 47
+	// = révision : 49
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de la commande git log
 	// » Utilise GIT_SSH si le fichier de configuration existe
@@ -146,7 +146,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				}
 				else if (strlen($branch) > 0) {
 
-					if (strpos($branch, ',') !== false)
+					if ((strpos($branch, 'HEAD') !== false) && (strpos($branch, 'origin') === false))
+						$branch = '';
+					else if (strpos($branch, ',') !== false)
 						$branch = trim(str_replace('origin/', '', substr($branch, strrpos($branch, ',') + 2, -1)));
 					else if (strpos($branch, 'origin/') !== false)
 						$branch = trim(substr($branch, strrpos($branch, 'origin/') + 7, -1));

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/02/06/2012
- * Updated S/09/02/2013
- * Version 13
+ * Updated V/22/03/2013
+ * Version 14
  *
  * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -30,14 +30,6 @@ class Luigifab_Versioning_Block_Adminhtml_Downtime extends Mage_Adminhtml_Block_
 		$this->_headerText = '<span class="'.Mage::getStoreConfig('versioning/scm/type').'">'.$this->__('Downtime').'</span>';
 		$this->_removeButton('edit');
 		$this->_removeButton('back');
-
-		if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning')) {
-			$this->_addButton('versioning', array(
-				'label'   => $this->__('Versioning'),
-				'onclick' => "location.href = '".$this->getUrl('*/versioning_repository/index')."';",
-				'class'   => 'go'
-			));
-		}
 
 		$this->_addButton('config', array(
 			'label'   => $this->__('Configuration'),

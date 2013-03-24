@@ -1,8 +1,8 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated M/26/02/2013
- * Version 7
+ * Updated D/24/03/2013
+ * Version 9
  *
  * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -26,14 +26,16 @@ else {
 	$this->overload = $this;
 }
 
+$lang = substr($_SESSION['lang'], 0, 2);
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo substr($_SESSION['lang'], 0, 2) ?>" lang="<?php echo substr($_SESSION['lang'], 0, 2) ?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>">
 <head>
 	<title><?php echo $this->overload->translate('Oups!') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<meta http-equiv="Content-Language" content="<?php echo substr($_SESSION['lang'], 0, 2) ?>" />
+	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
 
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->overload->getUrl('errors/versioning/css/styles.css') ?>" />
 	<?php if ($this->overload->hasUserCssFile()): ?>
@@ -44,7 +46,6 @@ else {
 </head>
 
 <body>
-	<?php require_once($contentTemplate) ?>
-
+	<?php require_once($contentTemplate); echo "\n"; ?>
 </body>
 </html>

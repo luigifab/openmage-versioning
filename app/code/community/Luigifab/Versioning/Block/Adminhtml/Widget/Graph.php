@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/08/06/2012
- * Updated D/03/02/2013
- * Version 7
+ * Updated D/24/03/2013
+ * Version 8
  *
  * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -33,6 +33,6 @@ class Luigifab_Versioning_Block_Adminhtml_Widget_Graph extends Mage_Adminhtml_Bl
 			'<input type="hidden" value="'.$row->getBranchName().'" class="branch" />'
 		);
 
-		return implode($graph);
+		return str_replace(array('-', '.', ' parent', ' rev', ' [merge]'), array('', '', ' parent-', ' rev-', ''), implode($graph));
 	}
 }

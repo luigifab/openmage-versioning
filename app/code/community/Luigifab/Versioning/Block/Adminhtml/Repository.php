@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/03/02/2013
- * Version 16
+ * Updated V/22/03/2013
+ * Version 17
  *
  * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -55,14 +55,6 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			'onclick' => "location.href = '".$this->getUrl('*/*/status')."';",
 			'class'   => 'go'
 		));
-
-		if (Mage::getSingleton('admin/session')->isAllowed('tools/downtime')) {
-			$this->_addButton('downtime', array(
-				'label'   => $this->__('Downtime'),
-				'onclick' => "location.href = '".$this->getUrl('*/versioning_downtime/index')."';",
-				'class'   => 'go'
-			));
-		}
 	}
 
 	public function getHeaderCssClass() {

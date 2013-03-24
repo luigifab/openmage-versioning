@@ -1,8 +1,7 @@
 @charset "utf-8";
 /**
- * Created J/22/12/2011, Updated S/09/02/2013, Version 24
- *
  * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * File created J/22/12/2011, updated D/24/03/2013, version 28
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -36,6 +35,7 @@ body.adminhtml-versioning-repository-index div.content-header td { width:auto !i
 #versioningGrid thead tr.headings { background-position:left -18px; }
 #versioningGrid thead tr.headings th.no-link { padding-bottom:5px; text-align:center; color:#666; }
 
+#versioningGrid tbody tr td { vertical-align:middle; }
 #versioningGrid tbody tr td.revision { padding:2px 0; }
 #versioningGrid tbody tr td.revision strong { font-size:115%; }
 #versioningGrid tbody tr td a.issue, #versioningGrid tbody tr td span.issue { float:right; padding-left:0.3em; color:#999; text-decoration:none; }
@@ -43,13 +43,15 @@ body.adminhtml-versioning-repository-index div.content-header td { width:auto !i
 #versioningGrid tbody tr td a.issue:hover, #versioningGrid tbody tr td a.issue:active,
 #versioningGrid tbody tr td a.issue:focus { color:#777; text-decoration:underline; }
 
+#svggraph { position:absolute; pointer-events:none; }
+
 #versioningLog { font:11px monospace; line-height:16px; color:#666; white-space:pre-wrap; }
 #versioningLog span { color:black; }
 #versioningLog em { color:#444; }
 
 #downtime li {
 	display:inline-block; margin:0.2em 0.5em 1.4em; width:30em; height:8em; padding:0.7em 1em; vertical-align:middle;
-	border-radius:1em; -khtml-border-radius:1em; -moz-border-radius:1em; -webkit-border-radius:1em;
+	border-radius:1em; -moz-border-radius:1em; -webkit-border-radius:1em;
 	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
 	border:1px solid #DDD; background-color:#EFEFEF;
 }
@@ -60,32 +62,35 @@ body.adminhtml-versioning-repository-index div.content-header td { width:auto !i
 
 
 /* ############################################# Demande de confirmation ### */
-#confirmForm h1 {
-	margin:0 0.5em 0.1em 0; padding:0 1px 0 21px; min-height:18px;
+body.adminhtml-versioning-upgrade-confirm { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); background-size:100% 100%; }
+
+#confirmform h1 {
+	margin:0 0.5em 0.1em 0; padding:0 1px 0 23px; min-height:18px;
 	font-size:1.25em; line-height:1.2em; color:#EB5E00;
 }
 
-#confirmForm h1.bzr { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
-#confirmForm h1.git { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
+#confirmform h1.bzr { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
+#confirmform h1.git { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
 
-#confirmForm {
-	position:relative; display:block; margin:9% auto auto; padding:0.8em; width:38em; background-color:white;
+#confirmform {
+	position:relative; display:block; margin:9.5% auto auto; padding:0.8em; width:38em;
+	background-color:white; background-color:rgba(255, 255, 255, 0.6);
 	border-radius:0.8em; -moz-border-radius:0.8em; -webkit-border-radius:0.8em;
 	background-clip:padding-box; -moz-background-clip:padding; -o-background-clip:padding; -webkit-background-clip:padding-box;
 }
 
-#confirmForm p { margin-top:1em; font-size:13px; }
-#confirmForm p.saving { position:absolute; top:40%; margin:0; padding-left:50px; }
+#confirmform p { margin-top:1em; font-size:13px; }
+#confirmform p.saving { position:absolute; top:40%; margin:0; padding-left:50px; }
 
-#confirmForm ul { margin-top:0.8em; }
-#confirmForm input { margin-right:0.1em; vertical-align:text-top; cursor:pointer; }
-#confirmForm label { cursor:pointer; }
-#confirmForm label.disabled { color:#999; cursor:default; }
-#confirmForm label.disabled input { cursor:default; }
+#confirmform ul { margin-top:0.8em; }
+#confirmform input { margin-right:0.1em; vertical-align:text-top; cursor:pointer; }
+#confirmform label { cursor:pointer; }
+#confirmform label.disabled { color:#999; cursor:default; }
+#confirmform label.disabled input { cursor:default; }
 
-#confirmForm div.buttons { margin:1.9em 0 0; text-align:right; }
-#confirmForm div.buttons button[type="submit"] { float:right; margin-left:0.4em; }
-#confirmForm div.buttons button:active, #confirmForm div.buttons button:focus { border:1px solid black; }
+#confirmform div.buttons { margin:1.9em 0 0; text-align:right; }
+#confirmform div.buttons button[type="submit"] { float:right; margin-left:0.4em; }
+#confirmform div.buttons button:active, #confirmform div.buttons button:focus { border:1px solid black; }
 
 #box.options.versioning h1 { white-space:nowrap; }
 #box.options.versioning div.bbcode p { font-size:13px; }
@@ -103,6 +108,8 @@ body.adminhtml-versioning-repository-index div.content-header td { width:auto !i
 
 /* ####################################################### Configuration ### */
 #row_versioning_scm_maintenance p.note { padding-top:3px; line-height:135%; }
+#row_versioning_tweak_svggraph p.note { padding-top:3px; line-height:135%; width:150%; }
+#row_versioning_tweak_svggraph td a { color:#2F2F2F; }
 #row_versioning_tweak_bugtracker td a { color:#2F2F2F; }
 #row_versioning_downtime_upgrade td { padding-top:14px; }
 

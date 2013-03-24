@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/09/02/2013
- * Version 27
+ * Updated D/24/03/2013
+ * Version 30
  *
  * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -31,7 +31,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Gestion de la mise à jour ############################## debug ## i18n ## public ### //
-	// = révision : 56
+	// = révision : 59
 	// » Affiche l'état d'avancement de la mise à jour sous la forme d'une page HTML
 	// » Désactive toutes les touches du clavier et empèche la fermeture de la page
 	// » S'assure de ne pas intervernir juste après l'identification et que l'action de mise à jour a été confirmée
@@ -70,23 +70,31 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n".'<meta http-equiv="Content-Style-Type" content="text/css" />';
 		echo "\n".'<meta http-equiv="Content-Language" content="'.$lang.'" />';
 		echo "\n".'<link rel="icon" href="'.Mage::getDesign()->getSkinUrl('images/ajax-loader.gif').'" type="image/x-icon" />';
+		// http://commons.wikimedia.org/wiki/File:MarsSunset.jpg
 		echo "\n".'<style type="text/css">';
 		echo "\n". '* { margin:0; padding:0; }';
-		echo "\n". 'body { margin:1.8em 3em 3.5em 150px; font:1em Verdana, sans-serif; color:#AAA; overflow-y:scroll; background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAABJJREFUCNdjEBQU/M9AFMCpEgBn3AJlgv0NRQAAAABJRU5ErkJggg==") black; }';
-		echo "\n". 'div.obj { position:fixed; left:0; right:0; top:3.8em; padding:9px 26px 10px; background-color:black; }';
-		echo "\n". 'div.ctn { position:relative; padding:0 1.3em; min-height:8em; border-radius:1.5em; border:1px solid #111; background-color:black; background-clip:padding-box; }';
-		echo "\n". 'object { display:block; }';
-		echo "\n". 'p { padding:1em 0; }';
-		echo "\n". 'p.first { border-bottom:1px dashed #111; }';
-		echo "\n". 'p.last { border-top:1px dashed #111; }';
-		echo "\n". 'p span { font-size:0.8em; font-style:italic; }';
-		echo "\n". 'pre { padding:1.4em 0; font:0.8em Verdana, sans-serif; line-height:140%; white-space:pre-wrap; }';
-		echo "\n". 'pre code { display:inline-block; margin:0.3em 0 0; font:11px monospace; line-height:16px; font-style:italic; color:#333; }';
-		echo "\n". 'pre code span { color:#555; }';
-		echo "\n". 'pre span.notice { font-size:0.85em; font-style:italic; color:#888; }';
+		echo "\n". 'html { height:100%; }';
+		echo "\n". 'body {';
+		echo "\n". ' font:1em Verdana, sans-serif; overflow:hidden;';
+		echo "\n". ' background-color:#E6E6E6; background-size:100% 100%;';
+		echo "\n". ' background-image:url('.Mage::getDesign()->getSkinUrl('images/luigifab/versioning/mars-sunset.jpg').');';
+		echo "\n". '}';
+		echo "\n". 'div.obj { position:absolute; top:5em; left:31px; opacity:0.25; }';
+		echo "\n". 'div.obj object { display:block; }';
+		echo "\n". 'div.ctn {';
+		echo "\n". ' position:absolute; top:3em; left:160px; right:-2em; bottom:25%; padding:0.8em 4em 0 1em; overflow-y:scroll;';
+		echo "\n". ' border-radius:1.2em; -moz-border-radius:1.2em; -webkit-border-radius:1.2em;';
+		echo "\n". ' background-color:white; background-color:rgba(255, 255, 255, 0.2);';
+		echo "\n". '}';
+		echo "\n". 'p { padding-bottom:0.8em; }';
+		echo "\n". 'p em { font-size:0.8em; }';
+		echo "\n". 'pre { padding-bottom:1.4em; font:0.8em Verdana, sans-serif; line-height:140%; white-space:pre-wrap; }';
+		echo "\n". 'pre code { display:inline-block; margin-top:0.2em; font:0.85em Verdana, sans-serif; font-style:italic; line-height:16px; color:#222; }';
+		echo "\n". 'pre code span { color:#333; }';
+		echo "\n". 'pre span.notice { font-size:0.85em; font-style:italic; }';
 		echo "\n". 'pre span.error { font-size:0.85em; font-style:italic; color:red; }';
 		echo "\n".'</style>';
-		echo "\n".'<!--[if IE 8]><style type="text/css">object { display:none; }</style><![endif]-->';
+		echo "\n".'<!--[if IE]><style type="text/css">div.obj { display:none; }</style><![endif]-->';
 		echo "\n".'<script type="text/javascript">';
 		echo "\n". '// disable keys of keyboard';
 		echo "\n". 'function disableKeyboard(ev) {';
@@ -103,7 +111,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n". 'document.onkeydown = disableKeyboard;';
 		echo "\n". '// auto scroll page';
 		echo "\n". 'function autoScroll() {';
-		echo "\n".  'window.scrollBy(0, 10000)';
+		echo "\n".  'document.getElementById("scroll").scrollTop += 10000;';
 		echo "\n". '}';
 		echo "\n". 'window.setInterval(autoScroll, 100);';
 		echo "\n".'</script>';
@@ -111,9 +119,9 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 		echo "\n".'<body>';
 		echo "\n".'<div class="obj"><object data="'.Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg.php').'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
-		echo "\n".'<div class="ctn">';
+		echo "\n".'<div class="ctn" id="scroll">';
 		echo "\n".'<p class="first"><strong>'.$this->__('Starting upgrade (revision %s)', $revision).'</strong>';
-		echo "\n".'<br /><span>'.$this->__('Do not touch anything / Do not try to cancel this operation').'</span></p>'."\n";
+		echo "\n".'<br /><em>'.$this->__('Do not touch anything / Do not try to cancel this operation').'</em></p>'."\n";
 
 		sleep(1);
 
@@ -124,16 +132,20 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n".'<script type="text/javascript">';
 		echo "\n". '// svg animation colors';
 		echo "\n". 'try {';
-		echo "\n".  'document.getElementById("state").getSVGDocument().getElementById("losange").setAttribute("fill", "'.$data['losange'].'");';
-		echo "\n".  'document.getElementById("state").getSVGDocument().getElementById("exclamA").setAttribute("fill", "'.$data['exclam'].'");';
-		echo "\n".  'document.getElementById("state").getSVGDocument().getElementById("exclamB").setAttribute("fill", "'.$data['exclam'].'");';
+		echo "\n".  'var svg = document.getElementById("state").getSVGDocument();';
+		echo "\n".  'svg.getElementById("a").setAttribute("values", "#222;'.$data['exclam'].'");';
+		echo "\n".  'svg.getElementById("b").setAttribute("values", "'.$data['exclam'].';#222");';
+		echo "\n".  'svg.getElementById("c").setAttribute("values", "#222;'.$data['diamond'].'");';
+		echo "\n".  'svg.getElementById("d").setAttribute("values", "'.$data['diamond'].';#222");';
 		echo "\n". '}';
 		echo "\n". 'catch (ee) {';
 		echo "\n".  'if (!document.getElementById("state").getSVGDocument()) {';
 		echo "\n".   'document.getElementById("state").onload = function () {';
-		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("losange").setAttribute("fill", "'.$data['losange'].'");';
-		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("exclamA").setAttribute("fill", "'.$data['exclam'].'");';
-		echo "\n".    'document.getElementById("state").getSVGDocument().getElementById("exclamB").setAttribute("fill", "'.$data['exclam'].'");';
+		echo "\n".    'var svg = document.getElementById("state").getSVGDocument();';
+		echo "\n".    'svg.getElementById("a").setAttribute("values", "#222;'.$data['exclam'].'");';
+		echo "\n".    'svg.getElementById("b").setAttribute("values", "'.$data['exclam'].';#222");';
+		echo "\n".    'svg.getElementById("c").setAttribute("values", "#222;'.$data['diamond'].'");';
+		echo "\n".    'svg.getElementById("d").setAttribute("values", "'.$data['diamond'].';#222");';
 		echo "\n".   '};';
 		echo "\n".  '}';
 		echo "\n". '}';
@@ -142,7 +154,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		sleep(1);
 
 		echo "\n".'<p class="last"><strong>'.$data['title'].'</strong>';
-		echo "\n".'<br /><span>'.$this->__('Back to Magento in one second').'</span></p>';
+		echo "\n".'<br /><em>'.$this->__('Back to Magento in one second').'</em></p>';
 		echo "\n".'</div>';
 
 		echo "\n".'<script type="text/javascript">';
@@ -154,7 +166,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		echo "\n".  'window.setTimeout(function () {';
 		echo "\n".   'window.onbeforeunload = disableClose;';
 		echo "\n".  '}, 1);';
-		echo "\n". '}, '.(($data['losange'] === 'red') ? 4000 : 1000).');';
+		echo "\n". '}, '.(($data['diamond'] === 'red') ? 4000 : 1000).');';
 		echo "\n".'</script>';
 		echo "\n".'</body>';
 		echo "\n".'</html>';
@@ -164,7 +176,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Gestion de la mise à jour ############################# debug ## i18n ## private ### //
-	// = révision : 75
+	// = révision : 76
 	// » Log les informations du processus de mise à jour
 	// » Met à jour le code application, purge le cache et régénère les fichiers minifiés lorsque nécessaire
 	// » Informe l'utiliseur en cas de changement de version
@@ -293,7 +305,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 			$this->checkModuleVersion($version, $newVersion);
 
 			// *** Finalisation ******************************** //
-			$status['exclam'] = 'blue'; $status['losange'] = 'orange';
+			$status['exclam'] = 'blue'; $status['diamond'] = 'orange';
 			$status['title'] = $this->__('Upgrade completed (revision %s)', $targetRevision);
 			$logger['duration'] = ceil(microtime(true) - $logger['duration']);
 			$logger['status'] = 'Upgrade completed'."\n".trim(file_get_contents($log));
@@ -309,7 +321,7 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 		catch (Exception $e) {
 
 			// *** Gestion des erreurs ************************* //
-			$status['exclam'] = 'red'; $status['losange'] = 'red';
+			$status['exclam'] = 'red'; $status['diamond'] = 'red';
 			$status['title'] = $this->__('Upgrade error (revision %s)', $targetRevision);
 			$logger['duration'] = ceil(microtime(true) - $logger['duration']);
 			$logger['status'] = (is_file($log) && is_readable($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
@@ -365,8 +377,8 @@ class Luigifab_Versioning_Versioning_UpgradeController extends Mage_Adminhtml_Co
 
 
 	// #### Désactivation des buffers ##################################### debug ## private ### //
-	// = révision : 8
-	// » Met fin à la temporisation de sortie (buffer) de Magento
+	// = révision : 9
+	// » Met fin aux temporisations de sortie activés par Magento
 	// » Est incapable de mettre fin à la temporisation de zlib.output_compression
 	private function disableAllBuffer() {
 

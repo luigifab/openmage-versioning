@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/09/02/2013
- * Version 25
+ * Updated D/24/03/2013
+ * Version 26
  *
  * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -127,8 +127,9 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
 						</deletelog>
-						<svggraph translate="label">
+						<svggraph translate="label comment">
 							<label>Enable branch representation (SVG image)</label>
+							<comment><![CDATA[Require: Chrome 4+, Firefox 4+, Opera 9+ or Safari 4+.<br />Tested with: Chrome 25, Firefox 19, Opera 12.14 and Safari 5.1.<br /><a href="http://caniuse.com/svg-smil" onclick="window.open(this.href); return false;">SVG SMIL animations</a>]]></comment>
 							<frontend_type>select</frontend_type>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
 							<sort_order>4</sort_order>

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated M/26/02/2013
- * Version 5
+ * Updated D/24/03/2013
+ * Version 7
  *
  * Copyright 2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -42,12 +42,16 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
 	<script type="text/javascript" charset="utf-8" src="<?php echo Mage::getBaseUrl('js') ?>prototype/prototype.js"></script>
 	<script type="text/javascript" charset="utf-8" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.js') ?>"></script>
+
+	<style type="text/css">
+	html { height:100%; }
+	</style>
 </head>
 
 
-<body onload="$('submit').focus();">
+<body class="adminhtml-versioning-upgrade-confirm" onload="$('submit').focus();">
 
-<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/run', array('revision' => $this->getRequest()->getParam('revision'))) ?>" method="get" onsubmit="luigifabConfirmUpgrade('<?php echo $this->helper('versioning')->__('Operation in progress...') ?>');" id="confirmForm">
+<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/run', array('revision' => $this->getRequest()->getParam('revision'))) ?>" method="get" onsubmit="luigifabConfirmUpgrade('<?php echo $this->helper('versioning')->__('Operation in progress...') ?>');" id="confirmform">
 
 	<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->helper('versioning')->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
 
@@ -62,7 +66,7 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 			<?php endif ?>
 
 			<?php if ($upgradeFlag): ?>
-				<li><label><input type="checkbox" name="flag" value="true" /> <?php echo $this->helper('versioning')->__('Do not leave the website maintenance mode (upgrade.flag)') ?></label></li>
+				<li><label><input type="checkbox" name="flag" value="true" /> <?php echo $this->helper('versioning')->__('Do not leave website downtime mode (upgrade.flag)') ?></label></li>
 			<?php endif ?>
 		</ul>
 	<?php endif ?>
