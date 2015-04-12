@@ -1,10 +1,10 @@
 <?php
 /**
- * Created V/27/04/2012
- * Updated V/27/04/2012
- * Version 1
+ * Created W/30/05/2012
+ * Updated D/01/06/2014
+ * Version 7
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,9 +18,19 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Block_Adminhtml_Widget_Details extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
 
-	public function render(Varien_Object $row) {
-		return $row->getDetails();
-	}
+if (is_file(ROOT.'/errors/config/processor.php')) {
+	require_once(ROOT.'/errors/config/processor.php');
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new UserProcessor();
 }
+else {
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new Processor();
+}
+
+$processor->init('error404');
+$processor->renderPage(404);

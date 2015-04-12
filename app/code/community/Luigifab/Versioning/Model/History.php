@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated V/03/08/2012
- * Version 2
+ * Updated V/03/04/2015
+ * Version 7
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,25 +18,31 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_History {
+class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
-	public function getCollection() {
+	protected $_pageSize = true;
+	protected $_isCollectionLoaded = true;
 
-		$helper = Mage::helper('versioning');
-		$file = $helper->getHistoryFile();
+	// collection spécifique (ou pas...) avec un simple array()
+	// avec un jolie bricolage mais c'est pas très important
+	public function init($page, $size) {
+
+		$file = Mage::helper('versioning')->getHistoryLog();
 
 		if (is_file($file) && is_readable($file)) {
 
-			$items = array();
+			// recherche des données
+			// construction d'un premier tableau
 			$ressource = fopen($file, 'r');
 
 			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
 
 				if (strlen($line[0]) > 1) {
+
 					$item = new Varien_Object();
 					$item->setDate($line[0]);
-					$item->setCurrentRevision($line[1]);
-					$item->setTargetRevision($line[2]);
+					$item->setFrom($line[1]);
+					$item->setTo($line[2]);
 					$item->setRemoteAddr($line[3]);
 					$item->setUser($line[4]);
 					$item->setDuration($line[5]);
@@ -44,40 +50,52 @@ class Luigifab_Versioning_Model_History {
 					// modifié en version 1.1.0
 					// la 7ème case contient désormais le statut suivi d'un saut de ligne suivi des détails de la mise à jour
 					if (strpos($line[6], "\n") !== false) {
-
-						$text = substr($line[6], strpos($line[6], "\n") + 1);
-						$text = strip_tags($text);
-						$text = addslashes($text);
-						$text = str_replace(array("\r","\n"), '\n', $text);
-
-						$item->setStatus($helper->__(substr($line[6], 0, strpos($line[6], "\n"))));
-						$item->setDetails('<a href="#" onclick="alert(\''.$text.'\'); return false;">'.Mage::helper('adminhtml')->__('Details').'</a>');
+						$pos = strpos($line[6], "\n");
+						$item->setStatus(substr($line[6], 0, $pos));
+						$item->setDetails(substr($line[6], $pos + 1));
 					}
 					else {
-						$item->setStatus($helper->__($line[6]));
-						$item->setDetails('');
+						$item->setStatus($line[6]);
+						$item->setDetails($line[6]);
 					}
 
 					// ajouté en version 1.1.0
-					// la 8ème case contient l'éventuel nom de la branche actuelle
+					// la 8ème case contient l'éventuel nom de la branche
 					$item->setBranch((isset($line[7])) ? $line[7] : '');
 
-					$items[] = $item;
+					// an upgrade is already...
+					// remplace le texte par sa version traduite
+					if (strpos($item->getDetails(), 'An upgrade is already underway') !== false)
+						$item->setDetails(Mage::helper('versioning')->__('Stop! Stop! Stop! An upgrade is already underway.'));
+
+					array_push($this->_items, $item);
 				}
 			}
 
 			fclose($ressource);
 
-			$items = array_reverse($items);
-			$collection = new Varien_Data_Collection();
+			// première sauvegarde
+			$this->_items = array_reverse($this->_items);
+			$this->_totalRecords = count($this->_items);
 
-			foreach ($items as $item)
-				$collection->addItem($item);
-		}
-		else {
-			$collection = new Varien_Data_Collection();
+			// collection finale
+			// construction de second tableau
+			$items = array();
+
+			$current = 0;
+			$from = ($page - 1) * $size;
+			$to = ($page - 1) * $size + $size;
+
+			foreach ($this->_items as $item) {
+				if (($current >= $from) && ($current < $to))
+					$items[] = $item;
+				$current++;
+			}
+
+			// seconde sauvegarde
+			$this->_items = $items;
 		}
 
-		return $collection;
+		return $this;
 	}
 }

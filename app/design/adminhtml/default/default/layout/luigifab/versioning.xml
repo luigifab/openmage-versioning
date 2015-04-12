@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated D/03/03/2013
- * Version 16
+ * Updated L/30/03/2015
+ * Version 20
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -23,7 +23,7 @@
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
+				<name>css/luigifab/versioning/styles.min.css</name>
 				<params>media="screen, projection"</params>
 			</action>
 		</reference>
@@ -36,58 +36,26 @@
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
+				<name>css/luigifab/versioning/styles.min.css</name>
 				<params>media="screen, projection"</params>
 			</action>
 			<action method="addItem">
 				<type>skin_js</type>
-				<name>js/luigifab/versioning/app.js</name>
+				<name>js/luigifab/versioning/app.min.js</name>
+			</action>
+			<action method="addItem">
+				<type>skin_js</type>
+				<name>js/luigifab/versioning/raphael.min.js</name>
+			</action>
+			<action method="addItem">
+				<type>skin_js</type>
+				<name>js/luigifab/versioning/innersvg.min.js</name>
 			</action>
 		</reference>
 		<reference name="content">
 			<block type="versioning/adminhtml_repository" name="versioning_repository" />
 		</reference>
 	</adminhtml_versioning_repository_index>
-
-	<adminhtml_versioning_repository_lastlog>
-		<reference name="head">
-			<action method="setTitle" translate="title">
-				<title>Versioning / Tools / Magento Admin</title>
-			</action>
-			<action method="addItem">
-				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
-				<params>media="screen, projection"</params>
-			</action>
-			<action method="addItem">
-				<type>skin_js</type>
-				<name>js/luigifab/versioning/app.js</name>
-			</action>
-		</reference>
-		<reference name="content">
-			<block type="versioning/adminhtml_lastlog" name="versioning_lastlog" />
-		</reference>
-	</adminhtml_versioning_repository_lastlog>
-
-	<adminhtml_versioning_repository_history>
-		<reference name="head">
-			<action method="setTitle" translate="title">
-				<title>Versioning / Tools / Magento Admin</title>
-			</action>
-			<action method="addItem">
-				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
-				<params>media="screen, projection"</params>
-			</action>
-			<action method="addItem">
-				<type>skin_js</type>
-				<name>js/luigifab/versioning/app.js</name>
-			</action>
-		</reference>
-		<reference name="content">
-			<block type="versioning/adminhtml_history" name="versioning_history" />
-		</reference>
-	</adminhtml_versioning_repository_history>
 
 	<adminhtml_versioning_repository_status>
 		<reference name="head">
@@ -96,7 +64,7 @@
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
+				<name>css/luigifab/versioning/styles.min.css</name>
 				<params>media="screen, projection"</params>
 			</action>
 		</reference>
@@ -105,25 +73,29 @@
 		</reference>
 	</adminhtml_versioning_repository_status>
 
-	<adminhtml_versioning_downtime_index>
+	<adminhtml_versioning_repository_history>
 		<reference name="head">
 			<action method="setTitle" translate="title">
-				<title>Downtime / Tools / Magento Admin</title>
+				<title>Versioning / Tools / Magento Admin</title>
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.css</name>
+				<name>css/luigifab/versioning/styles.min.css</name>
 				<params>media="screen, projection"</params>
+			</action>
+			<action method="addItem">
+				<type>skin_js</type>
+				<name>js/luigifab/versioning/app.min.js</name>
 			</action>
 		</reference>
 		<reference name="content">
-			<block type="versioning/adminhtml_downtime" name="versioning_downtime" />
+			<block type="versioning/adminhtml_history" name="versioning_history" />
 		</reference>
-	</adminhtml_versioning_downtime_index>
+	</adminhtml_versioning_repository_history>
 
-	<adminhtml_versioning_upgrade_confirm>
+	<adminhtml_versioning_repository_confirm>
 		<reference name="content">
 			<block type="core/template" name="root" template="luigifab/versioning/confirm.phtml" />
 		</reference>
-	</adminhtml_versioning_upgrade_confirm>
+	</adminhtml_versioning_repository_confirm>
 </layout>

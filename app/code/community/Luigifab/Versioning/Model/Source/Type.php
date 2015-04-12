@@ -1,10 +1,10 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated V/13/04/2012
- * Version 9
+ * Updated V/27/02/2015
+ * Version 12
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,22 +18,22 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_Source_Type {
+class Luigifab_Versioning_Model_Source_Type extends Luigifab_Versioning_Helper_Data {
 
 	public function toOptionArray() {
 
+		$models = $this->searchFiles(BP.'/app/code/community/Luigifab/Versioning/Model/Scm');
 		$list = array();
-		$allrepo = $this->searchFiles(Mage::getBaseDir('app').'/code/community/Luigifab/Versioning/Model/Scm');
 
-		foreach ($allrepo as $model) {
+		foreach ($models as $model) {
 
-			$repo = Mage::getModel($model);
+			$model = Mage::getModel($model);
 
-			$install = $repo->isSoftwareInstalled();
-			$version = $repo->getSoftwareVersion();
-			$type = strtoupper($repo->getRepositoryType());
+			$label = ($model->isSoftwareInstalled()) ?
+				$this->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :
+				$this->__('%s (not available)', strtoupper($model->getType()));
 
-			$list[strtolower($type)] = array('value' => strtolower($type), 'label' => ($install) ? Mage::helper('versioning')->__('%s (%s)', $type, $version) : Mage::helper('versioning')->__('%s (not available)', $type));
+			$list[strtolower($model->getType())] = array('value' => strtolower($model->getType()), 'label' => $label);
 		}
 
 		ksort($list);

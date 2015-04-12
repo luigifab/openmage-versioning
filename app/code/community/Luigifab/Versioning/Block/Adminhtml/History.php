@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated D/03/02/2013
- * Version 8
+ * Updated V/27/02/2015
+ * Version 15
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -26,29 +26,28 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 		$this->_controller = 'adminhtml_history';
 		$this->_blockGroup = 'versioning';
+		$this->_headerText = (!is_null($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+			$this->__('Upgrades log (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
+			$this->__('Upgrades log (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
-		$this->_headerText = $this->__('Upgrades log');
 		$this->_removeButton('add');
 
 		$this->_addButton('back', array(
 			'label'   => $this->helper('adminhtml')->__('Back'),
-			'onclick' => "location.href = '".$this->getUrl('*/*/index')."';",
+			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
 			'class'   => 'back'
 		));
 
-		if (is_file($this->helper('versioning')->getLastlogFile())) {
-			$this->_addButton('lastlog', array(
-				'label'   => $this->__('Upgrade log'),
-				'onclick' => "location.href = '".$this->getUrl('*/*/lastlog')."';",
-				'class'   => 'go'
-			));
-		}
-
-		$this->_addButton('delete', array(
-			'label'   => $this->helper('adminhtml')->__('Delete'),
-			'onclick' => "return luigifabVersioningDelete('".$this->getUrl('*/*/deletehistory')."');",
-			'class'   => 'delete'
+		$this->_addButton('status', array(
+			'label'   => $this->__('Repository status'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
+			'class'   => 'go'
 		));
+	}
+
+	public function getGridHtml() {
+		$file = $this->helper('versioning')->getLastLog();
+		return '<pre>'.((is_file($file) && is_readable($file)) ? file_get_contents($file) : '')."\n".'</pre> '.$this->getChildHtml('grid');
 	}
 
 	public function getHeaderCssClass() {

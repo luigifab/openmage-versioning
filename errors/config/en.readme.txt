@@ -1,0 +1,39 @@
+You can lock frontend access during upgrade process.
+To do this, you must update your index.php with the following code.
+
+## replace ##
+if (file_exists($maintenanceFile)) {
+    include_once dirname(__FILE__).'/errors/503.php';
+    exit;
+}
+## by ##
+// https://redmine.luigifab.info/projects/magento/wiki/versioning
+if (file_exists('maintenance.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
+    $ipFile = './errors/config/error503.ip';
+    if (!is_file($ipFile) || (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/503.php');
+        exit;
+    }
+}
+if (file_exists('upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
+    $ipFile = './errors/config/upgrade.ip';
+    if (!is_file($ipFile) || (is_file($ipFile) && (strpos(file_get_contents($ipFile), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/upgrade.php');
+        exit;
+    }
+}
+## end ##
+
+That's it (be careful if you are not using /admin/ for your backend).
+
+
+You can also rewrite files...
+ - errors/processor.php      » errors/config/processor.php (use UserProcessor as class name, your class must extends Processor)
+ - errors/page.phtml         » errors/config/page.phtml
+
+The errors/config directory will contains text files and YOU MUST IGNORE IT (with bzr or git: *ip *dat *csv).
+These files will be created automatically when you will save configuration in Magento backend...
+ - errors/config/error503.ip » list of ip addresses
+ - errors/config/upgrade.ip  » list of ip addresses
+ - errors/config/config.dat  » configuration
+ - errors/config/*.csv       » translations

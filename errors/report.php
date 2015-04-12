@@ -1,8 +1,8 @@
 <?php
 /**
- * Created J/01/03/2012
- * Updated M/24/02/2015
- * Version 7
+ * Created W/30/05/2012
+ * Updated D/18/01/2015
+ * Version 8
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,11 +18,23 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Block_Adminhtml_Widget_Status extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
 
-	public function render(Varien_Object $row) {
-		// pour le script des traductions $this->__('Success')
-		$status = ($row->getStatus() == 'Upgrade completed') ? 'success' : 'error';
-		return '<span class="grid-'.$status.'">'.$this->__(ucfirst($status)).'</span>';
-	}
+if (is_file(ROOT.'/errors/config/processor.php')) {
+	require_once(ROOT.'/errors/config/processor.php');
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new UserProcessor();
 }
+else {
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new Processor();
+}
+
+$processor->init('report');
+
+if (isset($reportData) && is_array($reportData))
+	$processor->saveReport($reportData);
+
+$processor->renderPage(503);

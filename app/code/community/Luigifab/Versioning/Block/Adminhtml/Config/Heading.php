@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/09/02/2013
- * Version 2
+ * Updated S/17/01/2015
+ * Version 7
  *
- * Copyright 2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,21 +22,42 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-		// store id
+		$code = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
+
+		// exemple d'une adresse de base : http://mario/sites/14/web/(index.php/)
+		// exemple d'une adresse finale  : http://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
+		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
+		$url = preg_replace('#/[^/]+\.php#', '', $url);
+		$url = $url.'errors/'.$element->getHtmlId().'.php?lang='.$code;
+		$url = str_replace(array('versioning_downtime_error', 'versioning_downtime_'), '', $url);
+
+		if ($element->getHtmlId() == 'versioning_downtime_report')
+			$url .= '&amp;demo';
+
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getLabel(), $url, $this->__('Preview in %s', $this->getLocaleName($code)));
+	}
+
+	private function getStoreId() {
+
 		$pWebsite = Mage::app()->getRequest()->getParam('website');
 		$pStore = Mage::app()->getRequest()->getParam('store');
-		$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
 
 		if (strlen($pStore) > 0)
 			$storeId = Mage::getModel('core/store')->load($pStore)->getStoreId();
 		else if (strlen($pWebsite) > 0)
 			$storeId = Mage::getModel('core/website')->load($pWebsite)->getDefaultStore()->getStoreId();
+		else
+			$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
 
-		// code html
-		$url = $this->helper('versioning')->getFrontendUrl();
-		$url = $url.'errors/versioning/'.$element->getHtmlId().'.php?lang='.Mage::getStoreConfig('general/locale/code', $storeId);
-		$url = str_replace(array('index.php/','versioning_downtime_error','versioning_downtime_'), '', $url);
+		return $storeId;
+	}
 
-		return sprintf('<tr class="system-fieldset-sub-head" id="row_%s"><td colspan="5"><h4 id="%s">%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getHtmlId(), $element->getHtmlId(), $element->getLabel(), $url, $this->__('Preview'));
+	private function getLocaleName($code) {
+
+		foreach (Mage::app()->getLocale()->getOptionLocales() as $locale) {
+
+			if ($locale['value'] == $code)
+				return $locale['label'];
+		}
 	}
 }

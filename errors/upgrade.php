@@ -1,10 +1,10 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated D/03/06/2012
- * Version 5
+ * Updated D/01/06/2014
+ * Version 7
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -17,10 +17,20 @@
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
  */
-?>
 
-<div class="box error503">
-	<div class="number"><span>5</span><span>0</span><span>3</span></div>
-	<h1><?php echo $this->overload->translate('error503_title') ?></h1>
-	<?php echo $this->overload->translate('error503_content') ?>
-</div>
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
+
+if (is_file(ROOT.'/errors/config/processor.php')) {
+	require_once(ROOT.'/errors/config/processor.php');
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new UserProcessor();
+}
+else {
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new Processor();
+}
+
+$processor->init('upgrade');
+$processor->renderPage(503);

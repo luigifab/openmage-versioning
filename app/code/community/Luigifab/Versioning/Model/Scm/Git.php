@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/24/03/2013
- * Version 20
+ * Updated D/05/04/2015
+ * Version 27
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,215 +20,327 @@
 
 class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
-	// définition des attributs
 	private $version = null;
-	private $commitCollection = null;
-	private $currentRevision = null;
+	private $revision = null;
+	private $items = null;
 
 
-	// #### Initialisation ############################################# exception ## public ### //
-	// = révision : 26
-	// » Indique si le gestionnaire de version est installé ou pas ainsi que sa version
-	public function _construct() {
-
-		if (Mage::app()->getRequest()->getControllerName() !== 'versioning_repository')
-			return;
-
-		if ((Mage::getStoreConfig('versioning/scm/enabled') !== '1') || (Mage::getStoreConfig('versioning/scm/type') !== 'git'))
-			throw new Exception('Please <a href="'.Mage::helper('adminhtml')->getUrl('adminhtml/system_config/edit', array('section' => 'versioning')).'" style="text-decoration:none;">configure</a> the module before use it.');
-
-		if (!$this->isSoftwareInstalled())
-			throw new Exception('On this system, GIT command is not available.');
-
-		if (is_null($this->getCurrentRevision()))
-			throw new Exception('Magento directory is not versioned or you have a <a href="'.Mage::helper('adminhtml')->getUrl('adminhtml/system_config/edit', array('section' => 'versioning')).'" style="text-decoration:none;">configuration</a> problem.');
-	}
-
+	// #### Initialisation ########################################################## public ### //
+	// = révision : 30
+	// » Indique si le gestionnaire de version est installé
+	// » Le tout à partir de la réponse de la commande 'git'
 	public function isSoftwareInstalled() {
 		exec('git --version', $data);
-		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', implode($data), $this->version) !== 0) ? true : false;
+		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', implode($data), $this->version) !== 0);
 	}
 
 	public function getSoftwareVersion() {
-		return (!is_null($this->version) && !empty($this->version)) ? trim($this->version[0]) : null;
+		if (is_null($this->version))
+			$this->isSoftwareInstalled();
+		return (!empty($this->version)) ? trim($this->version[0]) : null;
 	}
 
-	public function getRepositoryType() {
+	public function getType() {
 		return 'git';
 	}
 
 
-	// #### Historique ######################################### exception ## i18n ## public ### //
-	// = révision : 49
+	// #### Historique ############################################################## public ### //
+	// = révision : 67
 	// » Génère une collection à partir de l'historique des commits du dépôt
-	// » Met en forme les données à partir de la réponse de la commande git log
+	// » Met en forme les données à partir de la réponse de pleins de commandes
 	// » Utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitCollection() {
 
-		$controller = Mage::app()->getRequest()->getControllerName();
-		$network = 'ssh: Could not resolve hostname';
-
-		// données du cache
-		if (!is_null($this->commitCollection))
-			return $this->commitCollection;
+		if (!is_null($this->items))
+			return $this->items;
 
 		// lecture de l'historique des commits
-		// à noter qu'en cas de problème d'encodage avec le contenu des commits :
-		// » dans /etc/apache2/envvars décommenter '. /etc/default/locale'
-		// » ou utiliser 'export LANG=fr_FR.utf-8'
-		$configsh = realpath('./.git/ssh/config.sh');
+		if (!is_dir('./.git/') && !is_dir('../.git/'))
+			throw new Exception('The .git directory does not exist!');
 
+		$configsh = realpath('./.git/ssh/config.sh');
 		if (!is_string($configsh))
 			$configsh = realpath('../.git/ssh/config.sh');
 
-		$description = (version_compare($this->getSoftwareVersion(), '1.7.2', '>=')) ? '%B' : '%s%n%b';
+		$desc = (version_compare($this->getSoftwareVersion(), '1.7.2', '>=')) ? '%B' : '%s%n%b';
 
 		if (is_string($configsh) && is_executable($configsh)) {
 			exec('
 				export GIT_SSH="'.$configsh.'";
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <branch> %d </branch> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><refs> %d </refs><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 		else {
 			exec('
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --pretty=format:"<log><revno>%h</revno> <branch> %d </branch> <parents> %p </parents> <committer>%an</committer> <timestamp>%ai</timestamp> <message><![CDATA['.$description.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><refs> %d </refs><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 
+		// nettoyage du résultat
 		$data = implode("\n", $data);
 		$data = preg_replace('#<\!\[CDATA\[\s+\]\]>#', '', $data);
 		$data = str_replace("\n\n", "\n", $data);
 
 		// traitement de la réponse
-		if (($val !== 0) || (strpos($data, '</log>') === false) ||
-		    ((strpos($data, 'error: ') !== false) && (strpos($data, $network) !== 0) && ($controller === 'versioning_repository')) ||
-		    ((strpos($data, 'fatal: ') !== false) && (strpos($data, $network) !== 0) && ($controller === 'versioning_repository')) ||
-		    ((strpos($data, 'error: ') !== false) && ($controller !== 'versioning_repository')) ||
-		    ((strpos($data, 'fatal: ') !== false) && ($controller !== 'versioning_repository'))) {
+		if (($val !== 0) || (strpos($data, '</log>') === false) || (strpos($data, 'error: ') !== false) || (strpos($data, 'fatal: ') !== false)) {
 
-			$data = is_array($data) ? implode("\n", $data) : $data;
+			$data = (is_array($data)) ? implode("\n", $data) : $data;
 			$data = (strpos($data, '<log') !== false) ? substr($data, 0, strpos($data, '<log')) : $data;
+			$data = '<u>Response:</u>'."\n".$data;
 
-			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data));
+			$config = '<u>The git/config file:</u>'."\n".htmlspecialchars(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'));
+
+			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
 		}
 		else {
-			if ((strpos($data, $network) === 0) && ($controller === 'versioning_repository'))
-				Mage::getSingleton('adminhtml/session')->addNotice(Mage::helper('versioning')->__('Unable to update the commit history from the remote repository.<br />This list corresponds to the history of the local repository.'));
-
 			$data = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
-			$count = 0;
-
 			$xml = new DOMDocument();
 			$xml->loadXML('<root>'.$data.'</root>');
 
-			$this->commitCollection = new Varien_Data_Collection();
+			// extraction des données
+			$this->items = new Varien_Data_Collection();
 
 			foreach ($xml->getElementsByTagName('log') as $logentry) {
 
 				$revision = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
-				$branch = trim($logentry->getElementsByTagName('branch')->item(0)->firstChild->nodeValue);
 				$parents = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
+				$refs = trim($logentry->getElementsByTagName('refs')->item(0)->firstChild->nodeValue);
 				$author = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
 				$timestamp = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
 				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
-				// tags
-				$tags = array();
-				exec('git tag --points-at '.$revision, $tags);
-
-				// branche et parents
-				$parents = explode(' ', $parents);
-
-				if ($count++ < 1) {
-					$branch = $this->getCurrentBranch();
-				}
-				else if (strlen($branch) > 0) {
-
-					if ((strpos($branch, 'HEAD') !== false) && (strpos($branch, 'origin') === false))
-						$branch = '';
-					else if (strpos($branch, ',') !== false)
-						$branch = trim(str_replace('origin/', '', substr($branch, strrpos($branch, ',') + 2, -1)));
-					else if (strpos($branch, 'origin/') !== false)
-						$branch = trim(substr($branch, strrpos($branch, 'origin/') + 7, -1));
-					else
-						$branch = '';
-
-					if (($branch === 'HEAD') || ($branch === 'head'))
-						$branch = '';
+				if (strlen($refs) > 2) {
+					$refs = substr($refs, 1, -1);
+					$refs = str_replace(array('origin/','HEAD',' '), '', $refs);
+					$refs = preg_replace('#,{2,}#', ',', $refs);
+					$refs = trim($refs, ' ,');
+					$refs = explode(',', $refs);
+					$refs = array_unique($refs);
 				}
 				else {
-					$branch = '';
+					$refs = array();
 				}
 
-				$commitEntry = new Varien_Object();
-				$commitEntry->setRevision($revision);
-				$commitEntry->setTags($tags);
-				$commitEntry->setBranchName($branch);
-				$commitEntry->setParents($parents);
-				$commitEntry->setAuthor(preg_replace('#<[^>]+>#', '', $author));
-				$commitEntry->setDate(date('c', strtotime($timestamp)));
-				$commitEntry->setDescription($description);
+				$item = new Varien_Object();
+				$item->setCurrentRevision($this->getCurrentRevision());
+				$item->setRevision($revision);
+				$item->setParents(explode(' ', $parents));
+				$item->setRefs($refs);
+				$item->setDate(date('c', strtotime($timestamp)));
+				$item->setAuthor(preg_replace('#<[^>]+>#', '', $author));
+				$item->setDescription(htmlspecialchars($description));
 
-				$this->commitCollection->addItem($commitEntry);
+				$this->items->addItem($item);
+			}
+
+			// recherche du numéro de branche pour chaque commit
+			$this->populateCols($this->items);
+		}
+
+		return $this->items;
+	}
+
+	private function populateCols($collection) {
+
+		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
+		// heads.sort! { |head1, head2| head1.to_s <=> head2.to_s }
+		// space = nil
+		// heads.each do |head|
+		//   if commits_by_scmid.include? head.scmid
+		//     space = index_head((space || -1) + 1, head, commits_by_scmid)
+		//   end
+		// end
+		// # when no head matched anything use first commit
+		// space ||= index_head(0, commits.first, commits_by_scmid)
+
+		$space = -1;
+
+		foreach ($collection as $commit) {
+
+			foreach ($commit->getRefs() as $ref) {
+
+				if (strpos($ref, 'tag:') === false)
+					$space = $this->indexCols($space + 1, $commit, $collection);
 			}
 		}
 
-		return $this->commitCollection;
+		if ($space < 0)
+			$space = $this->indexCols(0, $collection->getFirstItem(), $collection);
+
+		return $space; // recalculé par Luigifab_Versioning_Block_Adminhtml_Repository::getGridHtml
+	}
+
+	private function indexCols($space, $commit, $collection) {
+
+		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
+		// def index_head(space, commit, commits_by_scmid)
+		//   stack = [[space, commits_by_scmid[commit.scmid]]]
+		//   max_space = space
+		//   until stack.empty?
+		//     space, commit = stack.pop
+		//     commit[:space] = space if commit[:space].nil?
+		//     space -= 1
+		//     commit[:parent_scmids].each_with_index do |parent_scmid, parent_index|
+		//       parent_commit = commits_by_scmid[parent_scmid]
+		//       if parent_commit and parent_commit[:space].nil?
+		//         stack.unshift [space += 1, parent_commit]
+		//       end
+		//     end
+		//     max_space = space if max_space < space
+		//   end
+		//   max_space
+		// end
+
+		// » la même chose avec les commentaires de donove
+		// » http://www.developpez.net/forums/d1510217/autres-langages/autres-langages/ruby/traduction-ruby-php-graphique-git/
+		// def index_head(space, commit, commits_by_scmid)
+		//   # commits_by_scmid serait ta variable $collection dans ta version PHP
+		//   # Avec la valeur de commit.scmid comme référence
+		//   stack = [ [space, commits_by_scmid[commit.scmid]] ]
+		//   max_space = space
+		//   # until est une boucle
+		//   # Tant que stack (pile) n'est pas empty (vide) on continue la boucle
+		//   until stack.empty?
+		//     # On retire le dernier élément de stack (pile)
+		//     space, commit = stack.pop
+		//     # Si commit[:space] vaut nil
+		//     # on attribue la valeur space à commit[:space]
+		//     # nil est comme null en pHP qui veut dire absence de valeur
+		//     commit[:space] = space if commit[:space].nil?
+		//     # On retire 1 à space
+		//     space -= 1
+		//     # commit est un Hash comme un tableau associatif en PHP
+		//     # On prend la clef :parent_scmids qui pourrait être une chaîne de caractère
+		//     # et on parcourt cette collection avec each_with_index
+		//     commit[:parent_scmids].each_with_index do |parent_scmid, parent_index|
+		//       # On cherche l'index dans la collection commits_by_scmid
+		//       parent_commit = commits_by_scmid[parent_scmid]
+		//       # Si parent_commit est différent de nil (null en PHP) ou false
+		//       # Et si parent_commit[:space] est nil (null en PHP)
+		//       if parent_commit and parent_commit[:space].nil?
+		//         stack.unshift [space += 1, parent_commit]
+		//       end
+		//     end
+		//     # Si space est supérieur à max_space on redéfinit max_space avec la valeur space
+		//     max_space = space if max_space < space
+		//   end
+		//   # On renvoit le valeur de max_space
+		//   max_space
+		// end
+
+		$stack = array(array($space, $commit));
+		$max = $space;
+
+		while (!empty($stack)) {
+
+			list($space, $commit) = array_pop($stack);
+
+			if (!is_int($commit->getSpace()))
+				$commit->setSpace($space);
+
+			$space -= 1;
+
+			foreach ($commit->getParents() as $rev) {
+
+				$parent = $collection->getItemByColumnValue('revision', $rev);
+
+				if (!is_object($parent)) {
+					$space += 1;
+					$fake = new Varien_Object();
+					$fake->setRevision($rev);
+					$fake->setParents(array());
+					array_unshift($stack, array($space, $fake));
+				}
+				else if (is_object($parent) && !is_int($parent->getSpace())) {
+					$space += 1;
+					array_unshift($stack, array($space, $parent));
+				}
+
+				$max = ($space > $max) ? $space : $max;
+			}
+		}
+
+		return $max;
 	}
 
 
-	// #### Révision ################################################################ public ### //
-	// = révision : 11
-	// » Renvoie le numéro de la révision actuelle de la copie locale
-	// » Extrait le numéro à partir de la réponse de la commande git log
-	public function getCurrentRevision($cache = true) {
+	// #### Révision, état et branche ############################################### public ### //
+	// = révision : 23
+	// » Renvoi le numéro de la révision actuelle de la copie locale
+	// » Extrait le numéro à partir de la réponse de la commande 'git log'
+	// » Renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
+	// » Renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
+	public function getCurrentRevision() {
 
-		// données du cache
-		if (!is_null($this->currentRevision) && $cache)
-			return $this->currentRevision;
+		if (!is_null($this->revision))
+			return $this->revision;
 
-		// recherche du numéro de révision
-		exec('git log --pretty=format:"rev#%h" -1', $data);
+		exec('git rev-parse --short HEAD', $data);
 		$data = implode($data);
-		$data = (strpos($data, 'rev#') !== false) ? trim(substr($data, 4)) : null;
+		$data = (strlen($data) > 0) ? trim($data) : null;
 
-		$this->currentRevision = $data;
-		return $this->currentRevision;
+		$this->revision = $data;
+		return $this->revision;
 	}
 
+	public function getCurrentDiff() {
 
-	// #### État #################################################################### public ### //
-	// = révision : 2
-	// » Renvoie l'état de la copie locale à partir de la réponse de la commande git status
+		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
+		//   Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
+		//   have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B)
+		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
+			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space --ignore-blank-lines';
+		else if (version_compare($this->getSoftwareVersion(), '1.5.0', '>='))
+			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space';
+		else
+			$command = 'git diff -U1 --diff-filter=MTUXB';
+
+		$i = 0;
+		exec($command, $lines);
+
+		foreach ($lines as &$line) {
+
+			if (strlen($line) < 1)
+				unset($lines[$i]);
+			else if (strpos($line, '--- a/') === 0)
+				unset($lines[$i]);
+			else if (strpos($line, '+++ b/') === 0)
+				unset($lines[$i]);
+			else if ($line === '\\ No newline at end of file')
+				unset($lines[$i]);
+			else if (strpos($line ,'diff --git a') === 0)
+				$line = "\n".'<strong>=== modified file '.substr(htmlspecialchars($line), 13, strpos($line, ' b/') - 13).'</strong>'; //13 strlen('diff --git a/')
+			else if ($line[0] === '+')
+				$line = '<ins>'.htmlspecialchars($line).' </ins>';
+			else if ($line[0] === '-')
+				$line = '<del>'.htmlspecialchars($line).' </del>';
+			else
+				$line = htmlspecialchars($line);
+
+			$i++;
+		}
+
+		return '<span>'.$command.'</span>'."\n".str_replace("\t", '    ', implode("\n", $lines));
+	}
+
 	public function getCurrentStatus() {
-
-		exec('git status', $dataStatus);
-		array_unshift($dataStatus, '<span>git status</span>');
-
-		return implode("\n", $dataStatus);
+		exec('git status', $data);
+		return '<span>git status</span>'."\n".htmlspecialchars(implode("\n", $data));
 	}
 
-
-	// #### Branche ################################################################# public ### //
-	// = révision : 11
-	// » Renvoie la branche actuelle
-	// » Extrait la branche à partir de la réponse de la commande git branch
 	public function getCurrentBranch() {
-
-		exec('git branch | grep "*"', $data);
-		$data = implode($data);
-		$data = (strpos($data, '*') !== false) ? trim(substr($data, 1)) : null;
-
-		return $data;
+		exec('git branch | grep "*" | cut -c3-', $data);
+		return (strlen(implode($data)) > 0) ? trim(implode($data)) : null;
 	}
 
 
 	// #### Mise à jour ############################################################# public ### //
-	// = révision : 9
-	// » Met à jour la copie locale avec git reset (après avoir annulé les éventuelles modifications avec git clean)
-	// » Prend soin de vérifier le code de retour de la commande git reset et d'enregistrer les détails de la mise à jour
+	// = révision : 10
+	// » Met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
+	// » Prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
 	// » N'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
 	public function upgradeToRevision($obj, $log, $revision) {
 

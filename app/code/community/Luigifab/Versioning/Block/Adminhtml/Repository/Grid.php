@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/07/02/2013
- * Version 22
+ * Updated S/28/02/2015
+ * Version 33
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -24,10 +24,11 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 		parent::__construct();
 
-		$this->setId('versioningGrid');
+		$this->setId('versioning_grid');
 		$this->setDefaultSort('date');
 		$this->setDefaultDir('DESC');
 
+		$this->setUseAjax(false);
 		$this->setSaveParametersInSession(false);
 		$this->setPagerVisibility(false);
 		$this->setFilterVisibility(false);
@@ -42,75 +43,66 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	protected function _prepareColumns() {
 
 		$this->addColumn('revision', array(
-			'header'   => $this->__('Revision'),
-			'align'    => 'center',
-			'width'    => '85px',
-			'index'    => 'revision',
-			'sortable' => false,
-			'filter'   => false,
-			'renderer' => 'versioning/adminhtml_widget_revision',
+			'header'    => $this->__('Revision'),
+			'index'     => 'revision',
+			'renderer'  => 'versioning/adminhtml_widget_revision',
+			'align'     => 'center',
+			'width'     => '85px',
+			'filter'    => false,
+			'sortable'  => false,
 			'column_css_class' => 'revision'
 		));
 
-		if (in_array(Mage::getStoreConfig('versioning/scm/type'), array('bzr','git')) && (Mage::getStoreConfig('versioning/tweak/svggraph') === '1')) {
-			$this->addColumn('graph', array(
-				'header'   => $this->__('Graph'),
-				'align'    => 'center',
-				'width'    => '123px',
-				'index'    => 'graph',
-				'sortable' => false,
-				'filter'   => false,
-				'renderer' => 'versioning/adminhtml_widget_graph',
-				'column_css_class' => 'graph'
-			));
-		}
+		$this->addColumn('graph', array(
+			'header'    => $this->__('Graph'),
+			'width'     => '200px',
+			'filter'    => false,
+			'sortable'  => false
+		));
 
 		$this->addColumn('author', array(
-			'header'   => $this->__('Author'),
-			'align'    => 'center',
-			'width'    => '225px',
-			'index'    => 'author',
-			'sortable' => false,
-			'filter'   => false
+			'header'    => $this->__('Author'),
+			'index'     => 'author',
+			'align'     => 'center',
+			'width'     => '185px',
+			'filter'    => false,
+			'sortable'  => false
 		));
 
 		$this->addColumn('description', array(
-			'header'   => $this->helper('adminhtml')->__('Description'),
-			'align'    => 'left',
-			'index'    => 'description',
-			'sortable' => false,
-			'filter'   => false,
-			'renderer' => 'versioning/adminhtml_widget_description'
+			'header'    => $this->helper('adminhtml')->__('Description'),
+			'index'     => 'description',
+			'renderer'  => 'versioning/adminhtml_widget_description',
+			'align'     => 'left',
+			'filter'    => false,
+			'sortable'  => false
 		));
 
 		$this->addColumn('date', array(
-			'header'   => $this->helper('adminhtml')->__('Date'),
-			'width'    => '185px',
-			'align'    => 'center',
-			'type'     => 'datetime',
-			'index'    => 'date',
-			'sortable' => false,
-			'filter'   => false
+			'header'    => $this->helper('adminhtml')->__('Date'),
+			'index'     => 'date',
+			'type'      => 'datetime',
+			'align'     => 'center',
+			'width'     => '185px',
+			'filter'    => false,
+			'sortable'  => false
 		));
 
-		$upgradeFlag = ($this->helper('versioning')->checkIndexPhp() && $this->helper('versioning')->checkLocalXml() && (Mage::getStoreConfig('versioning/scm/maintenance') === '1')) ? true : false;
-
 		$this->addColumn('action', array(
-			'header'  =>  $this->helper('adminhtml')->__('Action'),
-			'width'   => '60px',
-			'align'   => 'center',
 			'type'    => 'action',
 			'getter'  => 'getRevision',
 			'actions' => array(
 				array(
 					'caption' => $this->__('Deliver'),
-					'url'     => array('base' => '*/versioning_upgrade/run'),
+					'url'     => array('base' => '*/*/upgrade'),
 					'field'   => 'revision',
-					'onclick' => 'return luigifabVersioningUpgrade(this.href, '.(($this->helper('versioning')->isCompressorInstalled()) ? 'true' : 'false').', '.(($this->helper('versioning')->isCompressorEnabled()) ? 'true' : 'false').', '.(($upgradeFlag) ? 'true' : 'false').');'
+					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.addslashes($this->__('Upgrade to revision %s', '§')).'", "'.addslashes($this->helper('versioning')->getFields(true)).'", "'.addslashes($this->__('Martian sunset. Spirit at Gusev crater.')).'");'
 				)
 			),
-			'sortable'  => false,
+			'align'     => 'center',
+			'width'     => '55px',
 			'filter'    => false,
+			'sortable'  => false,
 			'is_system' => true
 		));
 
@@ -118,6 +110,6 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	public function getRowUrl($row) {
-		// rien à faire
+		return null;
 	}
 }

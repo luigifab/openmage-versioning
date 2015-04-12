@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/22/03/2013
- * Version 17
+ * Updated S/04/04/2015
+ * Version 32
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -26,35 +26,82 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
-
-		if (Mage::getStoreConfig('versioning/scm/type') === 'git')
-			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), Mage::registry('versioning')->getCurrentBranch());
-		else
-			$this->_headerText = $this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
+		$this->_headerText = (!is_null($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+			$this->__('Commit history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
+			$this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
 		$this->_removeButton('add');
 
-		if (is_file($this->helper('versioning')->getHistoryFile())) {
-			$this->_addButton('history', array(
-				'label'   => $this->__('Upgrades log'),
-				'onclick' => "location.href = '".$this->getUrl('*/*/history')."';",
-				'class'   => 'go'
+		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
+			$this->_addButton('maintenance_flag', array(
+				'label'   => $this->__('Remove maintenace page'),
+				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delMaintenanceFlag')."');",
+				'class'   => 'delpage delete'
+			));
+		}
+		else {
+			$this->_addButton('maintenance_flag', array(
+				'label'   => $this->__('Enable maintenace page'),
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".addslashes($this->helper('versioning')->getMaintenanceInfo(true))."', '".addslashes($this->__('Martian sunset. Spirit at Gusev crater.'))."');"
 			));
 		}
 
-		if (is_file($this->helper('versioning')->getLastlogFile())) {
-			$this->_addButton('lastlog', array(
-				'label'   => $this->__('Upgrade log'),
-				'onclick' => "location.href = '".$this->getUrl('*/*/lastlog')."';",
-				'class'   => 'go'
+		if (is_file($this->helper('versioning')->getUpgradeFlag())) {
+			$this->_addButton('upgrade_flag', array(
+				'label'   => $this->__('Remove upgrade page'),
+				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delUpgradeFlag')."');",
+				'class'   => 'delpage delete'
+			));
+		}
+		else {
+			$this->_addButton('upgrade_flag', array(
+				'label'   => $this->__('Enable upgrade page'),
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".addslashes($this->helper('versioning')->getUpgradeInfo(true))."', '".addslashes($this->__('Martian sunset. Spirit at Gusev crater.'))."');"
 			));
 		}
 
-		$this->_addButton('status', array(
-			'label'   => $this->__('Current repository status'),
-			'onclick' => "location.href = '".$this->getUrl('*/*/status')."';",
+		$this->_addButton('history', array(
+			'label'   => $this->__('Upgrades log'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
 		));
+
+		$this->_addButton('status', array(
+			'label'   => $this->__('Repository status'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
+			'class'   => 'go'
+		));
+	}
+
+	public function getGridHtml() {
+
+		$commits = Mage::registry('versioning')->getCommitCollection();
+		$count = count($commits) - 1;
+		$space = $current = 0;
+		$hash  = '';
+
+		// comptage dans l'ordre inverse
+		// le commit le plus récent = count($commits) - 1
+		// le commit le plus ancien = 0
+		foreach ($commits as $commit) {
+
+			$hash .= "\n";
+			$hash .= '"'.$commit->getRevision().'": {';
+			$hash .=  '"revision": "'.$commit->getRevision().'",';
+			$hash .=  '"parents": ["'.implode('","', $commit->getParents()).'"],';
+			$hash .=  '"refs": "'.implode(' ', $commit->getRefs()).'",';
+			$hash .=  '"col": '.$commit->getSpace().',';
+			$hash .=  '"row": '.$count--;
+			$hash .= '},';
+
+			$space = ($commit->getSpace() > $space) ? $commit->getSpace() : $space;
+
+			if ($commit->getRevision() === $commit->getCurrentRevision())
+				$current = $commit->getSpace();
+		}
+
+		return $this->getChildHtml('grid').' <script type="text/javascript">var versioningIds = {'.substr($hash, 0, -1).'}, versioningCols = '.$space.', versioningCurrentCol = '.$current.';</script>';
+
 	}
 
 	public function getHeaderCssClass() {

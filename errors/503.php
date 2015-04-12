@@ -1,10 +1,10 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated M/27/11/2012
- * Version 3
+ * Updated D/01/06/2014
+ * Version 7
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,14 +18,19 @@
  * GNU General Public License (GPL) for more details.
  */
 
-if (is_file('./readme.txt')) {
-	require_once('../processor.php');
-	require_once('./processor.php');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
+
+if (is_file(ROOT.'/errors/config/processor.php')) {
+	require_once(ROOT.'/errors/config/processor.php');
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new UserProcessor();
 }
 else {
-	require_once('./errors/processor.php');
-	require_once('./errors/versioning/processor.php');
+	require_once(ROOT.'/errors/processor.php');
+	$processor = new Processor();
 }
 
-$processor = new Versioning_Processor();
-$processor->process503();
+$processor->init('error503');
+$processor->renderPage(503);

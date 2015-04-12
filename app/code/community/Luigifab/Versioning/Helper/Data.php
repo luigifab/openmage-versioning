@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/09/02/2013
- * Version 24
+ * Updated J/26/02/2015
+ * Version 33
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -24,21 +24,74 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return (string) Mage::getConfig()->getModuleConfig('Luigifab_Versioning')->version;
 	}
 
-	public function getFrontendUrl() {
-		return Mage::getUrl('', array('_store' => Mage::app()->getDefaultStoreView()->getStoreId(), '_type' => 'direct_link'));
+
+	public function getFields($grid = false) {
+
+		$fields = new ArrayObject();
+		$fields->append('<label><input type="checkbox" name="use_flag" value="1" /> '.$this->__('Use upgrade page').'</label>');
+
+		Mage::dispatchEvent('admin_versioning_add_fields', array('fields' => $fields));
+
+		$html = '<p>'.$this->__('Are you sure you want to run the upgrade process?<br />Be careful, you can\'t cancel this operation.').'</p><ul><li>'.implode('</li><li>', $fields->getArrayCopy()).'</li></ul>';
+
+		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
 	}
 
-	public function isCompressorInstalled() {
-		return (is_file(Mage::getBaseDir('code').'/community/Luigifab/Compressor/Block/Head.php') &&
-		        (Mage::getConfig()->getNode('modules/Luigifab_Compressor') !== false)) ? true : false;
+	public function getMaintenanceInfo($grid = false) {
+
+		$file = BP.'/errors/config/error503.ip';
+		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$nobody = (!is_file($file) || (strlen(trim(Mage::getStoreConfig('versioning/downtime/error503_byip'))) < 1));
+
+		$html = array();
+		$html[] = '<p>'.$this->__('Are you sure you want to enable the maintenance page?').'</p>';
+		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
+		$html[] = '<p>'.$this->__('Your IP address: %s', getenv('REMOTE_ADDR'));
+
+		if ($nobody)
+			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
+		else if ($byip)
+			$html[] = '<br />'.$this->__('<strong>You will have</strong> access to the frontend.').'</p>';
+		else
+			$html[] = '<br />'.$this->__('<strong>You will haven\'t</strong> access to the frontend.').'</p>';
+
+		$html = implode("\n", $html);
+		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
 	}
 
-	public function isCompressorEnabled() {
-		return ((Mage::getStoreConfig('css/general/enabled') === '1') || (Mage::getStoreConfig('js/general/enabled') === '1')) ? true : false;
+	public function getUpgradeInfo($grid = false) {
+
+		$file = BP.'/errors/config/upgrade.ip';
+		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$nobody = (!is_file($file) || (strlen(trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'))) < 1));
+
+		$html = array();
+		$html[] = '<p>'.$this->__('Are you sure you want to enable the upgrade page?').'</p>';
+		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
+		$html[] = '<p>'.$this->__('Your IP address: %s', getenv('REMOTE_ADDR'));
+
+		if ($nobody)
+			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
+		else if ($byip)
+			$html[] = '<br />'.$this->__('<strong>You will have</strong> access to the frontend.').'</p>';
+		else
+			$html[] = '<br />'.$this->__('<strong>You will haven\'t</strong> access to the frontend.').'</p>';
+
+		$html = implode("\n", $html);
+		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
 	}
+
 
 	public function getLock() {
 		return Mage::getBaseDir('var').'/versioning.lock';
+	}
+
+	public function getHistoryLog() {
+		return Mage::getBaseDir('log').'/versioning.csv';
+	}
+
+	public function getLastLog() {
+		return Mage::getBaseDir('log').'/versioning.log';
 	}
 
 	public function getUpgradeFlag() {
@@ -47,55 +100,5 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function getMaintenanceFlag() {
 		return Mage::getBaseDir().'/maintenance.flag';
-	}
-
-	public function getStatusContent() {
-		$data = Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
-		return '<pre id="versioningLog">'.$data->getCurrentStatus().'</pre>';
-	}
-
-	public function getLastlogFile() {
-		return Mage::getBaseDir('log').'/versioning.log';
-	}
-
-	public function getLastlogContent() {
-
-		$file = $this->getLastlogFile();
-		$offset = Mage::getModel('core/date')->timestamp(time()) - time();
-
-		if (is_file($file) && is_readable($file)) {
-			$timestamp = filemtime($file) + $offset;
-			$html  = '<pre id="versioningLog">';
-			$html .= '<em>'.$this->__('Log generated on %s at %s', Mage::helper('core')->formatDate(date('Y-m-d', $timestamp), 'long', false), date('H:i:s', $timestamp)).'</em>';
-			$html .= "\n\n".file_get_contents($file);
-			$html .= '</pre>';
-		}
-		else {
-			$html  = '<pre id="versioningLog">';
-			$html .= $this->__('Log is empty');
-			$html .= '</pre>';
-		}
-
-		return $html;
-	}
-
-	public function getHistoryFile() {
-		return Mage::getBaseDir('log').'/versioning.csv';
-	}
-
-	public function checkIndexPhp() {
-		$content = file_get_contents(BP.'/index.php');
-		return ((strpos($content, 'upgrade.flag') !== false) && (strpos($content, '$ipFile') !== false)) ? true : false;
-	}
-
-	public function checkLocalXml() {
-
-		if (is_file(BP.'/errors/local.xml')) {
-			$content = file_get_contents(BP.'/errors/local.xml');
-			return (strpos($content, '<skin>versioning</skin>') !== false) ? true : false;
-		}
-		else {
-			return false;
-		}
 	}
 }

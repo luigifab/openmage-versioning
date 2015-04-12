@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated V/03/08/2012
- * Version 4
+ * Updated S/28/02/2015
+ * Version 11
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -24,113 +24,120 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 		parent::__construct();
 
-		$this->setId('versioningGrid');
+		$this->setId('history_grid');
 		$this->setDefaultSort('date');
 		$this->setDefaultDir('DESC');
 
+		$this->setUseAjax(true);
 		$this->setSaveParametersInSession(false);
-		$this->setPagerVisibility(false);
+		$this->setPagerVisibility(true);
 		$this->setFilterVisibility(false);
 	}
 
 	protected function _prepareCollection() {
 
-		$this->setCollection(Mage::getModel('versioning/history')->getCollection());
+		$page = $this->getParam($this->getVarNamePage(), 1);
+		$size = $this->getParam($this->getVarNameLimit(), 20);
+
+		$this->setCollection(Mage::getModel('versioning/history')->init($page, $size));
 		return parent::_prepareCollection();
 	}
 
 	protected function _prepareColumns() {
 
-		$this->addColumn('date', array(
-			'header'   => $this->helper('adminhtml')->__('Date'),
-			'width'    => '185px',
-			'align'    => 'center',
-			'type'     => 'datetime',
-			'index'    => 'date',
-			'sortable' => false,
-			'filter'   => false
-		));
-
-		if (Mage::getStoreConfig('versioning/scm/type') === 'git') {
-			$this->addColumn('branch', array(
-				'header'   => $this->__('Branch'),
-				'align'    => 'center',
-				'width'    => '100px',
-				'index'    => 'branch',
-				'sortable' => false,
-				'filter'   => false
-			));
-		}
-
-		$this->addColumn('current_revision', array(
+		$this->addColumn('from', array(
 			'header'   => $this->__('Current revision'),
+			'index'    => 'from',
 			'align'    => 'center',
 			'width'    => '120px',
-			'index'    => 'current_revision',
 			'sortable' => false,
 			'filter'   => false
 		));
 
-		$this->addColumn('target_revision', array(
+		$this->addColumn('to', array(
 			'header'   => $this->__('Target revision'),
+			'index'    => 'to',
 			'align'    => 'center',
 			'width'    => '120px',
-			'index'    => 'target_revision',
+			'sortable' => false,
+			'filter'   => false
+		));
+
+		$this->addColumn('branch', array(
+			'header'   => $this->__('Branch'),
+			'index'    => 'branch',
+			'align'    => 'center',
+			'width'    => '130px',
+			'sortable' => false,
+			'filter'   => false
+		));
+
+		$this->addColumn('empty', array(
 			'sortable' => false,
 			'filter'   => false
 		));
 
 		$this->addColumn('remote_addr', array(
 			'header'   => $this->__('Remote address'),
-			'align'    => 'center',
-			'width'    => '110px',
 			'index'    => 'remote_addr',
+			'align'    => 'center',
+			'width'    => '150px',
 			'sortable' => false,
 			'filter'   => false
 		));
 
 		$this->addColumn('user', array(
 			'header'   => $this->helper('adminhtml')->__('User'),
-			'align'    => 'center',
-			'width'    => '120px',
 			'index'    => 'user',
+			'align'    => 'center',
+			'width'    => '150px',
+			'sortable' => false,
+			'filter'   => false
+		));
+
+		$this->addColumn('date', array(
+			'header'   => $this->helper('adminhtml')->__('Date'),
+			'index'    => 'date',
+			'type'     => 'datetime',
+			'align'    => 'center',
+			'width'    => '180px',
 			'sortable' => false,
 			'filter'   => false
 		));
 
 		$this->addColumn('duration', array(
 			'header'   => $this->__('Duration'),
-			'align'    => 'center',
-			'width'    => '110px',
 			'index'    => 'duration',
+			'align'    => 'center',
+			'width'    => '60px',
 			'sortable' => false,
 			'filter'   => false,
 			'renderer' => 'versioning/adminhtml_widget_duration'
 		));
 
 		$this->addColumn('status', array(
-			'header'   => $this->helper('adminhtml')->__('Status'),
-			'align'    => 'left',
-			'index'    => 'status',
-			'sortable' => false,
-			'filter'   => false,
-			'renderer' => 'versioning/adminhtml_widget_status'
+			'header'    => $this->helper('adminhtml')->__('Status'),
+			'index'     => 'status',
+			'renderer'  => 'versioning/adminhtml_widget_status',
+			'align'     => 'status',
+			'width'     => '125px',
+			'filter'    => false,
+			'sortable'  => false
 		));
 
-		$this->addColumn('details', array(
-			'header'   => $this->helper('adminhtml')->__('Details'),
-			'align'    => 'center',
-			'width'    => '60px',
-			'index'    => 'details',
-			'sortable' => false,
-			'filter'   => false,
-			'renderer' => 'versioning/adminhtml_widget_details'
+		$this->addColumn('action', array(
+			'renderer'  => 'versioning/adminhtml_widget_link',
+			'align'     => 'center',
+			'width'     => '55px',
+			'filter'    => false,
+			'sortable'  => false,
+			'is_system' => true
 		));
 
 		return parent::_prepareColumns();
 	}
 
 	public function getRowUrl($row) {
-		// rien à faire
+		return null;
 	}
 }

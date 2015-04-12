@@ -1,10 +1,10 @@
 <?php
 /**
  * Created D/12/02/2012
- * Updated J/07/02/2013
- * Version 3
+ * Updated M/24/02/2015
+ * Version 5
  *
- * Copyright 2012-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,6 +21,6 @@
 class Luigifab_Versioning_Block_Adminhtml_Widget_Revision extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
 
 	public function render(Varien_Object $row) {
-		return ($row->getRevision() === Mage::registry('versioning')->getCurrentRevision()) ? '<strong>'.$row->getRevision().'</strong>' : $row->getRevision();
+		return ($row->getRevision() === $row->getCurrentRevision()) ? '<strong>'.$row->getRevision().'</strong>' : $row->getRevision();
 	}
 }

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated D/24/03/2013
- * Version 7
+ * Updated L/30/03/2015
+ * Version 14
  *
- * Copyright 2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,18 +18,12 @@
  * GNU General Public License (GPL) for more details.
  */
 
-$compressorInstalled = $this->helper('versioning')->isCompressorInstalled();
-$compressorEnabled = $this->helper('versioning')->isCompressorEnabled();
-
-$upgradeFlag = ($this->helper('versioning')->checkIndexPhp() && $this->helper('versioning')->checkLocalXml() &&
-	(Mage::getStoreConfig('versioning/scm/maintenance') === '1')) ? true : false;
-
 $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>" style="height:100%;">
 <head>
-	<title><?php echo $this->helper('versioning')->__('Versioning / Tools / Magento Admin').' - '.Mage::getStoreConfig('design/head/default_title') ?></title>
+	<title><?php echo $this->__('Versioning / Tools / Magento Admin'),' - ',Mage::getStoreConfig('design/head/default_title') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
@@ -37,46 +31,28 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.css') ?>" />
+	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
 
-	<script type="text/javascript" charset="utf-8" src="<?php echo Mage::getBaseUrl('js') ?>prototype/prototype.js"></script>
-	<script type="text/javascript" charset="utf-8" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.js') ?>"></script>
-
-	<style type="text/css">
-	html { height:100%; }
-	</style>
+	<script type="text/javascript" charset="utf-8" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
 </head>
 
 
-<body class="adminhtml-versioning-upgrade-confirm" onload="$('submit').focus();">
+<body class="adminhtml-versioning-repository-confirm">
 
-<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/run', array('revision' => $this->getRequest()->getParam('revision'))) ?>" method="get" onsubmit="luigifabConfirmUpgrade('<?php echo $this->helper('versioning')->__('Operation in progress...') ?>');" id="confirmform">
+	<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/upgrade', array('revision' => $this->getRequest()->getParam('revision'), 'confirm' => '1')) ?>" method="get" onsubmit="versioning.valid('<?php echo $this->__('Operation in progress...') ?>');">
 
-	<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->helper('versioning')->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
+		<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
+		<div class="bbcode">
+			<?php echo $this->helper('versioning')->getFields() ?>
+		</div>
+		<div class="buttons">
+			<button type="submit" autofocus="autofocus"><?php echo $this->helper('adminhtml')->__('Continue') ?></button>
+			<button type="button" class="back" onclick="versioning.valid('<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>');"><?php echo $this->helper('adminhtml')->__('Cancel') ?></button>
+		</div>
+	</form>
 
-	<p><?php echo $this->helper('versioning')->__('Are you sure you want to run the upgrade process?<br />Be careful, you can\'t cancel this operation.') ?></p>
-
-	<?php if ($compressorInstalled || $upgradeFlag): ?>
-		<ul>
-			<?php if ($compressorInstalled && $compressorEnabled): ?>
-				<li><label><input type="checkbox" name="code" value="true" /> <?php echo $this->helper('versioning')->__('Update the application code (?%s)', date('YmdHis', Mage::getModel('core/date')->timestamp(time()))) ?></label></li>
-			<?php elseif ($compressorInstalled): ?>
-				<li><label class="disabled"><input type="checkbox" name="code" value="true" disabled="disabled" /> <?php echo $this->helper('versioning')->__('Update the application code (?%s)', date('YmdHis', Mage::getModel('core/date')->timestamp(time()))) ?></label></li>
-			<?php endif ?>
-
-			<?php if ($upgradeFlag): ?>
-				<li><label><input type="checkbox" name="flag" value="true" /> <?php echo $this->helper('versioning')->__('Do not leave website downtime mode (upgrade.flag)') ?></label></li>
-			<?php endif ?>
-		</ul>
-	<?php endif ?>
-
-	<div class="buttons">
-		<input type="hidden" name="confirm" value="true" />
-		<button type="submit" id="submit"><?php echo $this->helper('versioning')->__('Confirm') ?></button>
-		<button type="button" class="back" onclick="location.href='<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>';"><?php echo $this->helper('core')->__('Cancel') ?></button>
-	</div>
-</form>
+	<p class="credits"><?php echo $this->__('Martian sunset. Spirit at Gusev crater.') ?></p>
 
 </body>
 </html>

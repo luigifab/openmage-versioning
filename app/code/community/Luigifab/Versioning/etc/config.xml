@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated D/24/03/2013
- * Version 21
+ * Updated D/05/04/2015
+ * Version 26
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>2.4.0</version>
+			<version>3.0.0</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -56,28 +56,37 @@
 		<events>
 			<admin_system_config_changed_section_versioning>
 				<observers>
-					<versioning_observer>
+					<versioning>
 						<class>versioning/observer</class>
 						<method>updateConfig</method>
-					</versioning_observer>
+					</versioning>
 				</observers>
 			</admin_system_config_changed_section_versioning>
-
-			<!-- BACKEND events examples -->
+			<!-- ADD FIELDS EVENT EXAMPLE -->
+			<!--admin_versioning_add_fields>
+				<observers>
+					<versioning_demo_addfields>
+						<class>versioning/demo</class>
+						<method>addFieldsEvent</method>
+					</versioning_demo_addfields>
+				</observers>
+			</admin_versioning_add_fields-->
+			<!-- BEFORE EVENT EXAMPLE -->
 			<!--admin_versioning_upgrade_before>
 				<observers>
-					<versioning_before>
+					<versioning_demo_before>
 						<class>versioning/demo</class>
 						<method>beforeUpgradeEvent</method>
-					</versioning_before>
+					</versioning_demo_before>
 				</observers>
-			</admin_versioning_upgrade_before>
-			<admin_versioning_upgrade_after>
+			</admin_versioning_upgrade_before-->
+			<!-- AFTER EVENT EXAMPLE -->
+			<!--admin_versioning_upgrade_after>
 				<observers>
-					<versioning_after>
+					<versioning_demo_after>
 						<class>versioning/demo</class>
 						<method>afterUpgradeEvent</method>
-					</versioning_after>
+					</versioning_demo_after>
 				</observers>
 			</admin_versioning_upgrade_after-->
 		</events>
@@ -98,17 +107,4 @@
 			</modules>
 		</translate>
 	</adminhtml>
-	<default>
-		<versioning>
-			<scm>
-				<maintenance>0</maintenance>
-				<events>0</events>
-			</scm>
-			<tweak>
-				<showlog>0</showlog>
-				<deletelog>0</deletelog>
-				<svggraph>1</svggraph>
-			</tweak>
-		</versioning>
-	</default>
 </config>

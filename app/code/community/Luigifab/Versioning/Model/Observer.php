@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated J/07/02/2013
- * Version 7
+ * Updated W/11/03/2015
+ * Version 14
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,101 +20,144 @@
 
 class Luigifab_Versioning_Model_Observer {
 
-	// #### Mise à jour de la configuration ################################# i18n ## public ### //
-	// = révision : 9
-	// » Met à jour les fichiers de traduction par rapport à la configuration
-	// » Met aussi à jour les adresses IP à exclure (en ajoutant un tiret avant et après chaque adresse)
-	// » S'assure que les dossiers de destination sont accessibles
+	// EVENT admin_system_config_changed_section_versioning
+	// Erreur 503 (maintenance.flag)
+	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html / Texte avec délai du rechargement automatique
+	// = (error503.ip) Désactiver la page à partir des adresses IP suivantes
+	// Mise à jour (upgrade.flag)
+	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html / Texte avec délai du rechargement automatique
+	// = (upgrade.ip)  Désactiver la page à partir des adresses IP suivantes
+	// Rapport d'erreur
+	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html
+	// = (config.dat)  Envoyer le rapport par email à
+	// Erreur 404 système
+	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html
 	public function updateConfig() {
 
-		// *** Vérification des dossiers ************************ //
-		$dir = Mage::getBaseDir().'/errors/versioning/locale';
-
-		if (!is_writeable($dir))
-			@chmod($dir, 0755);
-		if (!is_dir($dir) || !is_writeable($dir))
-			Throw new Exception(Mage::helper('versioning')->__('Directory <em>errors/versioning/locale</em> is not writable.'));
-
-		$dir = Mage::getBaseDir().'/errors/versioning/config';
+		// vérification du répertoire
+		$dir = Mage::getBaseDir().'/errors/config';
 
 		if (!is_dir($dir))
 			@mkdir($dir, 0755);
 		if (!is_dir($dir) || !is_writeable($dir))
-			Throw new Exception(Mage::helper('versioning')->__('Directory <em>errors/versioning/config</em> does not exist or is not writable.'));
+			throw new Exception('Directory <em>errors/config</em> does not exist or is not writable.');
 
-		// *** Traductions (vue magasin par vue magasin) ******** //
-		$storeids = array();
+		// récupération de toute la configuration utile
+		// enregistre le tout dans un tableau avant d'enregistrer le tout dans les fichiers *.csv, config.ip et config.dat
+		$global = array();
 
-		if (strlen($store = Mage::app()->getRequest()->getParam('store')) > 0) {
-			$storeid = Mage::getModel('core/store')->load($store)->getStoreId();
-			$this->updateStoreTranslation(Mage::getStoreConfig('general/locale/code', $storeid), $storeid);
-		}
-		else {
-			foreach (Mage::app()->getStores() as $store) {
-				if ($store->getIsActive() === '1')
-					$storeids[Mage::getStoreConfig('general/locale/code', $store->getStoreId())] = $store->getStoreId();
-			}
-			foreach ($storeids as $lang => $storeid) {
-				$this->updateStoreTranslation($lang, $storeid);
+		foreach (Mage::app()->getWebsites() as $website) {
+			foreach ($website->getGroups() as $group) {
+				foreach ($group->getStores() as $store) {
+					$locale = Mage::getStoreConfig('general/locale/code', $store->getStoreId());
+					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getStoreId());
+				}
 			}
 		}
 
-		// *** Adresses IP page upgrade ************************* //
-		$target = BP.'/errors/versioning/config/upgrade.ip';
-		$ips = trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'));
-
-		if (strlen($ips) > 0)
-			file_put_contents($target, '-'.str_replace(' ', "-\n-", $ips).'-');
-		else if (is_file($target))
-			unlink($target);
-
-		// *** Adresses IP page 503 ***************************** //
-		$target = BP.'/errors/versioning/config/503.ip';
-		$ips = trim(Mage::getStoreConfig('versioning/downtime/error503_byip'));
-
-		if (strlen($ips) > 0)
-			file_put_contents($target, '-'.str_replace(' ', "-\n-", $ips).'-');
-		else if (is_file($target))
-			unlink($target);
+		$this->updateTranslations($global);
+		$this->updateDataConfig($global);
+		$this->updateIpConfig($global);
 	}
 
 
-	// #### Génération des fichiers CSV ############################################ private ### //
-	// = révision : 12
-	// » Met à jour le fichier de traduction à partir des données du backend
-	// » Formate le texte de la description au format HTML
-	private function updateStoreTranslation($lang, $storeid) {
+	// $global ici dans l'ordre, mais l'ordre n'a aucune importance
+	// fr_FR => Array
+	//  [error503_pagetitle] [error503_title] [error503_content] [error503_autoreload] [error503_byip]
+	//  [upgrade_pagetitle]  [upgrade_title]  [upgrade_content]  [upgrade_autoreload]  [upgrade_byip]
+	//  [report_pagetitle]   [report_title]   [report_content]                                         [report_email]
+	//  [report_pagetitle]   [report_title]   [error404_content]
 
-		$text = array();
-		$target = BP.'/errors/versioning/locale/'.$lang.'2.csv';
+	// pagetitle/title, content, autoreload (*.csv)
+	private function updateTranslations($global) {
 
-		// titre de la page
-		$title = Mage::getStoreConfig('design/head/default_title', $storeid);
+		$translations = array();
 
-		if (strlen($title) > 0)
-			$text[] = '`Oups!`,`'.$title.'`';
+		// extraction des traductions locale par locale
+		// il se peut aussi qu'il n'y en ait qu'une seule
+		foreach ($global as $locale => $config) {
 
-		// traduction des pages
-		foreach (array('upgrade', 'report', 'error503', 'error404') as $key) {
+			// extraction de la configuration pour la locale
+			foreach ($config as $key => $value) {
 
-			$title = Mage::getStoreConfig('versioning/downtime/'.$key.'_title', $storeid);
+				$value = trim($value);
 
-			if (strlen($title) > 0)
-				$text[] = '`'.$key.'_title`,`'.$title.'`';
+				// versioning/downtime/*title
+				if (strpos($key, 'title') !== false) {
 
-			$content = Mage::getStoreConfig('versioning/downtime/'.$key.'_content', $storeid);
+					if (strlen($value) > 0)
+						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
+				}
+				// versioning/downtime/*content
+				else if (strpos($key, 'content') !== false) {
 
-			if ((strlen($content) > 0) && (strpos($content, '<') === 0))
-				$text[] = '`'.$key.'_content`,`'.$content.'`';
-			else if (strlen($content) > 0)
-				$text[] =  '`'.$key.'_content`,`<p>'.str_replace("\n", '<br />', $content).'</p>`';
+					if ((strlen($value) > 0) && (strpos($value, '<') === 0))
+						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
+					else if (strlen($value) > 0)
+						$translations[$locale][] =  '`'.$key.'`,`<p>'.str_replace("\n", '<br />', $value).'</p>`';
+				}
+				// versioning/downtime/*autoreload
+				else if (strpos($key, 'autoreload') !== false) {
+
+					if ((strlen($value) > 0) && (strpos($value, '[') !== false) && (strpos($value, ']') !== false))
+						$translations[$locale][] = '`'.$key.'`,`'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'`';
+				}
+			}
 		}
 
-		// sauvegarde des données
-		// ou suppression du fichier
-		if (count($text) > 0)
-			file_put_contents($target, implode("\n", $text));
-		else if (is_file($target))
-			unlink($target);
+		// sauvegarde des données (format CSV)
+		@unlink(BP.'/errors/config/*.csv');
+		if (count($translations) > 0) {
+			foreach ($translations as $locale => $values)
+				file_put_contents(BP.'/errors/config/'.$locale.'.csv', implode("\n", $values));
+		}
+	}
+
+	// email (config.dat)
+	private function updateDataConfig($global) {
+
+		$config = array();
+
+		// extraction de la configuration
+		foreach (reset($global) as $key => $value) {
+
+			$value = trim($value);
+			if (strlen($value) < 1)
+				continue;
+
+			if (strpos($key, '_email') !== false)
+				$config[] = $key.'='.str_replace('=', '', $value);
+		}
+
+		// sauvegarde des données dans un seul fichier (format CSV)
+		@unlink(BP.'/errors/config/config.dat');
+		if (count($config) > 0)
+			file_put_contents(BP.'/errors/config/config.dat', implode("\n", $config));
+	}
+
+	// byip (upgrade.ip error503.ip)
+	private function updateIpConfig($global) {
+
+		$config = array();
+
+		// extraction de la configuration
+		foreach (reset($global) as $key => $value) {
+
+			$value = trim($value);
+			if (strlen($value) < 1)
+				continue;
+
+			if (strpos($key, '_byip') !== false) {
+				$value = explode(' ', $value);
+				$config[substr($key, 0, strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
+			}
+		}
+
+		// sauvegarde des données dans plusieurs fichiers (format spécial)
+		@unlink(BP.'/errors/config/*.ip');
+		if (count($config) > 0) {
+			foreach ($config as $key => $values)
+				file_put_contents(BP.'/errors/config/'.$key.'.ip', implode("\n", $values));
+		}
 	}
 }

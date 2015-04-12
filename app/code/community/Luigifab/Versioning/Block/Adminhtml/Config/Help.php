@@ -1,8 +1,8 @@
 <?php
 /**
- * Created J/01/03/2012
- * Updated M/24/02/2015
- * Version 7
+ * Created V/23/05/2014
+ * Updated D/01/06/2014
+ * Version 2
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,11 +18,10 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Block_Adminhtml_Widget_Status extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract {
+class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface {
 
-	public function render(Varien_Object $row) {
-		// pour le script des traductions $this->__('Success')
-		$status = ($row->getStatus() == 'Upgrade completed') ? 'success' : 'error';
-		return '<span class="grid-'.$status.'">'.$this->__(ucfirst($status)).'</span>';
+	public function render(Varien_Data_Form_Element_Abstract $element) {
+		$url = 'https://redmine.luigifab.info/projects/magento/wiki/versioning';
+		return '<p class="box">Luigifab/Versioning '.$this->helper('versioning')->getVersion().' <a href="'.$url.'" onclick="window.open(this.href); return false;" style="float:right;">'.$url.'</a></p>';
 	}
 }

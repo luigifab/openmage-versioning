@@ -1,128 +1,165 @@
-@charset "utf-8";
 /**
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * File created J/22/12/2011, updated D/24/03/2013, version 28
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Created J/22/12/2011, updated D/05/04/2015, version 53
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
  */
 
-/* ########################################## Historiques et Maintenance ### */
-body.adminhtml-versioning-repository-index h3.icon-head, body.adminhtml-versioning-repository-history h3.icon-head,
-body.adminhtml-versioning-repository-lastlog h3 span, body.adminhtml-versioning-repository-status h3 span,
-body.adminhtml-versioning-downtime-index h3 span {
-	min-height:18px; padding-left:21px;
-}
-
-body.adminhtml-versioning-repository-index h3.icon-head.bzr, body.adminhtml-versioning-repository-history h3.icon-head.bzr,
-body.adminhtml-versioning-repository-lastlog h3 span.bzr, body.adminhtml-versioning-repository-status h3 span.bzr,
-body.adminhtml-versioning-downtime-index h3 span.bzr {
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& global &&& */
+body.adminhtml-versioning-repository-index h3.icon-head.bzr,
+body.adminhtml-versioning-repository-history h3.icon-head.bzr,
+body.adminhtml-versioning-repository-status h3.icon-head {
 	background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center;
 }
 
-body.adminhtml-versioning-repository-index h3.icon-head.git, body.adminhtml-versioning-repository-history h3.icon-head.git,
-body.adminhtml-versioning-repository-lastlog h3 span.git, body.adminhtml-versioning-repository-status h3 span.git,
-body.adminhtml-versioning-downtime-index h3 span.git {
+body.adminhtml-versioning-repository-index h3.icon-head.git,
+body.adminhtml-versioning-repository-history h3.icon-head.git,
+body.adminhtml-versioning-repository-status h3.icon-head.git {
 	background:url("../../../images/luigifab/versioning/git.png") no-repeat left center;
 }
 
-body.adminhtml-versioning-repository-history tbody tr td.last { padding:2px 6px; }
+body.adminhtml-versioning-repository-index h3.icon-head.svn,
+body.adminhtml-versioning-repository-history h3.icon-head.svn,
+body.adminhtml-versioning-repository-status h3.icon-head.svn {
+	background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center;
+}
+
+body.adminhtml-versioning-repository-index h3.icon-head.hg,
+body.adminhtml-versioning-repository-history h3.icon-head.hg,
+body.adminhtml-versioning-repository-status h3.icon-head.hg {
+	background:url("../../../images/luigifab/versioning/hg.png") no-repeat left center;
+}
+
+body.adminhtml-versioning-repository-index h3.icon-head.darcs,
+body.adminhtml-versioning-repository-history h3.icon-head.darcs,
+body.adminhtml-versioning-repository-status h3.icon-head.darcs {
+	background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center;
+}
+
+body.adminhtml-versioning-repository-index table.data tr:hover,
+body.adminhtml-versioning-repository-history table.data tr:hover { background-color:#DEDEDE; }
+
+body.adminhtml-versioning-repository-history #loading-mask { background-color:rgba(255,255,255, 0.5); }
+body.adminhtml-versioning-repository-history #loading_mask_loader { margin-left:-120px; margin-top:-30px; }
+
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
+#config_edit_form[action*="system_config/save/section/versioning"] { padding-top:0; }
+#config_edit_form[action*="system_config/save/section/versioning"] [title] { border-bottom:none; }
+#config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
+#config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
+#config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:3px; line-height:135%; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value input { width:400px; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value textarea { width:400px; height:10em; }
+
+/* &&&&&&&&&&&&& versioning/repository/history,status &&& */
+body.adminhtml-versioning-repository-status pre ins { display:inline-block; width:100%; text-decoration:none; background-color:#CFC; }
+body.adminhtml-versioning-repository-status pre del { display:inline-block; width:100%; text-decoration:none; background-color:#FCC; }
+body.adminhtml-versioning-repository-status pre strong { display:inline-block; width:100%; }
+
+body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repository-history pre {
+	margin-bottom:1em; padding:0.8em 1em 1em; overflow:hidden;
+	font:11px monospace; line-height:16px; white-space:pre-wrap;
+	color:#666; border:1px solid #DADFE0; background-color:#F6F6F6;
+}
+
+body.adminhtml-versioning-repository-history pre span, body.adminhtml-versioning-repository-status pre span { color:black; }
+body.adminhtml-versioning-repository-history pre { height:20em; margin-bottom:2em; overflow:auto; }
+
+body.adminhtml-versioning-repository-history table.data tr.headings th.no-link { padding:3px 4px; text-align:center; }
+body.adminhtml-versioning-repository-history table.data tr.current { font-weight:bold; background-color:#DEDEDE; }
+body.adminhtml-versioning-repository-history table.data tr.current td a { display:none; }
+
+body.adminhtml-versioning-repository-history table.data tr td.a-status span {
+	display:block; height:17px; line-height:17px; text-align:center;
+	font-size:10px; font-weight:bold; text-transform:uppercase; color:white; border-radius:10px;
+}
+
+body.adminhtml-versioning-repository-history table.data tr td.a-status span.grid-success { background-color:#3CB861; }
+body.adminhtml-versioning-repository-history table.data tr td.a-status span.grid-error { background-color:#E41101; }
+
+/* &&&&&&&&&&&&&&&&&&&&&& versioning/repository/index &&& */
+body.adminhtml-versioning-repository-index button.delpage.delete span { padding-left:0; background-image:none; }
 body.adminhtml-versioning-repository-index div.content-header td { width:auto !important; }
 
-#versioningGrid tbody tr:hover { background-color:#DEDEDE; }
+body.adminhtml-versioning-repository-index table.data tr.headings th.no-link { padding:3px 4px; text-align:center; color:#666; }
 
-#versioningGrid thead tr.headings { background-position:left -18px; }
-#versioningGrid thead tr.headings th.no-link { padding-bottom:5px; text-align:center; color:#666; }
+body.adminhtml-versioning-repository-index table.data tr.outside { color:#AAA; font-style:italic; }
+body.adminhtml-versioning-repository-index table.data tr.outside a { color:#AAA; }
+body.adminhtml-versioning-repository-index table.data tr.outside:hover { color:#888; }
+body.adminhtml-versioning-repository-index table.data tr.outside:hover a { color:#AAA; }
 
-#versioningGrid tbody tr td { vertical-align:middle; }
-#versioningGrid tbody tr td.revision { padding:2px 0; }
-#versioningGrid tbody tr td.revision strong { font-size:115%; }
-#versioningGrid tbody tr td a.issue, #versioningGrid tbody tr td span.issue { float:right; padding-left:0.3em; color:#999; text-decoration:none; }
+body.adminhtml-versioning-repository-index table.data tr td { vertical-align:middle; }
+body.adminhtml-versioning-repository-index table.data tr td.revision { padding:2px 0; }
+body.adminhtml-versioning-repository-index table.data tr td.revision strong { font-size:115%; }
+body.adminhtml-versioning-repository-index table.data tr td a.issue { float:right; padding-left:0.3em; color:#999; }
 
-#versioningGrid tbody tr td a.issue:hover, #versioningGrid tbody tr td a.issue:active,
-#versioningGrid tbody tr td a.issue:focus { color:#777; text-decoration:underline; }
-
-#svggraph { position:absolute; pointer-events:none; }
-
-#versioningLog { font:11px monospace; line-height:16px; color:#666; white-space:pre-wrap; }
-#versioningLog span { color:black; }
-#versioningLog em { color:#444; }
-
-#downtime li {
-	display:inline-block; margin:0.2em 0.5em 1.4em; width:30em; height:8em; padding:0.7em 1em; vertical-align:middle;
-	border-radius:1em; -moz-border-radius:1em; -webkit-border-radius:1em;
-	background-clip:padding-box; -moz-background-clip:padding; -webkit-background-clip:padding-box;
-	border:1px solid #DDD; background-color:#EFEFEF;
+body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
+body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
+	position:absolute !important; left:87px; width:197px;
+	transition:width 0.4s; -moz-transition:width 0.4s; -webkit-transition:width 0.4s;
+	background-color:rgba(0,0,0, 0.09); pointer-events:none;
 }
 
-#downtime li h3 { padding-left:20px; background:url("../../../images/fam_page_white.gif") no-repeat left center; }
-#downtime li p.ip { margin-top:1em; line-height:130%; }
-#downtime li p.ip a { color:inherit; }
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
+body.adminhtml-versioning-repository-index p.credits { position:absolute; bottom:1.2em; left:1em; color:#CCC; }
 
-
-/* ############################################# Demande de confirmation ### */
-body.adminhtml-versioning-upgrade-confirm { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); background-size:100% 100%; }
-
-#confirmform h1 {
-	margin:0 0.5em 0.1em 0; padding:0 1px 0 23px; min-height:18px;
-	font-size:1.25em; line-height:1.2em; color:#EB5E00;
+body.adminhtml-versioning-repository-index #apijsDialog {
+	background-color:#111; background-size:100% 100%;
+	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 
-#confirmform h1.bzr { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
-#confirmform h1.git { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
+#apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+#apijsBox.versioning h1 { padding-left:23px; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
+#apijsBox.versioning.bzr h1 { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
+#apijsBox.versioning.git h1 { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
+#apijsBox.versioning.svn h1 { background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center; }
+#apijsBox.versioning.hg h1  { background:url("../../../images/luigifab/versioning/hg.png") no-repeat left center; }
+#apijsBox.versioning.darcs h1 { background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center; }
 
-#confirmform {
-	position:relative; display:block; margin:9.5% auto auto; padding:0.8em; width:38em;
-	background-color:white; background-color:rgba(255, 255, 255, 0.6);
-	border-radius:0.8em; -moz-border-radius:0.8em; -webkit-border-radius:0.8em;
-	background-clip:padding-box; -moz-background-clip:padding; -o-background-clip:padding; -webkit-background-clip:padding-box;
+#apijsBox.versioning div.bbcode ul { margin-top:0.5em; font-size:0.9em; }
+#apijsBox.versioning div.bbcode ul li + li { margin-top:0.35em; }
+#apijsBox.versioning div.bbcode label { cursor:pointer; }
+#apijsBox.versioning div.bbcode input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
+#apijsBox.versioning p.reload { display:none; }
+
+/* &&&&&&&&&&&&&&&&&&&& versioning/repository/confirm &&& */
+body.adminhtml-versioning-repository-confirm {
+	height:100%; line-height:140%; overflow-y:scroll;
+	background-color:#111; background-size:100% 100%;
+	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 
-#confirmform p { margin-top:1em; font-size:13px; }
-#confirmform p.saving { position:absolute; top:40%; margin:0; padding-left:50px; }
+body.adminhtml-versioning-repository-confirm form {
+	position:relative; display:block; top:23%; margin:auto; padding:0.6em 0.8em 2.4em; width:26rem; min-height:12.5em;
+	font:0.8rem sans-serif; border-radius:0.8em; background-clip:padding-box; background-color:rgba(255,255,255, 0.6);
+}
 
-#confirmform ul { margin-top:0.8em; }
-#confirmform input { margin-right:0.1em; vertical-align:text-top; cursor:pointer; }
-#confirmform label { cursor:pointer; }
-#confirmform label.disabled { color:#999; cursor:default; }
-#confirmform label.disabled input { cursor:default; }
+body.adminhtml-versioning-repository-confirm h1 {
+	margin:0.15em 0 0.7em; padding-left:23px; min-height:1.2em;
+	font-size:1.2em; line-height:1.2em; color:#EB5E00;
+}
 
-#confirmform div.buttons { margin:1.9em 0 0; text-align:right; }
-#confirmform div.buttons button[type="submit"] { float:right; margin-left:0.4em; }
-#confirmform div.buttons button:active, #confirmform div.buttons button:focus { border:1px solid black; }
+body.adminhtml-versioning-repository-confirm h1.bzr { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
+body.adminhtml-versioning-repository-confirm h1.git { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
+body.adminhtml-versioning-repository-confirm h1.svn { background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center; }
+body.adminhtml-versioning-repository-confirm h1.hg  { background:url("../../../images/luigifab/versioning/hg.png") no-repeat left center; }
+body.adminhtml-versioning-repository-confirm h1.darcs { background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center; }
 
-#box.options.versioning h1 { white-space:nowrap; }
-#box.options.versioning div.bbcode p { font-size:13px; }
-#box.options.versioning div.bbcode input { margin-right:0.1em; vertical-align:text-top; cursor:pointer; }
-#box.options.versioning div.bbcode label { cursor:pointer; }
-#box.options.versioning div.bbcode label.disabled { color:#999; cursor:default; }
-#box.options.versioning div.bbcode label.disabled input { cursor:default; }
-#box.options.versioning div.bbcode ul { margin-top:1em; }
-#box.options.versioning div.bbcode ul li + li { margin-top:0.1em; }
+body.adminhtml-versioning-repository-confirm ul { margin-top:0.5em; font-size:0.9em; }
+body.adminhtml-versioning-repository-confirm ul li + li { margin-top:0.35em; }
+body.adminhtml-versioning-repository-confirm label { cursor:pointer; }
+body.adminhtml-versioning-repository-confirm input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
 
-#box.options.versioning.big { min-height:12.1em; }
-#box.options.versioning.big p.reload { display:none; }
-#box.options.versioning.big p.saving { bottom:7em; }
+body.adminhtml-versioning-repository-confirm p { margin:1em auto; line-height:140%; }
+body.adminhtml-versioning-repository-confirm p.credits { position:absolute; bottom:0.25em; left:1em; color:#CCC; }
+body.adminhtml-versioning-repository-confirm p.saving { position:absolute; top:4.35em; margin:0; }
 
+body.adminhtml-versioning-repository-confirm div.buttons { position:absolute; right:0.9em; bottom:0.7em; }
+body.adminhtml-versioning-repository-confirm div.buttons button { height:1.7em; }
+body.adminhtml-versioning-repository-confirm div.buttons button[type="submit"] { float:right; margin-left:0.4em; }
 
-/* ####################################################### Configuration ### */
-#row_versioning_scm_maintenance p.note { padding-top:3px; line-height:135%; }
-#row_versioning_tweak_svggraph p.note { padding-top:3px; line-height:135%; width:150%; }
-#row_versioning_tweak_svggraph td a { color:#2F2F2F; }
-#row_versioning_tweak_bugtracker td a { color:#2F2F2F; }
-#row_versioning_downtime_upgrade td { padding-top:14px; }
-
-#versioning_downtime h4 a[onclick] { float:right; margin-top:-0.2em; font-size:12px; }
-
-#versioning_downtime ul li { margin:0; line-height:140%; }
-#versioning_downtime ul li.doc { float:right; }
-#versioning_downtime ul li.ok, #versioning_downtime ul li.ok a { color:green; }
-#versioning_downtime ul li.ko, #versioning_downtime ul li.ko a { color:red; }
-
-#versioning_downtime_upgrade_byip, #versioning_downtime_error503_byip,
-#versioning_downtime_upgrade_title, #versioning_downtime_report_title,
-#versioning_downtime_error404_title, #versioning_downtime_error503_title { width:400px; }
-#versioning_downtime_upgrade_content, #versioning_downtime_report_content,
-#versioning_downtime_error404_content, #versioning_downtime_error503_content { width:400px; height:10em; }
-
+body.adminhtml-versioning-repository-confirm button { opacity:0.7; }
+body.adminhtml-versioning-repository-confirm button:hover, body.adminhtml-versioning-repository-confirm button:active,
+body.adminhtml-versioning-repository-confirm button:focus { opacity:1; }

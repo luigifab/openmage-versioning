@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/03/02/2013
- * Version 3
+ * Updated J/26/02/2015
+ * Version 4
  *
- * Copyright 2011-2013 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,7 +22,7 @@ class Luigifab_Versioning_Block_Adminhtml_Widget_Description extends Mage_Adminh
 
 	public function render(Varien_Object $row) {
 
-		$bugtracker = trim(Mage::getStoreConfig('versioning/tweak/bugtracker'));
+		$bugtracker = trim(Mage::getStoreConfig('versioning/scm/bugtracker'));
 		$description = nl2br($row->getDescription());
 
 		if (strlen($bugtracker) > 0) {
