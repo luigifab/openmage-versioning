@@ -27,12 +27,12 @@ if (file_exists('upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') ===
 C'est tout (faites attention si vous n'utilisez pas /admin/ pour votre back-office).
 
 
-Vous pouvez aussi surcharger les fichiers...
+Vous pouvez aussi surcharger les fichiers :
  - errors/processor.php      » errors/config/processor.php (utilisez UserProcessor comme nom de classe, votre classe doit étendre Processor)
  - errors/page.phtml         » errors/config/page.phtml
 
-Le dossier errors/config va contenir d'autres fichiers texte et VOUS DEVEZ LES IGNORER (avec bzr ou git : *ip *dat *csv).
-Ces fichiers seront créés automatiquement lorsque vous sauvegarderez la configuration dans le back-office de Magento...
+Le dossier errors/config va contenir d'autres fichiers texte et VOUS DEVEZ LES IGNORER (*ip *dat *csv).
+Ces fichiers seront créés automatiquement lorsque vous sauvegarderez la configuration dans le back-office de Magento :
  - errors/config/error503.ip » liste d'adresses ip
  - errors/config/upgrade.ip  » liste d'adresses ip
  - errors/config/config.dat  » configuration

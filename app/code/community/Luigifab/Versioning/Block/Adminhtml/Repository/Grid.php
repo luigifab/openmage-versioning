@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/28/02/2015
- * Version 33
+ * Updated S/11/04/2015
+ * Version 40
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -45,12 +45,12 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		$this->addColumn('revision', array(
 			'header'    => $this->__('Revision'),
 			'index'     => 'revision',
-			'renderer'  => 'versioning/adminhtml_widget_revision',
 			'align'     => 'center',
 			'width'     => '85px',
 			'filter'    => false,
 			'sortable'  => false,
-			'column_css_class' => 'revision'
+			'column_css_class' => 'revision',
+			'frame_callback' => array($this, 'decorateRevision')
 		));
 
 		$this->addColumn('graph', array(
@@ -72,10 +72,10 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		$this->addColumn('description', array(
 			'header'    => $this->helper('adminhtml')->__('Description'),
 			'index'     => 'description',
-			'renderer'  => 'versioning/adminhtml_widget_description',
 			'align'     => 'left',
 			'filter'    => false,
-			'sortable'  => false
+			'sortable'  => false,
+			'frame_callback' => array($this, 'decorateDescription')
 		));
 
 		$this->addColumn('date', array(
@@ -109,7 +109,34 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		return parent::_prepareColumns();
 	}
 
+
+	public function getRowClass($row) {
+		return '';
+	}
+
 	public function getRowUrl($row) {
 		return null;
+	}
+
+	public function decorateDescription($value, $row, $column, $isExport) {
+
+		$bugtracker = trim(Mage::getStoreConfig('versioning/scm/bugtracker'));
+		$description = nl2br($row->getData('description'));
+
+		if (strlen($bugtracker) > 0) {
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" onclick="window.open(this.href); return false;">$1</a>', $description);
+			$description = preg_replace('#\#([0-9]+)#', '<a href="'.$bugtracker.'$1" class="issue" onclick="window.open(this.href); return false;">$1</a>', $description);
+		}
+		else {
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" onclick="window.open(this.href); return false;">$1</a>', $description);
+		}
+
+		return $description;
+	}
+
+	public function decorateRevision($value, $row, $column, $isExport) {
+
+		$revision = $row->getData('revision');
+		return ($revision === $row->getData('current_revision')) ? '<strong>'.$revision.'</strong>' : $revision;
 	}
 }

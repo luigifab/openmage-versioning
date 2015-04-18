@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/28/02/2015
- * Version 11
+ * Updated S/11/04/2015
+ * Version 20
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -112,32 +112,67 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'width'    => '60px',
 			'sortable' => false,
 			'filter'   => false,
-			'renderer' => 'versioning/adminhtml_widget_duration'
+			'frame_callback' => array($this, 'decorateDuration')
 		));
 
 		$this->addColumn('status', array(
 			'header'    => $this->helper('adminhtml')->__('Status'),
 			'index'     => 'status',
-			'renderer'  => 'versioning/adminhtml_widget_status',
 			'align'     => 'status',
 			'width'     => '125px',
 			'filter'    => false,
-			'sortable'  => false
+			'sortable'  => false,
+			'frame_callback' => array($this, 'decorateStatus')
 		));
 
 		$this->addColumn('action', array(
-			'renderer'  => 'versioning/adminhtml_widget_link',
 			'align'     => 'center',
 			'width'     => '55px',
 			'filter'    => false,
 			'sortable'  => false,
-			'is_system' => true
+			'is_system' => true,
+			'frame_callback' => array($this, 'decorateLink')
 		));
 
 		return parent::_prepareColumns();
 	}
 
+
+	public function getRowClass($row) {
+		return '';
+	}
+
 	public function getRowUrl($row) {
 		return null;
+	}
+
+	public function decorateStatus($value, $row, $column, $isExport) {
+
+		$status = ($row->getData('status') === 'Upgrade completed') ? 'success' : 'error'; // pour translate.php  $this->__('Success')
+		return '<span class="grid-'.$status.'">'.$this->__(ucfirst($status)).'</span>';
+	}
+
+	public function decorateDuration($value, $row, $column, $isExport) {
+
+		$data = $row->getData('duration');
+		$minutes = intval($data / 60);
+		$seconds = intval($data % 60);
+
+		if ($data > 599)
+			$data = '<strong>'.(($seconds > 9) ? $minutes.':'.$seconds : $minutes.':0'.$seconds).'</strong>';
+		else if ($data > 59)
+			$data = '<strong>'.(($seconds > 9) ? '0'.$minutes.':'.$seconds : '0'.$minutes.':0'.$seconds).'</strong>';
+		else if ($data > 0)
+			$data = ($seconds > 9) ? '00:'.$data : '00:0'.$data;
+		else
+			$data = '&lt; 1';
+
+		return $data;
+	}
+
+	public function decorateLink($value, $row, $column, $isExport) {
+
+		$data = addslashes(base64_encode($row->getData('details')));
+		return '<a href="#" onclick="return versioning.history(this, \''.$data.'\');">'.$this->helper('adminhtml')->__('View').'</a>';
 	}
 }

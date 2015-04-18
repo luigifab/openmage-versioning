@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated D/05/04/2015
- * Version 26
+ * Updated S/11/04/2015
+ * Version 27
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.0.0</version>
+			<version>3.0.1</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/17/01/2015
- * Version 7
+ * Updated S/11/04/2015
+ * Version 8
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -22,19 +22,25 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-		$code = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
+		$lang = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
 
-		// exemple d'une adresse de base : http://mario/sites/14/web/(index.php/)
+		// exemple d'une adresse de base : http://mario/sites/14/web/(xyz/)(index.php/)
 		// exemple d'une adresse finale  : http://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
 		$url = preg_replace('#/[^/]+\.php#', '', $url);
-		$url = $url.'errors/'.$element->getHtmlId().'.php?lang='.$code;
+
+		if (Mage::getStoreConfig('web/url/use_store') === '1')
+			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getCode().'/', '/', $url);
+
+		// versioning_downtime_error503.php versioning_downtime_error404.php
+		// versioning_downtime_upgrade.php versioning_downtime_report.php
+		$url = $url.'errors/'.$element->getHtmlId().'.php?lang='.$lang;
 		$url = str_replace(array('versioning_downtime_error', 'versioning_downtime_'), '', $url);
 
-		if ($element->getHtmlId() == 'versioning_downtime_report')
+		if ($element->getHtmlId() === 'versioning_downtime_report')
 			$url .= '&amp;demo';
 
-		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getLabel(), $url, $this->__('Preview in %s', $this->getLocaleName($code)));
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getLabel(), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
 	}
 
 	private function getStoreId() {
@@ -52,11 +58,13 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		return $storeId;
 	}
 
-	private function getLocaleName($code) {
+	private function getLocaleName($lang) {
 
-		foreach (Mage::app()->getLocale()->getOptionLocales() as $locale) {
+		$locales = Mage::app()->getLocale()->getOptionLocales();
 
-			if ($locale['value'] == $code)
+		foreach ($locales as $locale) {
+
+			if ($locale['value'] === $lang)
 				return $locale['label'];
 		}
 	}
