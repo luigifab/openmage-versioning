@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated D/05/04/2015, version 54
+ * Created J/22/12/2011, updated V/01/05/2015, version 55
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -172,7 +172,7 @@ var versioning = {
 
 
 	// #### Représentation des branches ######################################### //
-	// = révision : 117
+	// = révision : 118
 	// » Est basé sur le script de Redmine (revision_graph.js - rev 9835) - http://www.redmine.org/
 	// » Utilise Raphael.js 2.1.2 (89,5 ko) pour la création de l'image SVG - http://raphaeljs.com/
 	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
@@ -182,7 +182,7 @@ var versioning = {
 	// » Crée ensuite les lignes entres les points
 	drawGraph: function (data, cols) {
 
-		var graph, colors = [], k, x, y, pX, pY, elem, grad = 0, alone,
+		var graph, colors = [], k, x, y, pX, pY, elem, grad = 0, names = [], alone,
 			commitsHash  = new Hash(data),
 			commitsArray = commitsHash.values(),
 			rows = commitsHash.keys().length - 1,
@@ -249,8 +249,9 @@ var versioning = {
 			// écrit le texte dans une étiquette
 			// en profite pour vérifier la largeur du graphique
 			// met en évidence l'étiquette du nom de de la branche actuelle
-			if (commit.refs.length > 0) {
+			if ((commit.refs.length > 0) && (names.indexOf(commit.refs) < 0)){
 
+				names.push(commit.refs);
 				elem = graph.text(x + 13, y - 0.3, commit.refs).attr('fill', colors[commit.col]).attr('text-anchor', 'start');
 				graph.path(
 					'M ' + (x + 3.2) + ',' + (y - 0.4) + // point de départ au niveau du point
