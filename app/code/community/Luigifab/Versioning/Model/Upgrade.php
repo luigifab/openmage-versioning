@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated V/03/04/2015
+ * Updated J/14/05/2015
  * Version 51
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -52,7 +52,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 
 	// #### Gestion de la mise à jour ####################################### i18n ## public ### //
-	// = révision : 86
+	// = révision : 87
 	// » Log toutes les informations de la mise à jour
 	// » Déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
@@ -118,7 +118,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
 			$H['duration'] = ($H['duration'] < 1000) ? $H['duration'] : 1;
-			$H['status']   = 'Upgrade completed'."\n".trim(file_get_contents($log));
+			$H['status']   = (is_file($log) && is_readable($log)) ? 'Upgrade completed'."\n".trim(file_get_contents($log)) : 'Upgrade completed';
 
 			$result = array(
 				'url'   => '*/versioning_repository/index',

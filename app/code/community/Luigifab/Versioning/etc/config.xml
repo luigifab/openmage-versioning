@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated D/03/05/2015
- * Version 27
+ * Updated J/14/05/2015
+ * Version 28
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.0.2</version>
+			<version>3.0.3</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -62,8 +62,7 @@
 					</versioning>
 				</observers>
 			</admin_system_config_changed_section_versioning>
-			<!-- ADD FIELDS EVENT EXAMPLE -->
-			<!--admin_versioning_add_fields>
+			<!--admin_versioning_add_fields>      ADD FIELDS EVENT EXAMPLE
 				<observers>
 					<versioning_demo_addfields>
 						<class>versioning/demo</class>
@@ -71,8 +70,7 @@
 					</versioning_demo_addfields>
 				</observers>
 			</admin_versioning_add_fields-->
-			<!-- BEFORE EVENT EXAMPLE -->
-			<!--admin_versioning_upgrade_before>
+			<!--admin_versioning_upgrade_before>  BEFORE EVENT EXAMPLE
 				<observers>
 					<versioning_demo_before>
 						<class>versioning/demo</class>
@@ -80,8 +78,7 @@
 					</versioning_demo_before>
 				</observers>
 			</admin_versioning_upgrade_before-->
-			<!-- AFTER EVENT EXAMPLE -->
-			<!--admin_versioning_upgrade_after>
+			<!--admin_versioning_upgrade_after>   AFTER EVENT EXAMPLE
 				<observers>
 					<versioning_demo_after>
 						<class>versioning/demo</class>

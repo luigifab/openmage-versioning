@@ -1,7 +1,7 @@
 @charset "utf-8";
 /**
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011,updated D/05/04/2015,version 53
+ * Created J/22/12/2011,updated J/14/05/2015,version 54
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software,you can redistribute it or modify
@@ -29,7 +29,7 @@ body.adminhtml-versioning-repository-status pre,body.adminhtml-versioning-reposi
 body.adminhtml-versioning-repository-history pre span,body.adminhtml-versioning-repository-status pre span{color:#000;}
 body.adminhtml-versioning-repository-history pre{height:20em;margin-bottom:2em;overflow:auto;}
 body.adminhtml-versioning-repository-history table.data tr.headings th.no-link{padding:3px 4px;text-align:center;}
-body.adminhtml-versioning-repository-history table.data tr.current{font-weight:700;background-color:#DEDEDE;}
+body.adminhtml-versioning-repository-history table.data tr.current{background-color:#DEDEDE;}
 body.adminhtml-versioning-repository-history table.data tr.current td a{display:none;}
 body.adminhtml-versioning-repository-history table.data tr td.a-status span{display:block;height:17px;line-height:17px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;color:#FFF;border-radius:10px;}
 body.adminhtml-versioning-repository-history table.data tr td.a-status span.grid-success{background-color:#3CB861;}
