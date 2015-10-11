@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated V/03/04/2015
+ * Updated L/07/09/2015
  * Version 18
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -103,7 +103,7 @@ class Processor {
 
 
 	// #### Contenu de la page ############################################## i18n ## public ### //
-	// = révision : 15
+	// = révision : 16
 	// » Renvoi le contenu de la page (éventuellement en utilisant des expressions régulières)
 	// » En fonction de la configuration, en fonction du contexte
 	public function getPageTitle() {
@@ -131,6 +131,8 @@ class Processor {
 			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceUpgrade'), $text);
 		else if (($this->getData('type') === 'error503') && is_file(ROOT.'/maintenance.flag'))
 			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceMaintenance'), $text);
+		else if (($this->getData('type') === 'upgrade') || ($this->getData('type') === 'error503'))
+			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceDemo'), $text);
 
 		return $text;
 	}
@@ -145,6 +147,9 @@ class Processor {
 		return strftime($matches[1], $time);
 	}
 
+	public function searchReplaceDemo($matches) {
+		return strftime($matches[1]);
+	}
 
 	// #### Génération des adresses ################################################# public ### //
 	// = révision : 5

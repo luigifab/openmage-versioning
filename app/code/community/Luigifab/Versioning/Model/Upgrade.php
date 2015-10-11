@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/14/05/2015
- * Version 51
+ * Updated L/07/09/2015
+ * Version 52
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,7 +52,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 
 	// #### Gestion de la mise à jour ####################################### i18n ## public ### //
-	// = révision : 87
+	// = révision : 88
 	// » Log toutes les informations de la mise à jour
 	// » Déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
@@ -78,6 +78,12 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			// ÉTAPE 1
 			$this->writeTitle($this->__('1) Locking and configuration check'));
 
+			if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning_upgrade') !== true)
+				throw new Exception('Not authorized');
+
+			if (is_file($lock))
+				throw new Exception('An upgrade is already underway');
+
 			if (is_file($log))
 				unlink($log);
 
@@ -87,9 +93,6 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			else
 				$this->writeNotice($this->__('Repository: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['current_rev'], $targetRevision));
-
-			if (is_file($lock))
-				throw new Exception('An upgrade is already underway');
 
 			if ($useFlag)
 				file_put_contents($this->getUpgradeFlag(), $H['current_rev'].' » '.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user']);
@@ -134,7 +137,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			$H['duration'] = ($H['duration'] < 1000) ? $H['duration'] : 1;
 			$H['status']   = (is_file($log) && is_readable($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
 
-			if ($e->getMessage() !== 'An upgrade is already underway') {
+			if (!in_array($e->getMessage(), array('Not authorized', 'An upgrade is already underway'))) {
 
 				$result = array(
 					'url'   => '*/versioning_repository/history',
@@ -161,8 +164,14 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 					'error' => true
 				);
 
-				$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
-				Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an upgrade is already underway.'));
+				if ($e->getMessage() === 'An upgrade is already underway') {
+					$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
+					Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an upgrade is already underway.'));
+				}
+				else {
+					$this->writeError($this->__('You are not authorized to perform this operation.'));
+					Mage::getSingleton('adminhtml/session')->addError($this->__('You are not authorized to perform this operation.'));
+				}
 			}
 		}
 

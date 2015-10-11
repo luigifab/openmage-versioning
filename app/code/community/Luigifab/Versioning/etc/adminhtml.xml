@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created J/22/12/2011
- * Updated M/19/08/2014
- * Version 13
+ * Updated L/07/09/2015
+ * Version 14
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,6 +52,12 @@
 							<versioning translate="title">
 								<title>Version control</title>
 								<sort_order>72</sort_order>
+								<children>
+									<upgrade translate="title">
+										<title>Perform upgrade</title>
+										<sort_order>1</sort_order>
+									</upgrade>
+								</children>
 							</versioning>
 						</children>
 					</tools>

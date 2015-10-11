@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/11/04/2015
- * Version 8
+ * Updated S/16/05/2015
+ * Version 9
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -45,13 +45,13 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	private function getStoreId() {
 
-		$pWebsite = Mage::app()->getRequest()->getParam('website');
-		$pStore = Mage::app()->getRequest()->getParam('store');
+		$website = $this->getRequest()->getParam('website');
+		$store = $this->getRequest()->getParam('store');
 
-		if (strlen($pStore) > 0)
-			$storeId = Mage::getModel('core/store')->load($pStore)->getStoreId();
-		else if (strlen($pWebsite) > 0)
-			$storeId = Mage::getModel('core/website')->load($pWebsite)->getDefaultStore()->getStoreId();
+		if (strlen($store) > 0)
+			$storeId = Mage::getModel('core/store')->load($store)->getStoreId();
+		else if (strlen($website) > 0)
+			$storeId = Mage::getModel('core/website')->load($website)->getDefaultStore()->getStoreId();
 		else
 			$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
 

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/05/04/2015
- * Version 27
+ * Updated D/06/09/2015
+ * Version 28
  *
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -46,7 +46,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Historique ############################################################## public ### //
-	// = révision : 67
+	// = révision : 68
 	// » Génère une collection à partir de l'historique des commits du dépôt
 	// » Met en forme les données à partir de la réponse de pleins de commandes
 	// » Utilise GIT_SSH si le fichier de configuration existe
@@ -114,7 +114,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 				if (strlen($refs) > 2) {
 					$refs = substr($refs, 1, -1);
-					$refs = str_replace(array('origin/','HEAD',' '), '', $refs);
+					$refs = str_replace(array('origin/','HEAD',' ','->'), '', $refs);
 					$refs = preg_replace('#,{2,}#', ',', $refs);
 					$refs = trim($refs, ' ,');
 					$refs = explode(',', $refs);
@@ -338,7 +338,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Mise à jour ############################################################# public ### //
-	// = révision : 10
+	// = révision : 11
 	// » Met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
 	// » Prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
 	// » N'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
@@ -355,10 +355,12 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			git reset --hard '.$revision.' >> '.$log.' 2>&1;
 		', $data, $val);
 
-		$data = trim(file_get_contents($log));
+		$data  = trim(file_get_contents($log));
+		$lines = explode("\n", $data);
+
 		$obj->writeCommand($data);
 
-		foreach (explode("\n", $data) as $line) {
+		foreach ($lines as $line) {
 			if (strpos($line, 'fatal: ') === 0)
 				throw new Exception(str_replace('fatal: ', '', $line));
 		}

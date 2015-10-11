@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated J/14/05/2015, version 54
+ * Created J/22/12/2011, updated M/01/09/2015, version 56
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -52,6 +52,7 @@ body.adminhtml-versioning-repository-history #loading_mask_loader { margin-left:
 #config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:3px; line-height:135%; }
 #config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value input { width:400px; }
 #config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value textarea { width:400px; height:10em; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value p.note { width:400px; }
 
 /* &&&&&&&&&&&&& versioning/repository/history,status &&& */
 body.adminhtml-versioning-repository-status pre ins { display:inline-block; width:100%; text-decoration:none; background-color:#CFC; }
@@ -111,7 +112,7 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 }
 
 #apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
-#apijsBox.versioning h1 { padding-left:23px; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
+#apijsBox.versioning h1 { padding-left:23px; height:1.2em; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
 #apijsBox.versioning.bzr h1 { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
 #apijsBox.versioning.git h1 { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
 #apijsBox.versioning.svn h1 { background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center; }
