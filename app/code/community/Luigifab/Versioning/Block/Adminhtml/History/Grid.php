@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/11/04/2015
- * Version 20
+ * Updated L/21/12/2014
+ * Version 21
  *
- * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -162,10 +162,10 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			$data = '<strong>'.(($seconds > 9) ? $minutes.':'.$seconds : $minutes.':0'.$seconds).'</strong>';
 		else if ($data > 59)
 			$data = '<strong>'.(($seconds > 9) ? '0'.$minutes.':'.$seconds : '0'.$minutes.':0'.$seconds).'</strong>';
-		else if ($data > 0)
+		else if ($data > 1)
 			$data = ($seconds > 9) ? '00:'.$data : '00:0'.$data;
 		else
-			$data = '&lt; 1';
+			$data = '⩽ 1';
 
 		return $data;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * Created J/22/12/2011, updated V/01/05/2015, version 55
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
@@ -10,7 +10,7 @@
 // dépend de Prototype, versioningIds/versioningCols/versioningCurrentCol dans Repository.php
 var versioning = {
 
-	// ATTENTION, confirmFlag actionConfirmFlag confirmUpgrade history, pas avant IE 10 !
+	// ATTENTION, confirmFlag confirmUpgrade history, pas avant IE 10 !
 	// avant IE 10, atob n'existe pas - http://caniuse.com/atob-btoa
 	// prise en charge de l'utf-8 avec Webkit - http://stackoverflow.com/q/3626183
 	decode: function (data) {

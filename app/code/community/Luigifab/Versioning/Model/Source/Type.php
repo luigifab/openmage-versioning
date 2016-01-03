@@ -1,10 +1,10 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated V/27/02/2015
- * Version 12
+ * Updated M/24/11/2015
+ * Version 13
  *
- * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -23,7 +23,7 @@ class Luigifab_Versioning_Model_Source_Type extends Luigifab_Versioning_Helper_D
 	public function toOptionArray() {
 
 		$models = $this->searchFiles(BP.'/app/code/community/Luigifab/Versioning/Model/Scm');
-		$list = array();
+		$options = array();
 
 		foreach ($models as $model) {
 
@@ -33,11 +33,11 @@ class Luigifab_Versioning_Model_Source_Type extends Luigifab_Versioning_Helper_D
 				$this->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :
 				$this->__('%s (not available)', strtoupper($model->getType()));
 
-			$list[strtolower($model->getType())] = array('value' => strtolower($model->getType()), 'label' => $label);
+			$options[strtolower($model->getType())] = array('value' => strtolower($model->getType()), 'label' => $label);
 		}
 
-		ksort($list);
-		return $list;
+		ksort($options);
+		return $options;
 	}
 
 	private function searchFiles($source) {

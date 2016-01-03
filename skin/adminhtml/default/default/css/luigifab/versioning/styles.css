@@ -1,6 +1,6 @@
 /**
- * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated M/01/09/2015, version 56
+ * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Created J/22/12/2011, updated J/03/12/2015, version 57
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -50,9 +50,9 @@ body.adminhtml-versioning-repository-history #loading_mask_loader { margin-left:
 #config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
 #config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
 #config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:3px; line-height:135%; }
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value input { width:400px; }
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value textarea { width:400px; height:10em; }
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] tr td.value p.note { width:400px; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value input { width:400px; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value textarea { width:400px; height:10em; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value p.note { width:400px; }
 
 /* &&&&&&&&&&&&& versioning/repository/history,status &&& */
 body.adminhtml-versioning-repository-status pre ins { display:inline-block; width:100%; text-decoration:none; background-color:#CFC; }
@@ -72,13 +72,13 @@ body.adminhtml-versioning-repository-history table.data tr.headings th.no-link {
 body.adminhtml-versioning-repository-history table.data tr.current { background-color:#DEDEDE; }
 body.adminhtml-versioning-repository-history table.data tr.current td a { display:none; }
 
-body.adminhtml-versioning-repository-history table.data tr td.a-status span {
+body.adminhtml-versioning-repository-history table.data td.a-status span {
 	display:block; height:17px; line-height:17px; text-align:center;
-	font-size:10px; font-weight:bold; text-transform:uppercase; color:white; border-radius:10px;
+	font-size:10px; font-weight:700; text-transform:uppercase; color:white; border-radius:10px;
 }
 
-body.adminhtml-versioning-repository-history table.data tr td.a-status span.grid-success { background-color:#3CB861; }
-body.adminhtml-versioning-repository-history table.data tr td.a-status span.grid-error { background-color:#E41101; }
+body.adminhtml-versioning-repository-history table.data td.a-status span.grid-success { background-color:#3CB861; }
+body.adminhtml-versioning-repository-history table.data td.a-status span.grid-error { background-color:#E41101; }
 
 /* &&&&&&&&&&&&&&&&&&&&&& versioning/repository/index &&& */
 body.adminhtml-versioning-repository-index button.delpage.delete span { padding-left:0; background-image:none; }
@@ -91,10 +91,10 @@ body.adminhtml-versioning-repository-index table.data tr.outside a { color:#AAA;
 body.adminhtml-versioning-repository-index table.data tr.outside:hover { color:#888; }
 body.adminhtml-versioning-repository-index table.data tr.outside:hover a { color:#AAA; }
 
-body.adminhtml-versioning-repository-index table.data tr td { vertical-align:middle; }
-body.adminhtml-versioning-repository-index table.data tr td.revision { padding:2px 0; }
-body.adminhtml-versioning-repository-index table.data tr td.revision strong { font-size:115%; }
-body.adminhtml-versioning-repository-index table.data tr td a.issue { float:right; padding-left:0.3em; color:#999; }
+body.adminhtml-versioning-repository-index table.data td { vertical-align:middle; }
+body.adminhtml-versioning-repository-index table.data td.revision { padding:2px 0; }
+body.adminhtml-versioning-repository-index table.data td.revision strong { font-size:115%; }
+body.adminhtml-versioning-repository-index table.data td a.issue { float:right; padding-left:0.3em; color:#999; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
@@ -120,7 +120,7 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 #apijsBox.versioning.darcs h1 { background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center; }
 
 #apijsBox.versioning div.bbcode ul { margin-top:0.5em; font-size:0.9em; }
-#apijsBox.versioning div.bbcode ul li + li { margin-top:0.35em; }
+#apijsBox.versioning div.bbcode li + li { margin-top:0.35em; }
 #apijsBox.versioning div.bbcode label { cursor:pointer; }
 #apijsBox.versioning div.bbcode input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
 #apijsBox.versioning p.reload { display:none; }
@@ -149,7 +149,7 @@ body.adminhtml-versioning-repository-confirm h1.hg  { background:url("../../../i
 body.adminhtml-versioning-repository-confirm h1.darcs { background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center; }
 
 body.adminhtml-versioning-repository-confirm ul { margin-top:0.5em; font-size:0.9em; }
-body.adminhtml-versioning-repository-confirm ul li + li { margin-top:0.35em; }
+body.adminhtml-versioning-repository-confirm li + li { margin-top:0.35em; }
 body.adminhtml-versioning-repository-confirm label { cursor:pointer; }
 body.adminhtml-versioning-repository-confirm input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
 

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated L/07/09/2015
+ * Updated W/09/12/2015
  * Version 52
  *
- * Copyright 2011-2015 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -65,7 +65,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			// données de l'historique
 			// l'ordre à une importance capitale (voir Luigifab_Versioning_Model_History)
 			$H = array(
-				'date'        => date('c', time()), // 0
+				'date'        => date('c'), // 0
 				'current_rev' => $repository->getCurrentRevision(), // 1
 				'target_rev'  => $targetRevision, // 2
 				'remote_addr' => (getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown', // 3
