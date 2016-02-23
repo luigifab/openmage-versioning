@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/11/04/2015
- * Version 40
+ * Updated S/20/02/2016
+ * Version 41
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -96,7 +96,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => '*/*/upgrade'),
 					'field'   => 'revision',
-					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.addslashes($this->__('Upgrade to revision %s', '§')).'", "'.addslashes($this->helper('versioning')->getFields(true)).'", "'.addslashes($this->__('Martian sunset. Spirit at Gusev crater.')).'");'
+					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.addslashes($this->__('Upgrade to revision %s', '§')).'", "'.addslashes($this->helper('versioning')->getFields(true)).'", "'.addslashes($this->__('Martian sunset by Spirit.')).'");'
 				)
 			),
 			'align'     => 'center',

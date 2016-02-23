@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated L/30/03/2015
- * Version 14
+ * Updated S/20/02/2016
+ * Version 15
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,20 +28,15 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
-
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
 	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
-
 	<script type="text/javascript" charset="utf-8" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
 </head>
 
-
 <body class="adminhtml-versioning-repository-confirm">
-
 	<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/upgrade', array('revision' => $this->getRequest()->getParam('revision'), 'confirm' => '1')) ?>" method="get" onsubmit="versioning.valid('<?php echo $this->__('Operation in progress...') ?>');">
-
 		<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
 		<div class="bbcode">
 			<?php echo $this->helper('versioning')->getFields() ?>
@@ -51,8 +46,6 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 			<button type="button" class="back" onclick="versioning.valid('<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>');"><?php echo $this->helper('adminhtml')->__('Cancel') ?></button>
 		</div>
 	</form>
-
-	<p class="credits"><?php echo $this->__('Martian sunset. Spirit at Gusev crater.') ?></p>
-
+	<p class="credits"><?php echo $this->__('Martian sunset by Spirit.') ?></p>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated J/03/12/2015, version 57
+ * Created J/22/12/2011, updated S/20/02/2016, version 58
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -164,3 +164,19 @@ body.adminhtml-versioning-repository-confirm div.buttons button[type="submit"] {
 body.adminhtml-versioning-repository-confirm button { opacity:0.7; }
 body.adminhtml-versioning-repository-confirm button:hover, body.adminhtml-versioning-repository-confirm button:active,
 body.adminhtml-versioning-repository-confirm button:focus { opacity:1; }
+
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&& adminhtml/index/login &&& */
+#page-login {
+	color:white; background-color:#111; background-size:100% 100%;
+	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
+}
+
+#page-login div.login-container { padding:0; background:none; }
+#page-login div.login-box div.login-form { background:none; }
+#page-login div.login-box p.legal { background:none; }
+#page-login div.login-box div.bottom { display:none; }
+#page-login div.login-box label, #page-login div.login-box a { font-weight:normal; text-decoration:none; color:white; }
+#page-login div.login-box input { padding:0.4em 0.2em; border:none; }
+#page-login div.login-box input.form-button { border:none; background:none; }
+
+#page-login p.credits { position:absolute; bottom:0.7em; left:1em; color:#CCC; }

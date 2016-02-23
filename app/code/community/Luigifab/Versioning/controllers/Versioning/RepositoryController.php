@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/28/03/2015
- * Version 37
+ * Updated S/20/02/2016
+ * Version 38
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -217,7 +217,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'</head>';
 
 		echo "\n",'<body>';
-		echo "\n",'<p class="credits">'.$this->__('Martian sunset. Spirit at Gusev crater.').'</p>';
+		echo "\n",'<p class="credits">'.$this->__('Martian sunset by Spirit.').'</p>';
 		echo "\n",'<div class="obj"><object data="',Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg'),'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
 		echo "\n",'<div class="ctn" id="scroll">';
 		echo "\n",'<p class="first"><strong>',$this->__('Starting upgrade (revision %s)', $revision),'</strong>';
