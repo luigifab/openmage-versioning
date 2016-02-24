@@ -4,7 +4,7 @@
 "Number of commits per page","Nombre de commits par page"
 "Bug tracker","Gestionnaire de projet"
 "Customize login page","Personnaliser la page de connexion"
-"For Magento 1.7+.","Pour Magento 1.7+."
+"For Magento 1.7+.","À partir de Magento 1.7."
 "Downtime pages","Pages de maintenance"
 "Warning! Here, [store view] = [lang].<br />The <em>maintenace.flag</em> page takes priority over the <em>upgrade.flag</em> page.","Attention ! Ici, [vue magasin] = [langue].<br />La page <em lang=""en"">maintenace.flag</em> à priorité sur la page <em lang=""en"">upgrade.flag</em>."
 "Error 503 (maintenance.flag)","Erreur 503 (<span lang=""en"">maintenance.flag</span>)"

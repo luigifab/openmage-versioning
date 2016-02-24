@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated L/22/02/2016
- * Version 22
+ * Updated W/24/02/2016
+ * Version 23
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -98,8 +98,7 @@
 	</adminhtml_versioning_repository_confirm>
 
 	<adminhtml_index_login>
-		<block type="adminhtml/template" name="root" output="toHtml" template="login.phtml" />
-		<reference name="root">
+		<reference name="content">
 			<action method="setTemplate" ifconfig="versioning/scm/login">
 				<template>luigifab/versioning/login.phtml</template>
 			</action>
@@ -107,8 +106,7 @@
 	</adminhtml_index_login>
 
 	<adminhtml_index_forgotpassword>
-		<block type="adminhtml/template" name="root" output="toHtml" template="forgotpassword.phtml" />
-		<reference name="root">
+		<reference name="content">
 			<action method="setTemplate" ifconfig="versioning/scm/login">
 				<template>luigifab/versioning/forgotpassword.phtml</template>
 			</action>
