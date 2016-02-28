@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/20/02/2016
- * Version 33
+ * Updated D/28/02/2016
+ * Version 34
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -31,6 +31,12 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			$this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
 		$this->_removeButton('add');
+
+		$this->_addButton('diff', array(
+			'label'   => $this->__('Show diff'),
+			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');",
+			'class'   => 'disabled'
+		));
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
 			$this->_addButton('maintenance_flag', array(

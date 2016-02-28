@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/06/09/2015
- * Version 28
+ * Updated D/28/02/2016
+ * Version 29
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -268,9 +268,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Révision, état et branche ############################################### public ### //
-	// = révision : 23
-	// » Renvoi le numéro de la révision actuelle de la copie locale
-	// » Extrait le numéro à partir de la réponse de la commande 'git log'
+	// = révision : 24
+	// » Renvoi le numéro de la révision actuelle de la copie locale (à partir de la réponse de la commande 'git log')
 	// » Renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
 	// » Renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
 	public function getCurrentRevision() {
@@ -286,7 +285,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		return $this->revision;
 	}
 
-	public function getCurrentDiff() {
+	public function getCurrentDiff($from = null, $to = null) {
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		//   Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
@@ -297,6 +296,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space';
 		else
 			$command = 'git diff -U1 --diff-filter=MTUXB';
+
+		if (!is_null($from) && !is_null($to))
+			$command .= ' '.$from.'..'.$to;
 
 		$i = 0;
 		exec($command, $lines);

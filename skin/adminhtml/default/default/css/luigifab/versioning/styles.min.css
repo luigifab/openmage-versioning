@@ -1,7 +1,7 @@
 @charset "utf-8";
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011,updated S/20/02/2016,version 58
+ * Created J/22/12/2011,updated D/28/02/2016,version 59
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software,you can redistribute it or modify
@@ -16,7 +16,6 @@ body.adminhtml-versioning-repository-index table.data tr:hover,body.adminhtml-ve
 body.adminhtml-versioning-repository-history #loading-mask{background-color:rgba(255,255,255,.5);}
 body.adminhtml-versioning-repository-history #loading_mask_loader{margin-left:-120px;margin-top:-30px;}
 #config_edit_form[action*="system_config/save/section/versioning"]{padding-top:0;}
-#config_edit_form[action*="system_config/save/section/versioning"] [title]{border-bottom:none;}
 #config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment{padding:5px;line-height:130%;color:red;}
 #config_edit_form[action*="system_config/save/section/versioning"] h4 a{float:right;font-size:12px;text-decoration:none;}
 #config_edit_form[action*="system_config/save/section/versioning"] p.note{padding-top:3px;line-height:135%;}
@@ -38,6 +37,8 @@ body.adminhtml-versioning-repository-history table.data td.a-status span.grid-er
 body.adminhtml-versioning-repository-index button.delpage.delete span{padding-left:0;background-image:none;}
 body.adminhtml-versioning-repository-index div.content-header td{width:auto !important;}
 body.adminhtml-versioning-repository-index table.data tr.headings th.no-link{padding:3px 4px;text-align:center;color:#666;}
+body.adminhtml-versioning-repository-index table.data tr:first-child input[name="diff2"]{visibility:hidden;}
+body.adminhtml-versioning-repository-index table.data tr:last-child input[name="diff1"]{visibility:hidden;}
 body.adminhtml-versioning-repository-index table.data tr.outside{color:#AAA;font-style:italic;}
 body.adminhtml-versioning-repository-index table.data tr.outside a{color:#AAA;}
 body.adminhtml-versioning-repository-index table.data tr.outside:hover{color:#888;}
@@ -47,7 +48,7 @@ body.adminhtml-versioning-repository-index table.data td.revision{padding:2px 0;
 body.adminhtml-versioning-repository-index table.data td.revision strong{font-size:115%;}
 body.adminhtml-versioning-repository-index table.data td a.issue{float:right;padding-left:.3em;color:#999;}
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll{position:relative;overflow:hidden;}
-body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg{position:absolute !important;left:87px;width:197px;transition:width .4s;-moz-transition:width .4s;-webkit-transition:width .4s;background-color:rgba(0,0,0,.09);pointer-events:none;}
+body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg{position:absolute !important;left:142px;width:197px;pointer-events:none;transition:width .4s;-moz-transition:width .4s;-webkit-transition:width .4s;background-color:rgba(0,0,0,.09);}
 body.adminhtml-versioning-repository-index p.credits{position:absolute;bottom:1.2em;left:1em;color:#CCC;}
 body.adminhtml-versioning-repository-index #apijsDialog{background-color:#111;background-size:100% 100%;background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");}
 #apijsBox.versioning{background-color:rgba(255,255,255,.6);opacity:1;box-shadow:none;-moz-box-shadow:none;-webkit-box-shadow:none;}

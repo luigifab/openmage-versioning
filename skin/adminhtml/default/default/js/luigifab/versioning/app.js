@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated V/01/05/2015, version 55
+ * Created J/22/12/2011, updated D/28/02/2016, version 56
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -19,10 +19,16 @@ var versioning = {
 
 	// initialisation
 	start: function () {
+
 		if (document.getElementById('history_grid'))
 			document.querySelector('table.data tbody tr td a').click();
-		if (typeof versioningIds !== 'undefined')
+
+		if (typeof versioningIds !== 'undefined') {
 			versioning.drawGraph(versioningIds, versioningCols);
+			versioning.initDiff();
+			var image = new Image();
+			image.src = SKIN_URL + 'images/luigifab/versioning/mars-sunset.jpg';
+		}
 	},
 
 
@@ -360,6 +366,42 @@ var versioning = {
 			if (versioningCurrentCol !== commit.col)
 				tableRows[rows - commit.row].setAttribute('class', tableRows[rows - commit.row].getAttribute('class') + ' outside');
 		});
+	},
+
+
+	// #### Gestion des cases du diff ########################################### //
+	// = révision : 1
+	// » Gère l'activation du lien vers la page du diff
+	initDiff: function () {
+
+		var elems = document.querySelectorAll('table.data input[type="radio"]'), elem;
+		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
+			elems[elem].setAttribute('onchange', 'versioning.goDiff();');
+		}
+	},
+
+	goDiff: function (url) {
+
+		var diff1 = document.querySelector('input[name="diff1"]:checked'),
+		    diff2 = document.querySelector('input[name="diff2"]:checked'), onclick;
+
+		if (diff1 && diff2) {
+
+			if (typeof url === 'string') {
+				location.href = url;
+			}
+			else {
+				onclick = document.querySelector('td.form-buttons button').getAttribute('onclick');
+				onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff1.value);
+				onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff2.value);
+
+				document.querySelector('td.form-buttons button').setAttribute('class', 'scalable');
+				document.querySelector('td.form-buttons button').setAttribute('onclick', onclick);
+			}
+		}
+		else {
+			document.querySelector('td.form-buttons button').setAttribute('class', 'scalable disabled');
+		}
 	}
 };
 

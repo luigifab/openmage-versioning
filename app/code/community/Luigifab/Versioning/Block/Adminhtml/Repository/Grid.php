@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/20/02/2016
- * Version 41
+ * Updated D/28/02/2016
+ * Version 42
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -35,7 +35,6 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	protected function _prepareCollection() {
-
 		$this->setCollection(Mage::registry('versioning')->getCommitCollection());
 		return parent::_prepareCollection();
 	}
@@ -53,11 +52,22 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'frame_callback' => array($this, 'decorateRevision')
 		));
 
+		$this->addColumn('diff', array(
+			'header'    => $this->__('Diff'),
+			'align'     => 'center',
+			'width'     => '55px',
+			'filter'    => false,
+			'sortable'  => false,
+			'is_system' => true,
+			'frame_callback' => array($this, 'decorateDiff')
+		));
+
 		$this->addColumn('graph', array(
 			'header'    => $this->__('Graph'),
 			'width'     => '200px',
 			'filter'    => false,
-			'sortable'  => false
+			'sortable'  => false,
+			'is_system' => true
 		));
 
 		$this->addColumn('author', array(
@@ -118,6 +128,14 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		return null;
 	}
 
+	public function decorateRevision($value, $row, $column, $isExport) {
+		return ($value === $row->getData('current_revision')) ? '<strong>'.$value.'</strong>' : $value;
+	}
+
+	public function decorateDiff($value, $row, $column, $isExport) {
+		return '<input type="radio" name="diff1" value="'.$row->getData('revision').'" /> <input type="radio" name="diff2" value="'.$row->getData('revision').'" />';
+	}
+
 	public function decorateDescription($value, $row, $column, $isExport) {
 
 		$bugtracker = trim(Mage::getStoreConfig('versioning/scm/bugtracker'));
@@ -132,11 +150,5 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		}
 
 		return $description;
-	}
-
-	public function decorateRevision($value, $row, $column, $isExport) {
-
-		$revision = $row->getData('revision');
-		return ($revision === $row->getData('current_revision')) ? '<strong>'.$revision.'</strong>' : $revision;
 	}
 }
