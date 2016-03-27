@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated D/28/02/2016, version 56
+ * Created J/22/12/2011, updated D/20/03/2016, version 57
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -370,7 +370,7 @@ var versioning = {
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 1
+	// = révision : 2
 	// » Gère l'activation du lien vers la page du diff
 	initDiff: function () {
 
@@ -392,8 +392,8 @@ var versioning = {
 			}
 			else {
 				onclick = document.querySelector('td.form-buttons button').getAttribute('onclick');
-				onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff1.value);
-				onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff2.value);
+				onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff2.value);
+				onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff1.value);
 
 				document.querySelector('td.form-buttons button').setAttribute('class', 'scalable');
 				document.querySelector('td.form-buttons button').setAttribute('onclick', onclick);

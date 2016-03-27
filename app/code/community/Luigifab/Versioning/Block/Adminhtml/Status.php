@@ -1,8 +1,8 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated D/28/02/2016
- * Version 15
+ * Updated V/25/03/2016
+ * Version 16
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -50,6 +50,12 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 			'class'   => 'back'
 		));
 
+		$this->_addButton('history', array(
+			'label'   => $this->__('Upgrades log'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
+			'class'   => 'go'
+		));
+
 		if ($from && $to) {
 			$this->_addButton('status', array(
 				'label'   => $this->__('Repository status'),
@@ -57,12 +63,6 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 				'class'   => 'go'
 			));
 		}
-
-		$this->_addButton('history', array(
-			'label'   => $this->__('Upgrades log'),
-			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
-			'class'   => 'go'
-		));
 	}
 
 	public function getGridHtml() {

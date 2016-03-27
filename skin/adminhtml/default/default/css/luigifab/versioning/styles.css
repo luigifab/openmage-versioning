@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated D/28/02/2016, version 59
+ * Created J/22/12/2011, updated J/24/03/2016, version 61
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -91,13 +91,13 @@ body.adminhtml-versioning-repository-index table.data td { vertical-align:middle
 body.adminhtml-versioning-repository-index table.data td.revision { padding:2px 0; }
 body.adminhtml-versioning-repository-index table.data td.revision strong { font-size:115%; }
 body.adminhtml-versioning-repository-index table.data td a.issue { float:right; padding-left:0.3em; color:#999; }
+body.adminhtml-versioning-repository-index table.data td input { cursor:pointer; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
 	position:absolute !important; left:142px; width:197px; pointer-events:none;
-	transition:width 0.4s; -moz-transition:width 0.4s; -webkit-transition:width 0.4s;
-	background-color:rgba(0,0,0, 0.09);
+	background-color:rgba(0,0,0, 0.09); transition:width 0.4s;
 }
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
@@ -108,7 +108,7 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 
-#apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; }
+#apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; }
 #apijsBox.versioning h1 { padding-left:23px; height:1.2em; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
 #apijsBox.versioning.bzr   h1 { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
 #apijsBox.versioning.git   h1 { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }

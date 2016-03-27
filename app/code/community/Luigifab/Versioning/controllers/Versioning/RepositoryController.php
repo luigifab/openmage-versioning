@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/20/02/2016
+ * Updated J/24/03/2016
  * Version 38
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -164,7 +164,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		// http://commons.wikimedia.org/wiki/File:MarsSunset.jpg
 		echo "\n",'<style type="text/css">';
 		echo "\n", '* { margin:0; padding:0; }';
-		echo "\n", 'html { height:100%; }';
+		echo "\n", 'html { height:100%; cursor:wait; }';
 		echo "\n", 'body {';
 		echo "\n", ' overflow-x:hidden; overflow-y:scroll; font:1em Verdana, sans-serif;';
 		echo "\n", ' background-color:#999; background-size:100% 100%;';
