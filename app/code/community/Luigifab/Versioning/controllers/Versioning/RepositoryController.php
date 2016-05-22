@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/24/03/2016
- * Version 38
+ * Updated V/25/03/2016
+ * Version 39
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -30,7 +30,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
-			Mage::register('versioning', Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
+			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
@@ -44,7 +44,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
-			Mage::register('versioning', Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
+			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
 
-			Mage::register('versioning', Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
+			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 
 			if ($this->getRequest()->getParam('isAjax', false))
 				$this->getResponse()->setBody($this->getLayout()->createBlock('versioning/adminhtml_history_grid')->toHtml());
@@ -147,7 +147,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			return;
 		}
 
-		$upgrade = Mage::getModel('versioning/upgrade');
+		$upgrade = Mage::getSingleton('versioning/upgrade');
 		$upgrade->disableAllBuffer();
 
 		$lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);

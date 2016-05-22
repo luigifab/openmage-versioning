@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated J/24/03/2016, version 61
+ * Created J/22/12/2011, updated S/23/04/2016, version 63
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -41,9 +41,11 @@ body.adminhtml-versioning-repository-history #loading_mask_loader { margin-left:
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
 #config_edit_form[action*="system_config/save/section/versioning"] { padding-top:0; }
+#config_edit_form[action*="system_config/save/section/versioning"] fieldset a[onclick]:before { content:"[↗] "; font-size:0.85em; }
 #config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
 #config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
-#config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:3px; line-height:135%; }
+#config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:4px; line-height:125%; }
+
 #config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value input { width:400px; }
 #config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value textarea { width:400px; height:10em; }
 #config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value p.note { width:400px; }
@@ -101,6 +103,7 @@ body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
 }
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
+body.adminhtml-versioning-repository-index { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); }
 body.adminhtml-versioning-repository-index p.credits { position:absolute; bottom:1.2em; left:1em; color:#CCC; }
 
 body.adminhtml-versioning-repository-index #apijsDialog {

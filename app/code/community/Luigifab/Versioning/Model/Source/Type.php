@@ -1,8 +1,8 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated M/24/11/2015
- * Version 13
+ * Updated V/25/03/2016
+ * Version 14
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -27,7 +27,7 @@ class Luigifab_Versioning_Model_Source_Type extends Luigifab_Versioning_Helper_D
 
 		foreach ($models as $model) {
 
-			$model = Mage::getModel($model);
+			$model = Mage::getSingleton($model);
 
 			$label = ($model->isSoftwareInstalled()) ?
 				$this->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :

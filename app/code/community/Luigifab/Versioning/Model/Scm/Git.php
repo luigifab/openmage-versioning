@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/28/02/2016
+ * Updated V/06/05/2016
  * Version 29
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -340,22 +340,32 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 
 	// #### Mise à jour ############################################################# public ### //
-	// = révision : 11
+	// = révision : 12
 	// » Met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
 	// » Prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
 	// » N'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
 	public function upgradeToRevision($obj, $log, $revision) {
 
-		exec('
-			echo "<span>git fetch</span>" >> '.$log.';
-			git fetch;
-
-			echo "<span>git clean -f -d</span>" >> '.$log.';
-			git clean -f -d >> '.$log.' 2>&1;
-
-			echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-			git reset --hard '.$revision.' >> '.$log.' 2>&1;
-		', $data, $val);
+		if (is_dir('../.git/')) {
+			exec('
+				echo "<span>git fetch</span>" >> '.$log.';
+				git fetch;
+				echo "<span>git clean -f -d</span>" >> '.$log.';
+				git clean -f -d .. >> '.$log.' 2>&1;
+				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+			', $data, $val);
+		}
+		else {
+			exec('
+				echo "<span>git fetch</span>" >> '.$log.';
+				git fetch;
+				echo "<span>git clean -f -d</span>" >> '.$log.';
+				git clean -f -d >> '.$log.' 2>&1;
+				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+			', $data, $val);
+		}
 
 		$data  = trim(file_get_contents($log));
 		$lines = explode("\n", $data);

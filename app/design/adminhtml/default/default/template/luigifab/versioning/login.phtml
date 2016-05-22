@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/20/02/2016
- * Updated W/24/02/2016
- * Version 3
+ * Updated S/23/04/2016
+ * Version 5
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,9 +28,9 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
 	<script type="text/javascript" src="<?php echo $this->getJsUrl('prototype/prototype.js') ?>"></script>
 	<script type="text/javascript" src="<?php echo $this->getJsUrl('prototype/validation.js') ?>"></script>
@@ -66,6 +66,6 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 			<div class="bottom"></div>
 		</div>
 	</div>
-	<p class="credits"><?php echo $this->helper('versioning')->__('Martian sunset by Spirit.') ?></p>
+	<p class="credits"><?php echo $this->__('Martian sunset by Spirit.') ?></p>
 </body>
 </html>

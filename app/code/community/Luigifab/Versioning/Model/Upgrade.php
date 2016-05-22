@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated W/09/12/2015
- * Version 52
+ * Updated V/25/03/2016
+ * Version 53
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -57,7 +57,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	// » Déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
 
-		$repository = Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
+		$repository = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
 		$lock = $this->getLock();
 		$log = $this->getLastLog();
 

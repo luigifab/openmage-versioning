@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/28/02/2016
- * Version 42
+ * Updated J/28/04/2016
+ * Version 43
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -80,7 +80,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		));
 
 		$this->addColumn('description', array(
-			'header'    => $this->helper('adminhtml')->__('Description'),
+			'header'    => $this->__('Description'),
 			'index'     => 'description',
 			'align'     => 'left',
 			'filter'    => false,
@@ -89,7 +89,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		));
 
 		$this->addColumn('date', array(
-			'header'    => $this->helper('adminhtml')->__('Date'),
+			'header'    => $this->__('Date'),
 			'index'     => 'date',
 			'type'      => 'datetime',
 			'align'     => 'center',
@@ -106,7 +106,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => '*/*/upgrade'),
 					'field'   => 'revision',
-					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.addslashes($this->__('Upgrade to revision %s', '§')).'", "'.addslashes($this->helper('versioning')->getFields(true)).'", "'.addslashes($this->__('Martian sunset by Spirit.')).'");'
+					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.$this->__('Upgrade to revision %s', '§').'", "'.$this->helper('versioning')->getFields(true).'", "'.$this->__('Martian sunset by Spirit.').'");'
 				)
 			),
 			'align'     => 'center',

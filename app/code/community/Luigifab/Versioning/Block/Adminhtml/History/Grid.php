@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated L/21/12/2014
- * Version 21
+ * Updated M/12/04/2016
+ * Version 22
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -87,7 +87,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('user', array(
-			'header'   => $this->helper('adminhtml')->__('User'),
+			'header'   => $this->__('User'),
 			'index'    => 'user',
 			'align'    => 'center',
 			'width'    => '150px',
@@ -96,7 +96,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('date', array(
-			'header'   => $this->helper('adminhtml')->__('Date'),
+			'header'   => $this->__('Date'),
 			'index'    => 'date',
 			'type'     => 'datetime',
 			'align'    => 'center',
@@ -116,7 +116,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('status', array(
-			'header'    => $this->helper('adminhtml')->__('Status'),
+			'header'    => $this->__('Status'),
 			'index'     => 'status',
 			'align'     => 'status',
 			'width'     => '125px',
@@ -173,6 +173,6 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 	public function decorateLink($value, $row, $column, $isExport) {
 
 		$data = addslashes(base64_encode($row->getData('details')));
-		return '<a href="#" onclick="return versioning.history(this, \''.$data.'\');">'.$this->helper('adminhtml')->__('View').'</a>';
+		return '<a href="#" onclick="return versioning.history(this, \''.$data.'\');">'.$this->__('View').'</a>';
 	}
 }

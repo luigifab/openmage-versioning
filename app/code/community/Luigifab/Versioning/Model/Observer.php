@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated W/11/03/2015
- * Version 14
+ * Updated S/07/05/2016
+ * Version 15
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -65,7 +65,7 @@ class Luigifab_Versioning_Model_Observer {
 	// fr_FR => Array
 	//  [error503_pagetitle] [error503_title] [error503_content] [error503_autoreload] [error503_byip]
 	//  [upgrade_pagetitle]  [upgrade_title]  [upgrade_content]  [upgrade_autoreload]  [upgrade_byip]
-	//  [report_pagetitle]   [report_title]   [report_content]                                         [report_email]
+	//  [report_pagetitle]   [report_title]   [report_content]                         [report_email]
 	//  [report_pagetitle]   [report_title]   [error404_content]
 
 	// pagetitle/title, content, autoreload (*.csv)
@@ -106,7 +106,7 @@ class Luigifab_Versioning_Model_Observer {
 		}
 
 		// sauvegarde des données (format CSV)
-		@unlink(BP.'/errors/config/*.csv');
+		array_map('unlink', glob(BP.'/errors/config/*.csv'));
 		if (count($translations) > 0) {
 			foreach ($translations as $locale => $values)
 				file_put_contents(BP.'/errors/config/'.$locale.'.csv', implode("\n", $values));
@@ -154,7 +154,7 @@ class Luigifab_Versioning_Model_Observer {
 		}
 
 		// sauvegarde des données dans plusieurs fichiers (format spécial)
-		@unlink(BP.'/errors/config/*.ip');
+		array_map('unlink', glob(BP.'/errors/config/*.ip'));
 		if (count($config) > 0) {
 			foreach ($config as $key => $values)
 				file_put_contents(BP.'/errors/config/'.$key.'.ip', implode("\n", $values));

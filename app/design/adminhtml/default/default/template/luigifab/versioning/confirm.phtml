@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated S/20/02/2016
- * Version 15
+ * Updated S/23/04/2016
+ * Version 17
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,11 +28,11 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
-	<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
+	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
-	<script type="text/javascript" charset="utf-8" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
+	<script type="text/javascript" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
 </head>
 
 <body class="adminhtml-versioning-repository-confirm">
@@ -42,8 +42,8 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 			<?php echo $this->helper('versioning')->getFields() ?>
 		</div>
 		<div class="buttons">
-			<button type="submit" autofocus="autofocus"><?php echo $this->helper('adminhtml')->__('Continue') ?></button>
-			<button type="button" class="back" onclick="versioning.valid('<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>');"><?php echo $this->helper('adminhtml')->__('Cancel') ?></button>
+			<button type="submit" autofocus="autofocus"><?php echo $this->__('Continue') ?></button>
+			<button type="button" class="back" onclick="versioning.valid('<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>');"><?php echo $this->__('Cancel') ?></button>
 		</div>
 	</form>
 	<p class="credits"><?php echo $this->__('Martian sunset by Spirit.') ?></p>

@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated D/20/03/2016, version 57
+ * Created J/22/12/2011, updated J/28/04/2016, version 57
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,22 +20,25 @@ var versioning = {
 	// initialisation
 	start: function () {
 
-		if (document.getElementById('history_grid'))
+		if (!document.querySelector('body[class*="adminhtml-versioning-repository-"]'))
+			return;
+		console.info('versioning.app hello!');
+
+		if (document.getElementById('history_grid')) {
 			document.querySelector('table.data tbody tr td a').click();
+		}
 
 		if (typeof versioningIds !== 'undefined') {
 			versioning.drawGraph(versioningIds, versioningCols);
 			versioning.initDiff();
-			var image = new Image();
-			image.src = SKIN_URL + 'images/luigifab/versioning/mars-sunset.jpg';
 		}
 	},
 
 
 	// #### Confirmation des pages de maintenance ############################### //
 	// = révision : 13
-	// » Demande de confirmation de mise en maintenance avec l'apijs (si disponible, IE 10+)
-	// » Demande de confirmation même si l'apijs n'est pas disponible, avec les mêmes informations (IE 10+)
+	// » Demande de confirmation de mise en maintenance avec l'apijs (si disponible)
+	// » Demande de confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
 	// » En cas de problème active quand même la page de maintenance ou de mise à jour en redirigeant directement sur l'action
 	// » Pour la désactivation, redirige simplement sur l'action
 	confirmFlag: function (that, url, title, content, credits) {
@@ -93,7 +96,7 @@ var versioning = {
 
 	// #### Confirmation de mise à jour ######################################### //
 	// = révision : 23
-	// » Demande de confirmation de mise à jour avec l'apijs (si disponible, IE 10+)
+	// » Demande de confirmation de mise à jour avec l'apijs (si disponible)
 	// » Dans le cas contraire on laisse le navigateur suivre le lien vers la page de demande de confirmation
 	confirmUpgrade: function (url, title, content, credits) {
 
@@ -159,7 +162,7 @@ var versioning = {
 
 	// #### Affichage de l'historique ########################################### //
 	// = révision : 10
-	// » Affiche les détails d'une mise à jour dans la balise pre (IE 10+, isNaN pour Webkit)
+	// » Affiche les détails d'une mise à jour dans la balise pre (isNaN pour Webkit)
 	// » Marque la ligne active du tableau avec la classe current
 	history: function (link, content) {
 

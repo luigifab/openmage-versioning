@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/28/02/2016
+ * Updated J/28/04/2016
  * Version 34
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -48,7 +48,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		else {
 			$this->_addButton('maintenance_flag', array(
 				'label'   => $this->__('Enable maintenace page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".addslashes($this->helper('versioning')->getMaintenanceInfo(true))."', '".addslashes($this->__('Martian sunset by Spirit.'))."');"
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset by Spirit.')."');"
 			));
 		}
 
@@ -62,7 +62,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		else {
 			$this->_addButton('upgrade_flag', array(
 				'label'   => $this->__('Enable upgrade page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".addslashes($this->helper('versioning')->getUpgradeInfo(true))."', '".addslashes($this->__('Martian sunset by Spirit.'))."');"
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset by Spirit.')."');"
 			));
 		}
 

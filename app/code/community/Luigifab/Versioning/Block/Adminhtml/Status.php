@@ -1,8 +1,8 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated V/25/03/2016
- * Version 16
+ * Updated M/12/04/2016
+ * Version 18
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -45,7 +45,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$this->_removeButton('add');
 
 		$this->_addButton('back', array(
-			'label'   => $this->helper('adminhtml')->__('Back'),
+			'label'   => $this->__('Back'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
 			'class'   => 'back'
 		));
@@ -67,7 +67,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 
 	public function getGridHtml() {
 
-		$model = Mage::getModel('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
+		$model = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
 		$from = $this->getRequest()->getParam('from', false);
 		$to = $this->getRequest()->getParam('to', false);
 

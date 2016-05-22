@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated V/27/02/2015
- * Version 15
+ * Updated M/12/04/2016
+ * Version 16
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -33,7 +33,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 		$this->_removeButton('add');
 
 		$this->_addButton('back', array(
-			'label'   => $this->helper('adminhtml')->__('Back'),
+			'label'   => $this->__('Back'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
 			'class'   => 'back'
 		));
