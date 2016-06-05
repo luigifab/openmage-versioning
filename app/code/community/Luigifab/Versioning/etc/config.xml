@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated M/12/04/2016
+ * Updated J/02/06/2016
  * Version 28
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -21,7 +21,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.4.0</version>
+			<version>3.4.1</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>

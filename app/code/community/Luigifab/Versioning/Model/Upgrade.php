@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated V/25/03/2016
- * Version 53
+ * Updated J/02/06/2016
+ * Version 54
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -52,7 +52,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 
 	// #### Gestion de la mise à jour ####################################### i18n ## public ### //
-	// = révision : 88
+	// = révision : 89
 	// » Log toutes les informations de la mise à jour
 	// » Déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
@@ -78,7 +78,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			// ÉTAPE 1
 			$this->writeTitle($this->__('1) Locking and configuration check'));
 
-			if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning_upgrade') !== true)
+			if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning/upgrade') !== true)
 				throw new Exception('Not authorized');
 
 			if (is_file($lock))
