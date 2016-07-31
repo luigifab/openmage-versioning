@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated S/23/04/2016
- * Version 17
+ * Updated V/08/07/2016
+ * Version 18
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -23,7 +23,7 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>" style="height:100%;">
 <head>
-	<title><?php echo $this->__('Versioning / Tools / Magento Admin'),' - ',Mage::getStoreConfig('design/head/default_title') ?></title>
+	<title><?php echo $this->__('Version control / Tools / Magento Admin'),' - ',Mage::getStoreConfig('design/head/default_title') ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
@@ -37,7 +37,7 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 
 <body class="adminhtml-versioning-repository-confirm">
 	<form action="<?php echo $this->helper('adminhtml')->getUrl('*/*/upgrade', array('revision' => $this->getRequest()->getParam('revision'), 'confirm' => '1')) ?>" method="get" onsubmit="versioning.valid('<?php echo $this->__('Operation in progress...') ?>');">
-		<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->__('Upgrade to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
+		<h1 class="<?php echo Mage::getStoreConfig('versioning/scm/type') ?>"><?php echo $this->__('Update to revision %s', $this->getRequest()->getParam('revision')) ?></h1>
 		<div class="bbcode">
 			<?php echo $this->helper('versioning')->getFields() ?>
 		</div>
@@ -46,6 +46,6 @@ $lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
 			<button type="button" class="back" onclick="versioning.valid('<?php echo $this->helper('adminhtml')->getUrl('*/versioning_repository/index') ?>');"><?php echo $this->__('Cancel') ?></button>
 		</div>
 	</form>
-	<p class="credits"><?php echo $this->__('Martian sunset by Spirit.') ?></p>
+	<p class="credits"><?php echo $this->__('Martian sunset seen by Spirit.') ?></p>
 </body>
 </html>

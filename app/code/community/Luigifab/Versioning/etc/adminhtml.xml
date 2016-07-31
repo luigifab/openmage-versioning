@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created J/22/12/2011
- * Updated L/07/09/2015
- * Version 14
+ * Updated V/08/07/2016
+ * Version 15
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -54,7 +54,7 @@
 								<sort_order>72</sort_order>
 								<children>
 									<upgrade translate="title">
-										<title>Perform upgrade</title>
+										<title>Perform updates</title>
 										<sort_order>1</sort_order>
 									</upgrade>
 								</children>

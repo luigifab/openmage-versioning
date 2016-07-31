@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/26/02/2015
- * Version 33
+ * Updated V/08/07/2016
+ * Version 34
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -28,11 +28,11 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getFields($grid = false) {
 
 		$fields = new ArrayObject();
-		$fields->append('<label><input type="checkbox" name="use_flag" value="1" /> '.$this->__('Use upgrade page').'</label>');
+		$fields->append('<label><input type="checkbox" name="use_flag" value="1" /> '.$this->__('Use update page').'</label>');
 
 		Mage::dispatchEvent('admin_versioning_add_fields', array('fields' => $fields));
 
-		$html = '<p>'.$this->__('Are you sure you want to run the upgrade process?<br />Be careful, you can\'t cancel this operation.').'</p><ul><li>'.implode('</li><li>', $fields->getArrayCopy()).'</li></ul>';
+		$html = '<p>'.$this->__('Are you sure you want to launch the update process?<br />Be careful, you can\'t cancel this operation.').'</p><ul><li>'.implode('</li><li>', $fields->getArrayCopy()).'</li></ul>';
 
 		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
 	}
@@ -53,7 +53,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		else if ($byip)
 			$html[] = '<br />'.$this->__('<strong>You will have</strong> access to the frontend.').'</p>';
 		else
-			$html[] = '<br />'.$this->__('<strong>You will haven\'t</strong> access to the frontend.').'</p>';
+			$html[] = '<br />'.$this->__('<strong>You will not have</strong> access to the frontend.').'</p>';
 
 		$html = implode("\n", $html);
 		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
@@ -66,7 +66,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		$nobody = (!is_file($file) || (strlen(trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'))) < 1));
 
 		$html = array();
-		$html[] = '<p>'.$this->__('Are you sure you want to enable the upgrade page?').'</p>';
+		$html[] = '<p>'.$this->__('Are you sure you want to enable the update page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
 		$html[] = '<p>'.$this->__('Your IP address: %s', getenv('REMOTE_ADDR'));
 
@@ -75,7 +75,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		else if ($byip)
 			$html[] = '<br />'.$this->__('<strong>You will have</strong> access to the frontend.').'</p>';
 		else
-			$html[] = '<br />'.$this->__('<strong>You will haven\'t</strong> access to the frontend.').'</p>';
+			$html[] = '<br />'.$this->__('<strong>You will not have</strong> access to the frontend.').'</p>';
 
 		$html = implode("\n", $html);
 		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/02/06/2016
- * Version 54
+ * Updated S/23/07/2016
+ * Version 55
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -20,6 +20,8 @@
 
 class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data {
 
+	// attention, ceci est un singleton
+	// comme chaque model dans Scm
 	private $event = false;
 
 
@@ -105,7 +107,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			Mage::dispatchEvent('admin_versioning_upgrade_before',
 				array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
 
-			$this->writeTitle($this->__('2) Upgrading'));
+			$this->writeTitle($this->__('2) Updating'));
 			$repository->upgradeToRevision($this, $log, $targetRevision);
 
 			$this->writeEvent('admin_versioning_upgrade_after...');
@@ -121,15 +123,15 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
 			$H['duration'] = ($H['duration'] < 1000) ? $H['duration'] : 1;
-			$H['status']   = (is_file($log) && is_readable($log)) ? 'Upgrade completed'."\n".trim(file_get_contents($log)) : 'Upgrade completed';
+			$H['status']   = (is_file($log) && is_readable($log)) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
 
 			$result = array(
 				'url'   => '*/versioning_repository/index',
-				'title' => $this->__('Upgrade completed (revision %s)', $targetRevision),
+				'title' => $this->__('Update completed (revision %s)', $targetRevision),
 				'error' => false
 			);
 
-			Mage::getSingleton('adminhtml/session')->addSuccess($this->__('Upgrade to revision %s completed.', $targetRevision));
+			Mage::getSingleton('adminhtml/session')->addSuccess($this->__('Update to revision %s completed.', $targetRevision));
 		}
 		catch (Exception $e) {
 
@@ -141,7 +143,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 				$result = array(
 					'url'   => '*/versioning_repository/history',
-					'title' => $this->__('Upgrade error (revision %s)', $targetRevision),
+					'title' => $this->__('Update error (revision %s)', $targetRevision),
 					'error' => true
 				);
 
@@ -160,13 +162,13 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			else {
 				$result = array(
 					'url'   => '*/versioning_repository/index',
-					'title' => $this->__('Upgrade error (revision %s)', $targetRevision),
+					'title' => $this->__('Update error (revision %s)', $targetRevision),
 					'error' => true
 				);
 
 				if ($e->getMessage() === 'An upgrade is already underway') {
-					$this->writeError($this->__('Stop! Stop! Stop! An upgrade is already underway.'));
-					Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an upgrade is already underway.'));
+					$this->writeError($this->__('Stop! Stop! Stop! An update is in progress.'));
+					Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an update is in progress.'));
 				}
 				else {
 					$this->writeError($this->__('You are not authorized to perform this operation.'));

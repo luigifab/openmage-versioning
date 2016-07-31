@@ -1,12 +1,12 @@
-`error404_pagetitle`,`Woops`
+`error404_pagetitle`,`Oops`
 `error404_title`,`Page not found`
 `error404_content`,`<p>The requested page does not exist.</p>`
-`error503_pagetitle`,`Woops`
+`error503_pagetitle`,`Oops`
 `error503_title`,`Service Temporarily Unavailable`
-`error503_content`,`<p>The server is temporarily unable to service your request due to maintenance downtime or technical problem.</p>`
-`upgrade_pagetitle`,`Woops`
+`error503_content`,`<p>The server is temporarily unavailable due to maintenance or technical problems.</p>`
+`upgrade_pagetitle`,`Oops`
 `upgrade_title`,`Service Temporarily Unavailable`
-`upgrade_content`,`<p>The server is temporarily unable to service your request due to maintenance downtime.</p>`
-`report_pagetitle`,`Woops`
+`upgrade_content`,`<p>The server is temporarily unavailable due to a maintenance operation.</p>`
+`report_pagetitle`,`Oops`
 `report_title`,`There has been an error processing your request`
-`report_content`,`<p>The server is temporarily unable to service your request due to technical problem.</p>`
+`report_content`,`<p>The server is temporarily unavailable due to a technical problem</p>`

@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/12/04/2016
- * Version 22
+ * Updated S/23/07/2016
+ * Version 24
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -55,7 +55,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('to', array(
-			'header'   => $this->__('Target revision'),
+			'header'   => $this->__('Requested revision'),
 			'index'    => 'to',
 			'align'    => 'center',
 			'width'    => '120px',
@@ -78,7 +78,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('remote_addr', array(
-			'header'   => $this->__('Remote address'),
+			'header'   => $this->__('IP address'),
 			'index'    => 'remote_addr',
 			'align'    => 'center',
 			'width'    => '150px',
@@ -99,8 +99,9 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Date'),
 			'index'    => 'date',
 			'type'     => 'datetime',
+			'format'   => Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT, true),
 			'align'    => 'center',
-			'width'    => '180px',
+			'width'    => '150px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -148,7 +149,9 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	public function decorateStatus($value, $row, $column, $isExport) {
 
-		$status = ($row->getData('status') === 'Upgrade completed') ? 'success' : 'error'; // pour translate.php  $this->__('Success')
+		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ?
+			'success' : 'error'; // pour translate.php $this->__('Success') - il y avait Upgrade avant 3.4.2
+
 		return '<span class="grid-'.$status.'">'.$this->__(ucfirst($status)).'</span>';
 	}
 

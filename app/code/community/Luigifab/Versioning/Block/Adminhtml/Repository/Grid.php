@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/28/04/2016
- * Version 43
+ * Updated S/23/07/2016
+ * Version 45
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -45,11 +45,11 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'header'    => $this->__('Revision'),
 			'index'     => 'revision',
 			'align'     => 'center',
-			'width'     => '85px',
+			'width'     => '90px',
 			'filter'    => false,
 			'sortable'  => false,
 			'column_css_class' => 'revision',
-			'frame_callback' => array($this, 'decorateRevision')
+			'frame_callback'   => array($this, 'decorateRevision')
 		));
 
 		$this->addColumn('diff', array(
@@ -72,9 +72,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 		$this->addColumn('author', array(
 			'header'    => $this->__('Author'),
+			'width'     => '200px',
 			'index'     => 'author',
 			'align'     => 'center',
-			'width'     => '185px',
 			'filter'    => false,
 			'sortable'  => false
 		));
@@ -92,8 +92,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'header'    => $this->__('Date'),
 			'index'     => 'date',
 			'type'      => 'datetime',
+			'format'    => Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT, true),
 			'align'     => 'center',
-			'width'     => '185px',
+			'width'     => '150px',
 			'filter'    => false,
 			'sortable'  => false
 		));
@@ -106,7 +107,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 					'caption' => $this->__('Deliver'),
 					'url'     => array('base' => '*/*/upgrade'),
 					'field'   => 'revision',
-					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.$this->__('Upgrade to revision %s', '§').'", "'.$this->helper('versioning')->getFields(true).'", "'.$this->__('Martian sunset by Spirit.').'");'
+					'onclick' => 'return versioning.confirmUpgrade(this.href, "'.$this->__('Update to revision %s', '§').'", "'.$this->helper('versioning')->getFields(true).'", "'.$this->__('Martian sunset seen by Spirit.').'");'
 				)
 			),
 			'align'     => 'center',

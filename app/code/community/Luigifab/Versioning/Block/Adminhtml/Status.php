@@ -1,8 +1,8 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated M/12/04/2016
- * Version 18
+ * Updated V/08/07/2016
+ * Version 19
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -51,7 +51,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		));
 
 		$this->_addButton('history', array(
-			'label'   => $this->__('Upgrades log'),
+			'label'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
 		));

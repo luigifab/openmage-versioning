@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated V/03/04/2015
- * Version 7
+ * Updated V/08/07/2016
+ * Version 8
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -66,7 +66,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 					// an upgrade is already...
 					// remplace le texte par sa version traduite
 					if (strpos($item->getDetails(), 'An upgrade is already underway') !== false)
-						$item->setDetails(Mage::helper('versioning')->__('Stop! Stop! Stop! An upgrade is already underway.'));
+						$item->setDetails(Mage::helper('versioning')->__('Stop! Stop! Stop! An update is in progress.'));
 
 					array_push($this->_items, $item);
 				}

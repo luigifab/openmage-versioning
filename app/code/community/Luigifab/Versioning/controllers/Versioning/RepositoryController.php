@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/25/03/2016
- * Version 39
+ * Updated S/23/07/2016
+ * Version 41
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -29,12 +29,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
+		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
-			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before use it.'));
+			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
 			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
 		}
 	}
@@ -43,12 +43,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
+		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
-			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before use it.'));
+			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
 			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
 		}
 	}
@@ -57,7 +57,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		if (Mage::getStoreConfig('versioning/scm/enabled') === '1') {
+		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 
 			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 
@@ -67,7 +67,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 				$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
-			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before use it.'));
+			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
 			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
 		}
 	}
@@ -129,12 +129,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		$revision = $this->getRequest()->getParam('revision', ''); // string
-		$confirm =  $this->getRequest()->getParam('confirm',  ''); // string
-		$useflag = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
+		$revision =  $this->getRequest()->getParam('revision', ''); // string
+		$goconfir = ($this->getRequest()->getParam('confirm',  '') !== '1'); // boolean
+		$useflag  = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
 
-		if (Mage::getStoreConfig('versioning/scm/enabled') !== '1') {
-			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before use it.'));
+		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
+			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
 			$this->_redirect('adminhtml/system_config/edit', array('section' => 'versioning'));
 			return;
 		}
@@ -142,7 +142,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			$this->_redirect('*/versioning_repository/index');
 			return;
 		}
-		else if ($confirm !== '1') {
+		else if ($goconfir) {
 			$this->_forward('confirm');
 			return;
 		}
@@ -154,7 +154,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 		echo "\n",'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="',$lang,'" lang="',$lang,'">';
 		echo "\n",'<head>';
-		echo "\n",'<title>',$this->__('Upgrading'),' - ',Mage::getStoreConfig('design/head/default_title'),'</title>';
+		echo "\n",'<title>',$this->__('Updating'),' - ',Mage::getStoreConfig('design/head/default_title'),'</title>';
 		echo "\n",'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		echo "\n",'<meta http-equiv="Content-Script-Type" content="text/javascript" />';
 		echo "\n",'<meta http-equiv="Content-Style-Type" content="text/css" />';
@@ -217,10 +217,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'</head>';
 
 		echo "\n",'<body>';
-		echo "\n",'<p class="credits">'.$this->__('Martian sunset by Spirit.').'</p>';
+		echo "\n",'<p class="credits">'.$this->__('Martian sunset seen by Spirit.').'</p>';
 		echo "\n",'<div class="obj"><object data="',Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg'),'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
 		echo "\n",'<div class="ctn" id="scroll">';
-		echo "\n",'<p class="first"><strong>',$this->__('Starting upgrade (revision %s)', $revision),'</strong>';
+		echo "\n",'<p class="first"><strong>',$this->__('Starting update (revision %s)', $revision),'</strong>';
 		echo "\n",'<br /><em>',$this->__('Do not touch anything / Do not try to cancel this operation'),'</em></p>',"\n";
 
 		sleep(3);

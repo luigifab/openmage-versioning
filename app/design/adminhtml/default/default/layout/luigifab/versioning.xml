@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated W/24/02/2016
- * Version 23
+ * Updated J/07/07/2016
+ * Version 24
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -32,7 +32,7 @@
 	<adminhtml_versioning_repository_index>
 		<reference name="head">
 			<action method="setTitle" translate="title">
-				<title>Versioning / Tools / Magento Admin</title>
+				<title>Version control / Tools / Magento Admin</title>
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>
@@ -60,7 +60,7 @@
 	<adminhtml_versioning_repository_status>
 		<reference name="head">
 			<action method="setTitle" translate="title">
-				<title>Versioning / Tools / Magento Admin</title>
+				<title>Version control / Tools / Magento Admin</title>
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>
@@ -76,7 +76,7 @@
 	<adminhtml_versioning_repository_history>
 		<reference name="head">
 			<action method="setTitle" translate="title">
-				<title>Versioning / Tools / Magento Admin</title>
+				<title>Version control / Tools / Magento Admin</title>
 			</action>
 			<action method="addItem">
 				<type>skin_css</type>

@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated S/23/04/2016, version 63
+ * Created J/22/12/2011, updated S/23/07/2016, version 65
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -81,8 +81,6 @@ body.adminhtml-versioning-repository-index button.delpage.delete span { padding-
 body.adminhtml-versioning-repository-index div.content-header td { width:auto !important; }
 
 body.adminhtml-versioning-repository-index table.data tr.headings th.no-link { padding:3px 4px; text-align:center; color:#666; }
-body.adminhtml-versioning-repository-index table.data tr:first-child input[name="diff2"] { visibility:hidden; }
-body.adminhtml-versioning-repository-index table.data tr:last-child input[name="diff1"] { visibility:hidden; }
 
 body.adminhtml-versioning-repository-index table.data tr.outside { color:#AAA; font-style:italic; }
 body.adminhtml-versioning-repository-index table.data tr.outside a { color:#AAA; }
@@ -93,12 +91,13 @@ body.adminhtml-versioning-repository-index table.data td { vertical-align:middle
 body.adminhtml-versioning-repository-index table.data td.revision { padding:2px 0; }
 body.adminhtml-versioning-repository-index table.data td.revision strong { font-size:115%; }
 body.adminhtml-versioning-repository-index table.data td a.issue { float:right; padding-left:0.3em; color:#999; }
-body.adminhtml-versioning-repository-index table.data td input { cursor:pointer; }
+body.adminhtml-versioning-repository-index table.data td input { cursor:pointer; visibility:hidden; }
+body.adminhtml-versioning-repository-index table.data td input[onchange]:not([disabled]) { visibility:visible; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
-	position:absolute !important; left:142px; width:197px; pointer-events:none;
+	position:absolute !important; left:147px; width:197px; pointer-events:none;
 	background-color:rgba(0,0,0, 0.09); transition:width 0.4s;
 }
 
@@ -152,6 +151,7 @@ body.adminhtml-versioning-repository-confirm ul { margin-top:0.5em; font-size:0.
 body.adminhtml-versioning-repository-confirm li + li { margin-top:0.35em; }
 body.adminhtml-versioning-repository-confirm label { cursor:pointer; }
 body.adminhtml-versioning-repository-confirm input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
+body.adminhtml-versioning-repository-confirm input:focus, body.adminhtml-versioning-repository-confirm input:active { outline:1px dotted gray; }
 
 body.adminhtml-versioning-repository-confirm p { margin:1em auto; line-height:140%; }
 body.adminhtml-versioning-repository-confirm p.credits { position:absolute; bottom:0.25em; left:1em; color:#CCC; }

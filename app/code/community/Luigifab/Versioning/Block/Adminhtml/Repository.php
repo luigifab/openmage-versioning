@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/28/04/2016
- * Version 34
+ * Updated V/08/07/2016
+ * Version 35
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -27,8 +27,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
 		$this->_headerText = (!is_null($branch = Mage::registry('versioning')->getCurrentBranch())) ?
-			$this->__('Commit history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
-			$this->__('Commit history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
+			$this->__('Commits history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
+			$this->__('Commits history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
 		$this->_removeButton('add');
 
@@ -40,34 +40,34 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
 			$this->_addButton('maintenance_flag', array(
-				'label'   => $this->__('Remove maintenace page'),
+				'label'   => $this->__('Remove the maintenance page'),
 				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delMaintenanceFlag')."');",
 				'class'   => 'delpage delete'
 			));
 		}
 		else {
 			$this->_addButton('maintenance_flag', array(
-				'label'   => $this->__('Enable maintenace page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset by Spirit.')."');"
+				'label'   => $this->__('Enable the maintenance page'),
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
 			));
 		}
 
 		if (is_file($this->helper('versioning')->getUpgradeFlag())) {
 			$this->_addButton('upgrade_flag', array(
-				'label'   => $this->__('Remove upgrade page'),
+				'label'   => $this->__('Remove the update page'),
 				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delUpgradeFlag')."');",
 				'class'   => 'delpage delete'
 			));
 		}
 		else {
 			$this->_addButton('upgrade_flag', array(
-				'label'   => $this->__('Enable upgrade page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset by Spirit.')."');"
+				'label'   => $this->__('Enable the update page'),
+				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
 			));
 		}
 
 		$this->_addButton('history', array(
-			'label'   => $this->__('Upgrades log'),
+			'label'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
 		));

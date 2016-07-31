@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/16/05/2015
- * Version 9
+ * Updated V/08/07/2016
+ * Version 10
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -29,7 +29,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
 		$url = preg_replace('#/[^/]+\.php#', '', $url);
 
-		if (Mage::getStoreConfig('web/url/use_store') === '1')
+		if (Mage::getStoreConfigFlag('web/url/use_store'))
 			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getCode().'/', '/', $url);
 
 		// versioning_downtime_error503.php versioning_downtime_error404.php

@@ -1,6 +1,6 @@
 /**
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated J/28/04/2016, version 57
+ * Created J/22/12/2011, updated L/25/07/2016, version 58
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,6 +22,7 @@ var versioning = {
 
 		if (!document.querySelector('body[class*="adminhtml-versioning-repository-"]'))
 			return;
+
 		console.info('versioning.app hello!');
 
 		if (document.getElementById('history_grid')) {
@@ -183,11 +184,10 @@ var versioning = {
 	// #### Représentation des branches ######################################### //
 	// = révision : 118
 	// » Est basé sur le script de Redmine (revision_graph.js - rev 9835) - http://www.redmine.org/
-	// » Utilise Raphael.js 2.1.2 (89,5 ko) pour la création de l'image SVG - http://raphaeljs.com/
+	// » Utilise Raphael.js 2.2.0 (90,6 ko) pour la création de l'image SVG - http://raphaeljs.com/
 	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Commence par rechercher les branches (dans tous les cas, passe la branche actuelle en premier)
 	// » Pour chaque commit, crée un point suivi d'une étiquette avec le nom de la branche et des tags
-	// » Met en gras la première étiquette (généralement le nom de la branche actuelle)
 	// » Crée ensuite les lignes entres les points
 	drawGraph: function (data, cols) {
 
@@ -257,10 +257,10 @@ var versioning = {
 
 			// écrit le texte dans une étiquette
 			// en profite pour vérifier la largeur du graphique
-			// met en évidence l'étiquette du nom de de la branche actuelle
 			if ((commit.refs.length > 0) && (names.indexOf(commit.refs) < 0)){
 
 				names.push(commit.refs);
+
 				elem = graph.text(x + 13, y - 0.3, commit.refs).attr('fill', colors[commit.col]).attr('text-anchor', 'start');
 				graph.path(
 					'M ' + (x + 3.2) + ',' + (y - 0.4) + // point de départ au niveau du point
@@ -373,14 +373,23 @@ var versioning = {
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 2
+	// = révision : 5
 	// » Gère l'activation du lien vers la page du diff
+	// » Active automatiquement les premières cases
 	initDiff: function () {
 
 		var elems = document.querySelectorAll('table.data input[type="radio"]'), elem;
 		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
 			elems[elem].setAttribute('onchange', 'versioning.goDiff();');
 		}
+
+		document.querySelector('table.data tr:last-child input[name="diff1"]').setAttribute('disabled', 'disabled');
+		document.querySelector('table.data tr:first-child input[name="diff2"]').setAttribute('disabled', 'disabled');
+		document.querySelector('input[name="diff1"]:not([disabled])').checked = true;
+		document.querySelector('input[name="diff2"]:not([disabled])').checked = true;
+		document.querySelector('td.form-buttons button').setAttribute('class', 'scalable');
+
+		this.goDiff();
 	},
 
 	goDiff: function (url) {
@@ -388,22 +397,15 @@ var versioning = {
 		var diff1 = document.querySelector('input[name="diff1"]:checked'),
 		    diff2 = document.querySelector('input[name="diff2"]:checked'), onclick;
 
-		if (diff1 && diff2) {
-
-			if (typeof url === 'string') {
-				location.href = url;
-			}
-			else {
-				onclick = document.querySelector('td.form-buttons button').getAttribute('onclick');
-				onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff2.value);
-				onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff1.value);
-
-				document.querySelector('td.form-buttons button').setAttribute('class', 'scalable');
-				document.querySelector('td.form-buttons button').setAttribute('onclick', onclick);
-			}
+		if (typeof url === 'string') {
+			location.href = url;
 		}
 		else {
-			document.querySelector('td.form-buttons button').setAttribute('class', 'scalable disabled');
+			onclick = document.querySelector('td.form-buttons button').getAttribute('onclick');
+			onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff2.value);
+			onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff1.value);
+
+			document.querySelector('td.form-buttons button').setAttribute('onclick', onclick);
 		}
 	}
 };
