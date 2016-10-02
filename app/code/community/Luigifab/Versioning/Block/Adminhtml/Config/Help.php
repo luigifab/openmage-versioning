@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated D/01/06/2014
- * Version 2
+ * Updated M/13/09/2016
+ * Version 3
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -22,6 +22,6 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 		$url = 'https://redmine.luigifab.info/projects/magento/wiki/versioning';
-		return '<p class="box">Luigifab/Versioning '.$this->helper('versioning')->getVersion().' <a href="'.$url.'" onclick="window.open(this.href); return false;" style="float:right;">'.$url.'</a></p>';
+		return sprintf('<p class="box">Luigifab/Versioning %s <a href="%s" onclick="window.open(this.href); return false;" style="float:right;">%2$s</a></p>', $this->helper('versioning')->getVersion(), $url);
 	}
 }

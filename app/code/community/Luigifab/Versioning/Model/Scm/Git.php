@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/06/05/2016
+ * Updated V/16/09/2016
  * Version 29
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
@@ -143,7 +143,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		return $this->items;
 	}
 
-	private function populateCols($collection) {
+	private function populateCols($commits) {
 
 		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
 		// heads.sort! { |head1, head2| head1.to_s <=> head2.to_s }
@@ -158,22 +158,20 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		$space = -1;
 
-		foreach ($collection as $commit) {
-
+		foreach ($commits as $commit) {
 			foreach ($commit->getRefs() as $ref) {
-
 				if (strpos($ref, 'tag:') === false)
-					$space = $this->indexCols($space + 1, $commit, $collection);
+					$space = $this->indexCols($space + 1, $commit, $commits);
 			}
 		}
 
 		if ($space < 0)
-			$space = $this->indexCols(0, $collection->getFirstItem(), $collection);
+			$space = $this->indexCols(0, $commits->getFirstItem(), $commits);
 
 		return $space; // recalculé par Luigifab_Versioning_Block_Adminhtml_Repository::getGridHtml
 	}
 
-	private function indexCols($space, $commit, $collection) {
+	private function indexCols($space, $commit, $commits) {
 
 		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
 		// def index_head(space, commit, commits_by_scmid)
@@ -197,7 +195,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		// » la même chose avec les commentaires de donove
 		// » http://www.developpez.net/forums/d1510217/autres-langages/autres-langages/ruby/traduction-ruby-php-graphique-git/
 		// def index_head(space, commit, commits_by_scmid)
-		//   # commits_by_scmid serait ta variable $collection dans ta version PHP
+		//   # commits_by_scmid serait ta variable $commits dans ta version PHP
 		//   # Avec la valeur de commit.scmid comme référence
 		//   stack = [ [space, commits_by_scmid[commit.scmid]] ]
 		//   max_space = space
@@ -245,7 +243,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 			foreach ($commit->getParents() as $rev) {
 
-				$parent = $collection->getItemByColumnValue('revision', $rev);
+				$parent = $commits->getItemByColumnValue('revision', $rev);
 
 				if (!is_object($parent)) {
 					$space += 1;
@@ -292,7 +290,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		//   have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B)
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
 			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space --ignore-blank-lines';
-		else if (version_compare($this->getSoftwareVersion(), '1.5.0', '>='))
+		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
 			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space';
 		else
 			$command = 'git diff -U1 --diff-filter=MTUXB';

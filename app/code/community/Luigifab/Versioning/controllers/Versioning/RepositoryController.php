@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/23/07/2016
- * Version 41
+ * Updated M/23/08/2016
+ * Version 42
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -150,7 +150,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$upgrade = Mage::getSingleton('versioning/upgrade');
 		$upgrade->disableAllBuffer();
 
-		$lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
+		$lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 		echo "\n",'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="',$lang,'" lang="',$lang,'">';
 		echo "\n",'<head>';

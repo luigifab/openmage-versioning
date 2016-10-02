@@ -1,8 +1,8 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/23/07/2016
- * Version 24
+ * Updated V/16/09/2016
+ * Version 27
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -26,7 +26,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 		$this->setId('history_grid');
 		$this->setDefaultSort('date');
-		$this->setDefaultDir('DESC');
+		$this->setDefaultDir('desc');
 
 		$this->setUseAjax(true);
 		$this->setSaveParametersInSession(false);
@@ -99,7 +99,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Date'),
 			'index'    => 'date',
 			'type'     => 'datetime',
-			'format'   => Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT, true),
+			'format'   => Mage::getSingleton('core/locale')->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT),
 			'align'    => 'center',
 			'width'    => '150px',
 			'sortable' => false,

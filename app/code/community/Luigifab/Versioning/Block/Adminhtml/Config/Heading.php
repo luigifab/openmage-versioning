@@ -1,8 +1,8 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated V/08/07/2016
- * Version 10
+ * Updated M/23/08/2016
+ * Version 11
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -60,7 +60,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	private function getLocaleName($lang) {
 
-		$locales = Mage::app()->getLocale()->getOptionLocales();
+		$locales = Mage::getSingleton('core/locale')->getOptionLocales();
 
 		foreach ($locales as $locale) {
 

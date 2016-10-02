@@ -1,8 +1,8 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated V/08/07/2016
- * Version 18
+ * Updated M/23/08/2016
+ * Version 19
  *
  * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
@@ -18,7 +18,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-$lang = substr(Mage::app()->getLocale()->getLocaleCode(), 0, 2);
+$lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>" style="height:100%;">
