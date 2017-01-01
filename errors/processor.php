@@ -1,10 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated L/07/09/2015
- * Version 18
+ * Updated M/08/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -29,7 +28,7 @@ class Processor {
 
 
 	// #### Initialisation ########################################################## public ### //
-	// = révision : 27
+	// = révision : 28
 	// » Recherche la liste des langues disponibles en fonction des fichiers CSV (définie la langue en fonction du navigateur)
 	// » Charge les fichiers de traductions et les données de configuration
 	// » Prend en charge les fichiers utilisateur (dossier config)
@@ -54,18 +53,54 @@ class Processor {
 		}
 
 		// définition de la langue
-		// langue à partir du choix de l'utilisateur ($_GET lang fr_FR)
-		// langue à partir du navigateur ($_SERVER, 2 ou 4 caractères)
+		// langue à partir de l'utilisateur : $_GET lang, 4 caractères, par exemple fr_FR
+		// langue à partir du navigateur : $_SERVER, 2 ou 4 caractères, pour devenir par exemple fr_FR
 		if (isset($_GET['lang']) && in_array($_GET['lang'], $locales)) {
 			$this->setData('lang', $_GET['lang']);
 		}
 		else if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 
-			$browser = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-			$browser = (strlen($browser) >= 5) ? strtolower(substr($browser, 0, 2)).'_'.strtoupper(substr($browser, 3, 2)) :
-				strtolower(substr($browser, 0, 2)).'_'.strtoupper(substr($browser, 0, 2));
+			// http://stackoverflow.com/a/33748742/2980105
+			// voir aussi MINIFIER/Model_Observer::setAutolang et APIJS/Documentation::__construct
+			$languages = array_reduce(
+				explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']),
+				function ($res, $el) {
+					list($l, $q) = array_merge(explode(';q=', $el), [1]);
+					$res[$l] = (float) $q;
+					return $res;
+				},
+				[]
+			);
 
-			$this->setData('lang', (in_array($browser, $locales)) ? $browser : $this->getData('lang'));
+			arsort($languages);
+			$languages = array_keys($languages); // la liste triée de HTTP_ACCEPT_LANGUAGE (xx-XX, xx...)
+			//$locales = $locales;               // la liste des langues autorisées (xx_XX, ...)
+
+			foreach ($languages as $language) {
+				if (strlen($language) == 2) {
+					// par exemple es devient es_ES
+					// de manière à prioriser es_ES au lieu d'utiliser es_AR
+					if (in_array($language.'_'.strtoupper($language), $locales)) {
+						$this->setData('lang', $language.'_'.strtoupper($language));
+						break;
+					}
+					// par exemple es est cherché dans la liste des langues autorisées
+					foreach ($locales as $locale) {
+						if (stripos($locale, $language) === 0) {
+							$this->setData('lang', $locale);
+							break 2; // car il y a bien 2 foreach
+						}
+					}
+				}
+				else {
+					// par exemple 'es-ES' devient es_ES
+					$language = str_replace('-', '_', $language);
+					if (in_array($language, $locales)) {
+						$this->setData('lang', $language);
+						break;
+					}
+				}
+			}
 		}
 
 		// chargement des traductions
@@ -103,7 +138,7 @@ class Processor {
 
 
 	// #### Contenu de la page ############################################## i18n ## public ### //
-	// = révision : 16
+	// = révision : 17
 	// » Renvoi le contenu de la page (éventuellement en utilisant des expressions régulières)
 	// » En fonction de la configuration, en fonction du contexte
 	public function getPageTitle() {
@@ -124,31 +159,7 @@ class Processor {
 	}
 
 	public function getHtmlContent() {
-
-		$text = $this->__($this->getData('type').'_content');
-
-		if (($this->getData('type') === 'upgrade') && is_file(ROOT.'/upgrade.flag'))
-			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceUpgrade'), $text);
-		else if (($this->getData('type') === 'error503') && is_file(ROOT.'/maintenance.flag'))
-			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceMaintenance'), $text);
-		else if (($this->getData('type') === 'upgrade') || ($this->getData('type') === 'error503'))
-			$text = preg_replace_callback('#%date\[([^\]]+)\]%#', array($this, 'searchReplaceDemo'), $text);
-
-		return $text;
-	}
-
-	public function searchReplaceUpgrade($matches) {
-		$time = filemtime(ROOT.'/upgrade.flag');
-		return strftime($matches[1], $time);
-	}
-
-	public function searchReplaceMaintenance($matches) {
-		$time = filemtime(ROOT.'/maintenance.flag');
-		return strftime($matches[1], $time);
-	}
-
-	public function searchReplaceDemo($matches) {
-		return strftime($matches[1]);
+		return $this->__($this->getData('type').'_content');
 	}
 
 	// #### Génération des adresses ################################################# public ### //
@@ -228,7 +239,7 @@ class Processor {
 
 	// #### Méthodes magiques ####################################################### public ### //
 	// = révision : 5
-	// » Tout simplement magnifique et simplissime
+	// » Tout simplement magnifique
 	public function __($data, $a = null, $b = null, $c = null, $d = null, $e = null) {
 		return $this->translate($data, $a, $b, $c, $d, $e);
 	}

@@ -1,6 +1,6 @@
 /**
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated V/16/09/2016, version 66
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Created J/22/12/2011, updated M/08/11/2016
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -103,6 +103,7 @@ body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
 body.adminhtml-versioning-repository-index { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); }
+body.adminhtml-versioning-repository-index > div.wrapper { padding-bottom:1px; }
 body.adminhtml-versioning-repository-index p.credits { position:absolute; bottom:1.2em; left:1em; color:#CCC; }
 
 body.adminhtml-versioning-repository-index #apijsDialog {
@@ -112,6 +113,7 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 
 #apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; }
 #apijsBox.versioning h1 { padding-left:23px; height:1.2em; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
+#apijsBox.versioning h1:before { display:none; }
 #apijsBox.versioning.bzr   h1 { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
 #apijsBox.versioning.git   h1 { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
 #apijsBox.versioning.svn   h1 { background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center; }
@@ -169,7 +171,7 @@ body.adminhtml-versioning-repository-confirm button::-moz-focus-inner { margin:-
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&& adminhtml/index/login &&& */
 #page-login {
-	color:white; background-color:#111; background-size:100% 100%;
+	overflow-y:scroll; color:white; background-color:#111; background-size:100% 100%;
 	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 

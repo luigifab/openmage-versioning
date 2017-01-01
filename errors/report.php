@@ -1,10 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated D/18/01/2015
- * Version 8
+ * Updated M/08/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify

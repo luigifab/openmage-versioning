@@ -8,5 +8,5 @@
 `upgrade_title`,`Service Temporarily Unavailable`
 `upgrade_content`,`<p>The server is temporarily unavailable due to a maintenance operation.</p>`
 `report_pagetitle`,`Oops`
-`report_title`,`There has been an error processing your request`
+`report_title`,`There was an error while processing your request`
 `report_content`,`<p>The server is temporarily unavailable due to a technical problem</p>`

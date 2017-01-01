@@ -1,10 +1,9 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated S/23/07/2016
- * Version 55
+ * Updated V/11/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -25,11 +24,9 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	private $event = false;
 
 
-	// #### Désactivation des buffers ############################################### public ### //
-	// = révision : 11
-	// » Met fin aux temporisations de sortie activés par Magento
-	// » Est incapable de mettre fin à la temporisation de zlib.output_compression
-	// » N'utilise surtout pas le fichier versioning.log pour Mage::log
+	// met fin aux temporisations de sortie activés par Magento
+	// est incapable de mettre fin à la temporisation de zlib.output_compression
+	// n'utilise surtout pas le fichier versioning.log pour Mage::log
 	public function disableAllBuffer() {
 
 		header('Content-Encoding: chunked', true);
@@ -53,10 +50,8 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	}
 
 
-	// #### Gestion de la mise à jour ####################################### i18n ## public ### //
-	// = révision : 89
-	// » Log toutes les informations de la mise à jour
-	// » Déroule le processus de mise à jour
+	// log toutes les informations de la mise à jour
+	// déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
 
 		$repository = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
@@ -182,24 +177,21 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	}
 
 
-	// #### Gestion de l'affichage des commandes ############################ private/public ### //
-	// = révision : 20
-	// » Affiche une commande ou une information pour savoir ce qu'il se passe
-	// » Ajoute un peu de code HTML pour faire plus jolie
-	private function writeEvent($data) {
-		$this->event = true;
-		echo '<span class="event">',$data,"\n";
-	}
-
+	// affiche une commande ou une information pour savoir ce qu'il se passe
+	// ajoute un peu de code HTML pour faire plus jolie
 	private function writeTitle($data) {
-
 		if ($this->event) {
-			echo '</span>',"\n\n",$data,"\n";
+			echo '</span>',"\n",$data,"\n";
 			$this->event = false;
 		}
 		else {
 			echo "\n",$data,"\n";
 		}
+	}
+
+	private function writeEvent($data) {
+		$this->event = true;
+		echo '<span class="event">',$data,"\n";
 	}
 
 	public function writeError($data) {
@@ -215,11 +207,9 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	}
 
 
-	// #### Nettoyage du cache ##################################################### private ### //
-	// = révision : 27
-	// » Tente de vider totalement le cache de Magento (du moins essaye)
-	// » Utilise les méthodes et événements de Magento puis supprime tous les répertoires
-	// » N'utilise surtout pas le fichier versioning.log pour Mage::log
+	// tente de vider totalement le cache de Magento (du moins essaye)
+	// utilise les méthodes et événements de Magento puis supprime tous les répertoires
+	// n'utilise surtout pas le fichier versioning.log pour Mage::log
 	private function clearAllCache() {
 
 		try {

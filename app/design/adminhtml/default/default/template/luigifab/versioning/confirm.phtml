@@ -1,10 +1,9 @@
 <?php
 /**
  * Created S/09/02/2013
- * Updated M/23/08/2016
- * Version 19
+ * Updated M/08/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,6 +17,11 @@
  * GNU General Public License (GPL) for more details.
  */
 
+$head = Mage::getBlockSingleton('adminhtml/page_head');
+$head->addItem('skin_css', 'css/luigifab/versioning/styles.min.css');    // évite que _data['items'] soit inexistant
+$head->removeItem('skin_css', 'css/luigifab/versioning/styles.min.css'); // sur le foreach du getCssJsHtml
+$cssjs = trim($head->getCssJsHtml());
+
 $lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -28,11 +32,16 @@ $lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
-	<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
-	<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
-	<script type="text/javascript" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
+	<?php if (strlen($cssjs) > 10): ?>
+		<?php echo $cssjs ?>
+		<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
+	<?php else: ?>
+		<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('reset.css') ?>" />
+		<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('boxes.css') ?>" />
+		<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getSkinUrl('css/luigifab/versioning/styles.min.css') ?>" />
+		<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
+		<script type="text/javascript" src="<?php echo $this->getSkinUrl('js/luigifab/versioning/app.min.js') ?>"></script>
+	<?php endif ?>
 </head>
 
 <body class="adminhtml-versioning-repository-confirm">

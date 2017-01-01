@@ -1,13 +1,13 @@
 /**
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated L/25/07/2016, version 58
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Created J/22/12/2011, updated M/08/11/2016
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
  */
 
-// dépend de Prototype, versioningIds/versioningCols/versioningCurrentCol dans Repository.php
+// dépend de Prototype, versioningIds/versioningCols dans Repository.php
 var versioning = {
 
 	// ATTENTION, confirmFlag confirmUpgrade history, pas avant IE 10 !
@@ -182,12 +182,12 @@ var versioning = {
 
 
 	// #### Représentation des branches ######################################### //
-	// = révision : 118
+	// = révision : 120
 	// » Est basé sur le script de Redmine (revision_graph.js - rev 9835) - http://www.redmine.org/
 	// » Utilise Raphael.js 2.2.0 (90,6 ko) pour la création de l'image SVG - http://raphaeljs.com/
 	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Commence par rechercher les branches (dans tous les cas, passe la branche actuelle en premier)
-	// » Pour chaque commit, crée un point suivi d'une étiquette avec le nom de la branche et des tags
+	// » Pour chaque commit, crée un point suivi d'une étiquette avec le nom de la branche
 	// » Crée ensuite les lignes entres les points
 	drawGraph: function (data, cols) {
 
@@ -197,6 +197,16 @@ var versioning = {
 			rows = commitsHash.keys().length - 1,
 			tableRows = $$('#versioning_grid_table tbody tr'),
 			offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0;
+
+		// http://stackoverflow.com/a/1129270/2980105
+		// mais dans l'ordre inverse
+		commitsArray.sort(function (a,b) {
+			if (a.row > b.row)
+				return -1;
+			if (a.row < b.row)
+				return 1;
+			return 0;
+		});
 
 		// recheche de la hauteur et de la position du graphique (avec Prototype > 1.7 ou non)
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
@@ -257,11 +267,11 @@ var versioning = {
 
 			// écrit le texte dans une étiquette
 			// en profite pour vérifier la largeur du graphique
-			if ((commit.refs.length > 0) && (names.indexOf(commit.refs) < 0)){
+			if ((commit.branch.length > 0) && (names.indexOf(commit.branch) < 0)){
 
-				names.push(commit.refs);
+				names.push(commit.branch);
 
-				elem = graph.text(x + 13, y - 0.3, commit.refs).attr('fill', colors[commit.col]).attr('text-anchor', 'start');
+				elem = graph.text(x + 13, y - 0.3, commit.branch).attr('fill', colors[commit.col]).attr('text-anchor', 'start');
 				graph.path(
 					'M ' + (x + 3.2) + ',' + (y - 0.4) + // point de départ au niveau du point
 					' L ' + (x + 3.2 + 8) + ',' + (y - 0.4 - 8) + // en haut à gauche
@@ -366,7 +376,7 @@ var versioning = {
 				}
 			});
 
-			if (versioningCurrentCol !== commit.col)
+			if (commit.col > 0)
 				tableRows[rows - commit.row].setAttribute('class', tableRows[rows - commit.row].getAttribute('class') + ' outside');
 		});
 	},

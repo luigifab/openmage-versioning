@@ -1,10 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/16/09/2016
- * Version 29
+ * Updated J/10/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -25,10 +24,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	private $items = null;
 
 
-	// #### Initialisation ########################################################## public ### //
-	// = révision : 30
-	// » Indique si le gestionnaire de version est installé
-	// » Le tout à partir de la réponse de la commande 'git'
+	// indique si le gestionnaire de version est installé
+	// le tout à partir de la réponse de la commande 'git'
 	public function isSoftwareInstalled() {
 		exec('git --version', $data);
 		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', implode($data), $this->version) !== 0);
@@ -45,11 +42,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	}
 
 
-	// #### Historique ############################################################## public ### //
-	// = révision : 68
-	// » Génère une collection à partir de l'historique des commits du dépôt
-	// » Met en forme les données à partir de la réponse de pleins de commandes
-	// » Utilise GIT_SSH si le fichier de configuration existe
+	// génère une collection à partir de l'historique des commits du dépôt
+	// met en forme les données à partir de la réponse de la commande 'git log'
+	// utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitCollection() {
 
 		if (!is_null($this->items))
@@ -69,13 +64,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			exec('
 				export GIT_SSH="'.$configsh.'";
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><refs> %d </refs><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 		else {
 			exec('
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><refs> %d </refs><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 
@@ -97,38 +92,40 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		}
 		else {
 			$data = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
+			$branchs = array($this->getCurrentBranch());
+
 			$xml = new DOMDocument();
 			$xml->loadXML('<root>'.$data.'</root>');
 
 			// extraction des données
+			// construction de la collection des commits
 			$this->items = new Varien_Data_Collection();
 
 			foreach ($xml->getElementsByTagName('log') as $logentry) {
 
 				$revision = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
 				$parents = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
-				$refs = trim($logentry->getElementsByTagName('refs')->item(0)->firstChild->nodeValue);
 				$author = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
 				$timestamp = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
 				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
-				if (strlen($refs) > 2) {
-					$refs = substr($refs, 1, -1);
-					$refs = str_replace(array('origin/','HEAD',' ','->'), '', $refs);
-					$refs = preg_replace('#,{2,}#', ',', $refs);
-					$refs = trim($refs, ' ,');
-					$refs = explode(',', $refs);
-					$refs = array_unique($refs);
+				preg_match('#\s*\{([^\}]+)\}\s*$#', $description, $branch);
+				if (count($branch) >= 1) {
+					$description = preg_replace('#\s*\{[^\}]+\}\s*$#', '', $description);
+					$branch = trim(array_pop($branch));
 				}
 				else {
-					$refs = array();
+					$branch = 'unknown';
 				}
+
+				if (!in_array($branch, $branchs))
+					$branchs[] = $branch;
 
 				$item = new Varien_Object();
 				$item->setCurrentRevision($this->getCurrentRevision());
+				$item->setBranch($branch);
 				$item->setRevision($revision);
 				$item->setParents(explode(' ', $parents));
-				$item->setRefs($refs);
 				$item->setDate(date('c', strtotime($timestamp)));
 				$item->setAuthor(preg_replace('#<[^>]+>#', '', $author));
 				$item->setDescription(htmlspecialchars($description));
@@ -136,140 +133,20 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				$this->items->addItem($item);
 			}
 
-			// recherche du numéro de branche pour chaque commit
-			$this->populateCols($this->items);
+			// gestion des colonnes
+			// en fonction des branches
+			foreach ($this->items as $item) {
+				$item->setColumn(array_search($item->getBranch(), $branchs));
+			}
 		}
 
 		return $this->items;
 	}
 
-	private function populateCols($commits) {
 
-		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
-		// heads.sort! { |head1, head2| head1.to_s <=> head2.to_s }
-		// space = nil
-		// heads.each do |head|
-		//   if commits_by_scmid.include? head.scmid
-		//     space = index_head((space || -1) + 1, head, commits_by_scmid)
-		//   end
-		// end
-		// # when no head matched anything use first commit
-		// space ||= index_head(0, commits.first, commits_by_scmid)
-
-		$space = -1;
-
-		foreach ($commits as $commit) {
-			foreach ($commit->getRefs() as $ref) {
-				if (strpos($ref, 'tag:') === false)
-					$space = $this->indexCols($space + 1, $commit, $commits);
-			}
-		}
-
-		if ($space < 0)
-			$space = $this->indexCols(0, $commits->getFirstItem(), $commits);
-
-		return $space; // recalculé par Luigifab_Versioning_Block_Adminhtml_Repository::getGridHtml
-	}
-
-	private function indexCols($space, $commit, $commits) {
-
-		// » http://www.redmine.org/projects/redmine/repository/entry/trunk/app/helpers/repositories_helper.rb
-		// def index_head(space, commit, commits_by_scmid)
-		//   stack = [[space, commits_by_scmid[commit.scmid]]]
-		//   max_space = space
-		//   until stack.empty?
-		//     space, commit = stack.pop
-		//     commit[:space] = space if commit[:space].nil?
-		//     space -= 1
-		//     commit[:parent_scmids].each_with_index do |parent_scmid, parent_index|
-		//       parent_commit = commits_by_scmid[parent_scmid]
-		//       if parent_commit and parent_commit[:space].nil?
-		//         stack.unshift [space += 1, parent_commit]
-		//       end
-		//     end
-		//     max_space = space if max_space < space
-		//   end
-		//   max_space
-		// end
-
-		// » la même chose avec les commentaires de donove
-		// » http://www.developpez.net/forums/d1510217/autres-langages/autres-langages/ruby/traduction-ruby-php-graphique-git/
-		// def index_head(space, commit, commits_by_scmid)
-		//   # commits_by_scmid serait ta variable $commits dans ta version PHP
-		//   # Avec la valeur de commit.scmid comme référence
-		//   stack = [ [space, commits_by_scmid[commit.scmid]] ]
-		//   max_space = space
-		//   # until est une boucle
-		//   # Tant que stack (pile) n'est pas empty (vide) on continue la boucle
-		//   until stack.empty?
-		//     # On retire le dernier élément de stack (pile)
-		//     space, commit = stack.pop
-		//     # Si commit[:space] vaut nil
-		//     # on attribue la valeur space à commit[:space]
-		//     # nil est comme null en pHP qui veut dire absence de valeur
-		//     commit[:space] = space if commit[:space].nil?
-		//     # On retire 1 à space
-		//     space -= 1
-		//     # commit est un Hash comme un tableau associatif en PHP
-		//     # On prend la clef :parent_scmids qui pourrait être une chaîne de caractère
-		//     # et on parcourt cette collection avec each_with_index
-		//     commit[:parent_scmids].each_with_index do |parent_scmid, parent_index|
-		//       # On cherche l'index dans la collection commits_by_scmid
-		//       parent_commit = commits_by_scmid[parent_scmid]
-		//       # Si parent_commit est différent de nil (null en PHP) ou false
-		//       # Et si parent_commit[:space] est nil (null en PHP)
-		//       if parent_commit and parent_commit[:space].nil?
-		//         stack.unshift [space += 1, parent_commit]
-		//       end
-		//     end
-		//     # Si space est supérieur à max_space on redéfinit max_space avec la valeur space
-		//     max_space = space if max_space < space
-		//   end
-		//   # On renvoit le valeur de max_space
-		//   max_space
-		// end
-
-		$stack = array(array($space, $commit));
-		$max = $space;
-
-		while (!empty($stack)) {
-
-			list($space, $commit) = array_pop($stack);
-
-			if (!is_int($commit->getSpace()))
-				$commit->setSpace($space);
-
-			$space -= 1;
-
-			foreach ($commit->getParents() as $rev) {
-
-				$parent = $commits->getItemByColumnValue('revision', $rev);
-
-				if (!is_object($parent)) {
-					$space += 1;
-					$fake = new Varien_Object();
-					$fake->setRevision($rev);
-					$fake->setParents(array());
-					array_unshift($stack, array($space, $fake));
-				}
-				else if (is_object($parent) && !is_int($parent->getSpace())) {
-					$space += 1;
-					array_unshift($stack, array($space, $parent));
-				}
-
-				$max = ($space > $max) ? $space : $max;
-			}
-		}
-
-		return $max;
-	}
-
-
-	// #### Révision, état et branche ############################################### public ### //
-	// = révision : 24
-	// » Renvoi le numéro de la révision actuelle de la copie locale (à partir de la réponse de la commande 'git log')
-	// » Renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
-	// » Renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
+	// renvoi le numéro de la révision actuelle de la copie locale (à partir de la réponse de la commande 'git log')
+	// renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
+	// renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
 	public function getCurrentRevision() {
 
 		if (!is_null($this->revision))
@@ -337,11 +214,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	}
 
 
-	// #### Mise à jour ############################################################# public ### //
-	// = révision : 12
-	// » Met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
-	// » Prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
-	// » N'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
+	// met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
+	// prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
+	// n'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
 	public function upgradeToRevision($obj, $log, $revision) {
 
 		if (is_dir('../.git/')) {

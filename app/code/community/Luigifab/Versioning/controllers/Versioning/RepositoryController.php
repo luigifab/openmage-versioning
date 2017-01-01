@@ -1,10 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/23/08/2016
- * Version 42
+ * Updated S/19/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -129,9 +128,9 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		$revision =  $this->getRequest()->getParam('revision', ''); // string
-		$goconfir = ($this->getRequest()->getParam('confirm',  '') !== '1'); // boolean
-		$useflag  = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
+		$revision = $this->getRequest()->getParam('revision', ''); // string
+		$askconf = ($this->getRequest()->getParam('confirm',  '') !== '1'); // boolean
+		$useflag = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
 
 		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
@@ -142,7 +141,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			$this->_redirect('*/versioning_repository/index');
 			return;
 		}
-		else if ($goconfir) {
+		else if ($askconf) {
 			$this->_forward('confirm');
 			return;
 		}
@@ -173,7 +172,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", 'p.credits { position:absolute; bottom:1.2em; left:1em; padding:0; font:12px/1.5em Arial,Helvetica,sans-serif; color:#CCC; }';
 		echo "\n", 'div.obj { position:absolute; top:6em; left:30px; opacity:0.7; }';
 		echo "\n", 'div.obj object { display:block; box-shadow:#444 0 0 0.3em; }';
-		echo "\n", 'div.ctn {';
+		echo "\n", 'div.content {';
 		echo "\n", ' position:absolute; top:0; left:160px; right:-2em; bottom:25%; padding:2em 4em 0 1.5em; overflow-x:hidden; overflow-y:scroll;';
 		echo "\n", ' border-radius:0 0 0 1.2em; background-color:white; background-color:rgba(255, 255, 255, 0.2); box-shadow:#444 0 0 0.3em;';
 		echo "\n", '}';
@@ -185,13 +184,14 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", ' font:0.85em Verdana, sans-serif; font-style:italic; line-height:16px; color:#222;';
 		echo "\n", '}';
 		echo "\n", 'pre code span { color:#333; }';
-		echo "\n", 'pre > span { display:inline-block; margin-top:0.2em; }';
-		echo "\n", 'pre > span + span { margin-top:0; }';
-		echo "\n", 'pre > span[class], pre > span.event::first-line { font-size:0.85em; font-style:italic; }';
-		echo "\n", 'pre > span.error { color:red; }';
-		echo "\n", 'pre > span.event { margin:1em -2em 0; padding:0.5em 5em 0.5em 2em; width:100%; font-size:inherit; background-color:rgba(255,255,255, 0.18); }';
+		echo "\n", 'pre > span.notice { font-size:0.85em; font-style:italic; }';
+		echo "\n", 'pre > span.error { font-size:0.85em; font-style:italic; color:red; }';
+		echo "\n", 'pre > span.event {';
+		echo "\n", ' display:block; margin:1em -2em 0; padding:0.5em 5em 0.5em 2em; width:100%;';
+		echo "\n", ' font-style:italic; background-color:rgba(255,255,255, 0.18);';
+		echo "\n", '}';
+		echo "\n", 'pre > span.event::first-line { font-size:0.85em; }'; // first-line = nom de l'événement
 		echo "\n",'</style>';
-		echo "\n",'<!--[if IE]><style type="text/css">div.obj { display:none; }</style><![endif]-->';
 		// script
 		// désactive toutes les touches du clavier et empèche la fermeture de la page
 		echo "\n",'<script type="text/javascript">';
@@ -215,19 +215,19 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", 'window.setInterval(autoScroll, 100);';
 		echo "\n",'</script>';
 		echo "\n",'</head>';
-
 		echo "\n",'<body>';
 		echo "\n",'<p class="credits">'.$this->__('Martian sunset seen by Spirit.').'</p>';
 		echo "\n",'<div class="obj"><object data="',Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg'),'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
-		echo "\n",'<div class="ctn" id="scroll">';
+		echo "\n",'<div class="content" id="scroll">';
 		echo "\n",'<p class="first"><strong>',$this->__('Starting update (revision %s)', $revision),'</strong>';
 		echo "\n",'<br /><em>',$this->__('Do not touch anything / Do not try to cancel this operation'),'</em></p>',"\n";
 
 		sleep(3);
+
 		// procédure de mise à jour
+		// action !
 		echo '<pre>';
 		$result = $upgrade->process($revision, $useflag);
-		list($colorA, $colorB) = ($result['error']) ? array('red','red') : array('blue','orange');
 		echo '</pre>';
 		// script
 		// changement des couleurs
@@ -235,30 +235,23 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", '// svg animation colors';
 		echo "\n", 'try {';
 		echo "\n",  'var svg = document.getElementById("state").getSVGDocument();';
-		echo "\n",  'svg.getElementById("a").setAttribute("values", "#222;',$colorA,'");';
-		echo "\n",  'svg.getElementById("b").setAttribute("values", "',$colorA,';#222");';
-		echo "\n",  'svg.getElementById("c").setAttribute("values", "#222;',$colorB,'");';
-		echo "\n",  'svg.getElementById("d").setAttribute("values", "',$colorB,';#222");';
+		echo "\n",  'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
 		echo "\n", '}';
 		echo "\n", 'catch (ee) {';
 		echo "\n",  'if (!document.getElementById("state").getSVGDocument()) {';
 		echo "\n",   'document.getElementById("state").onload = function () {';
 		echo "\n",    'var svg = document.getElementById("state").getSVGDocument();';
-		echo "\n",    'svg.getElementById("a").setAttribute("values", "#222;',$colorA,'");';
-		echo "\n",    'svg.getElementById("b").setAttribute("values", "',$colorA,';#222");';
-		echo "\n",    'svg.getElementById("c").setAttribute("values", "#222;',$colorB,'");';
-		echo "\n",    'svg.getElementById("d").setAttribute("values", "',$colorB,';#222");';
+		echo "\n",    'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
 		echo "\n",   '};';
 		echo "\n",  '}';
 		echo "\n", '}';
 		echo "\n",'</script>';
 
+		// script
+		// redirection vers Magento
 		echo "\n",'<p class="last"><strong>',$result['title'],'</strong>';
 		echo "\n",'<br /><em>',$this->__('Back to Magento in one second'),'</em></p>';
 		echo "\n",'</div>';
-
-		// script
-		// redirection vers Magento
 		echo "\n",'<script type="text/javascript">';
 		echo "\n", '// clear disableClose function, go to Magento backend, re-reregister disableClose function';
 		echo "\n", '// register disableClose delayed to prevent close warning in Chrome/Chromium browser';

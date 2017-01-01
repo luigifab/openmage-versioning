@@ -1,10 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/08/07/2016
- * Version 35
+ * Updated M/08/11/2016
  *
- * Copyright 2011-2016 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://redmine.luigifab.info/projects/magento/wiki/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -34,8 +33,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_addButton('diff', array(
 			'label'   => $this->__('Show diff'),
-			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');",
-			'class'   => 'disabled'
+			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');"
 		));
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
@@ -82,9 +80,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 	public function getGridHtml() {
 
 		$commits = Mage::registry('versioning')->getCommitCollection();
-		$count = count($commits) - 1;
-		$space = $current = 0;
-		$hash  = '';
+		$count  = count($commits) - 1;
+		$cols = 0;
+		$hash = '';
 
 		// comptage dans l'ordre inverse
 		// le commit le plus récent = count($commits) - 1
@@ -95,18 +93,18 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			$hash .= '"'.$commit->getRevision().'": {';
 			$hash .=  '"revision": "'.$commit->getRevision().'",';
 			$hash .=  '"parents": ["'.implode('","', $commit->getParents()).'"],';
-			$hash .=  '"refs": "'.implode(' ', $commit->getRefs()).'",';
-			$hash .=  '"col": '.$commit->getSpace().',';
+			$hash .=  '"branch": "'.$commit->getBranch().'",';
+			$hash .=  '"col": '.$commit->getColumn().',';
 			$hash .=  '"row": '.$count--;
 			$hash .= '},';
 
-			$space = ($commit->getSpace() > $space) ? $commit->getSpace() : $space;
-
-			if ($commit->getRevision() === $commit->getCurrentRevision())
-				$current = $commit->getSpace();
+			$cols = ($commit->getColumn() > $cols) ? $commit->getColumn() : $cols;
 		}
 
-		return $this->getChildHtml('grid').' <script type="text/javascript">var versioningIds = {'.substr($hash, 0, -1).'}, versioningCols = '.$space.', versioningCurrentCol = '.$current.';</script>';
+		return $this->getChildHtml('grid')."\n".
+			'<script type="text/javascript">'."\n".
+			'var versioningIds = {'.substr($hash, 0, -1).'}, versioningCols = '.$cols.';'."\n".
+			'</script>';
 
 	}
 
