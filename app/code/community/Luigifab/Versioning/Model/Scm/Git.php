@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/10/11/2016
+ * Updated S/29/04/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -32,7 +32,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	}
 
 	public function getSoftwareVersion() {
-		if (is_null($this->version))
+		if (empty($this->version))
 			$this->isSoftwareInstalled();
 		return (!empty($this->version)) ? trim($this->version[0]) : null;
 	}
@@ -47,7 +47,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	// utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitCollection() {
 
-		if (!is_null($this->items))
+		if (!empty($this->items))
 			return $this->items;
 
 		// lecture de l'historique des commits
@@ -62,6 +62,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		if (is_string($configsh) && is_executable($configsh)) {
 			exec('
+				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				export GIT_SSH="'.$configsh.'";
 				git fetch 2>&1;
 				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
@@ -69,6 +70,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		}
 		else {
 			exec('
+				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				git fetch 2>&1;
 				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
@@ -122,13 +124,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 					$branchs[] = $branch;
 
 				$item = new Varien_Object();
-				$item->setCurrentRevision($this->getCurrentRevision());
-				$item->setBranch($branch);
-				$item->setRevision($revision);
-				$item->setParents(explode(' ', $parents));
-				$item->setDate(date('c', strtotime($timestamp)));
-				$item->setAuthor(preg_replace('#<[^>]+>#', '', $author));
-				$item->setDescription(htmlspecialchars($description));
+				$item->setData('current_revision', $this->getCurrentRevision());
+				$item->setData('branch', $branch);
+				$item->setData('revision', $revision);
+				$item->setData('parents', explode(' ', $parents));
+				$item->setData('date', date('c', strtotime($timestamp)));
+				$item->setData('author', preg_replace('#<[^>]+>#', '', $author));
+				$item->setData('description', htmlspecialchars($description));
 
 				$this->items->addItem($item);
 			}
@@ -136,7 +138,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			// gestion des colonnes
 			// en fonction des branches
 			foreach ($this->items as $item) {
-				$item->setColumn(array_search($item->getBranch(), $branchs));
+				$item->setData('column', array_search($item->getData('branch'), $branchs));
 			}
 		}
 
@@ -144,17 +146,25 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	}
 
 
+	// renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
 	// renvoi le numéro de la révision actuelle de la copie locale (à partir de la réponse de la commande 'git log')
 	// renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
-	// renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
+	public function getCurrentBranch() {
+
+		exec('git branch | grep "*" | cut -c3-', $data);
+		$data = trim(implode($data));
+
+		return (!empty($data)) ? $data : null;
+	}
+
 	public function getCurrentRevision() {
 
-		if (!is_null($this->revision))
+		if (!empty($this->revision))
 			return $this->revision;
 
 		exec('git rev-parse --short HEAD', $data);
-		$data = implode($data);
-		$data = (strlen($data) > 0) ? trim($data) : null;
+		$data = trim(implode($data));
+		$data = (!empty($data)) ? $data : null;
 
 		$this->revision = $data;
 		return $this->revision;
@@ -163,8 +173,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 	public function getCurrentDiff($from = null, $to = null) {
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
-		//   Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
-		//   have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B)
+		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
+		// have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
 			$command = 'git diff -U1 --diff-filter=MTUXB --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
@@ -172,15 +182,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		else
 			$command = 'git diff -U1 --diff-filter=MTUXB';
 
-		if (!is_null($from) && !is_null($to))
+		if (!empty($from) && !empty($to))
 			$command .= ' '.$from.'..'.$to;
 
 		$i = 0;
-		exec($command, $lines);
+		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		foreach ($lines as &$line) {
 
-			if (strlen($line) < 1)
+			if (empty($line))
 				unset($lines[$i]);
 			else if (strpos($line, '--- a/') === 0)
 				unset($lines[$i]);
@@ -188,8 +198,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				unset($lines[$i]);
 			else if ($line === '\\ No newline at end of file')
 				unset($lines[$i]);
-			else if (strpos($line ,'diff --git a') === 0)
-				$line = "\n".'<strong>=== modified file '.substr(htmlspecialchars($line), 13, strpos($line, ' b/') - 13).'</strong>'; //13 strlen('diff --git a/')
+			else if (strpos($line ,'diff --git a') === 0)                 // 13 = strlen('diff --git a/')
+				$line = "\n".'<strong>=== '.substr(htmlspecialchars($line), 13, strpos($line, ' b/') - 13).'</strong>';
 			else if ($line[0] === '+')
 				$line = '<ins>'.htmlspecialchars($line).' </ins>';
 			else if ($line[0] === '-')
@@ -200,17 +210,56 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			$i++;
 		}
 
-		return '<span>'.$command.'</span>'."\n".str_replace("\t", '    ', implode("\n", $lines));
+		return '<span>'.$command.'</span>'."\n".'<span class="help">'.
+			'Select only files that are Added (A), Copied (C), Deleted (D), Modified (<strong>M</strong>), Renamed (R),'."\n".
+			'have their Type changed (<strong>T</strong>), are Unmerged (<strong>U</strong>), are Unknown (<strong>X</strong>),'.
+			'or have had their pairing Broken (<strong>B</strong>).'.
+			'</span>'."\n".str_replace("\t", '    ', implode("\n", $lines));
+	}
+
+	public function getCurrentDiffStatus($from, $to) {
+
+		$help = Mage::helper('versioning');
+
+		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
+			$command = 'git diff --name-status --ignore-all-space --ignore-blank-lines';
+		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
+			$command = 'git diff --name-status --ignore-all-space';
+		else
+			$command = 'git diff --name-status';
+
+		$command .= ' '.$from.'..'.$to;
+		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+
+		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
+		foreach ($lines as &$line) {
+
+			if (strpos($line, 'A') === 0)
+				$line = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $help->__('new file:-------')), $line);
+			else if (strpos($line, 'C') === 0)
+				$line = str_replace('C'."\t", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
+			else if (strpos($line, 'D') === 0)
+				$line = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $help->__('deleted:--------')), $line);
+			else if (strpos($line, 'M') === 0)
+				$line = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
+			else if (strpos($line, 'R') === 0)
+				$line = str_replace('R'."\t", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
+			else if (strpos($line, 'T') === 0)
+				$line = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $help->__('type changed:---')), $line);
+			else if (strpos($line, 'U') === 0)
+				$line = str_replace('U'."\t", "\t\t".str_replace('-', ' ', $help->__('unmerged:-------')), $line);
+			else if (strpos($line, 'X') === 0)
+				$line = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $help->__('unknown:--------')), $line);
+			else if (strpos($line, 'B') === 0)
+				$line = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
+		}
+
+		return '<span>'.$command.'</span>'."\n".$help->__('For the current diff')."\n\n".str_replace("\t", '    ', implode("\n", $lines));
 	}
 
 	public function getCurrentStatus() {
-		exec('git status', $data);
+		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 git status', $data);
 		return '<span>git status</span>'."\n".htmlspecialchars(implode("\n", $data));
-	}
-
-	public function getCurrentBranch() {
-		exec('git branch | grep "*" | cut -c3-', $data);
-		return (strlen(implode($data)) > 0) ? trim(implode($data)) : null;
 	}
 
 
@@ -221,6 +270,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 
 		if (is_dir('../.git/')) {
 			exec('
+				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
@@ -231,6 +281,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		}
 		else {
 			exec('
+				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';

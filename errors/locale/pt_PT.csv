@@ -1,0 +1,13 @@
+`error404_pagetitle`,`Ups`
+`error404_title`,`Página não encontrada`
+`error404_content`,`<p>A página pedida não existe ou não existe mais.</p>`
+`error503_pagetitle`,`Ups`
+`error503_title`,`Serviço temporariamente indisponível`
+`error503_content`,`<p>O servidor é temporariamente indisponível devido a uma operação de manutenção ou a um problema técnico.</p>`
+`upgrade_pagetitle`,`Ups`
+`upgrade_title`,`Serviço temporariamente indisponível`
+`upgrade_content`,`<p>O servidor é temporariamente indisponível devido a uma operação de manutenção.</p>`
+`report_pagetitle`,`Ups`
+`report_title`,`Houve um erro no processamento do seu pedido`
+`report_content`,`<p>O servidor é temporariamente indisponível devido a um problema técnico.</p>`
+`Error number: §`,`Erro número: §`

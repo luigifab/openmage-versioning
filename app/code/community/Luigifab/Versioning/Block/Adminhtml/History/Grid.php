@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/08/11/2016
+ * Updated D/16/07/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -48,7 +48,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Current revision'),
 			'index'    => 'from',
 			'align'    => 'center',
-			'width'    => '120px',
+			'width'    => '110px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -57,7 +57,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Requested revision'),
 			'index'    => 'to',
 			'align'    => 'center',
-			'width'    => '120px',
+			'width'    => '110px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -71,16 +71,10 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'filter'   => false
 		));
 
-		$this->addColumn('empty', array(
-			'sortable' => false,
-			'filter'   => false
-		));
-
 		$this->addColumn('remote_addr', array(
 			'header'   => $this->__('IP address'),
 			'index'    => 'remote_addr',
 			'align'    => 'center',
-			'width'    => '150px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -89,7 +83,6 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('User'),
 			'index'    => 'user',
 			'align'    => 'center',
-			'width'    => '150px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -126,6 +119,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		));
 
 		$this->addColumn('action', array(
+			'type'      => 'action',
 			'align'     => 'center',
 			'width'     => '55px',
 			'filter'    => false,
@@ -137,21 +131,26 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		return parent::_prepareColumns();
 	}
 
+	public function getCount() {
+		return $this->getCollection()->getSize();
+	}
+
 
 	public function getRowClass($row) {
 		return '';
 	}
 
 	public function getRowUrl($row) {
-		return null;
+		return false;
 	}
 
 	public function decorateStatus($value, $row, $column, $isExport) {
 
 		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ?
-			'success' : 'error'; // pour translate.php $this->__('Success') - il y avait Upgrade avant 3.4.2
+			'success' : 'error'; // il y avait Upgrade avant 3.4.2
+		$text = ($status === 'success') ? $this->helper('versioning')->_('Success') : $this->__('Error');
 
-		return '<span class="grid-'.$status.'">'.$this->__(ucfirst($status)).'</span>';
+		return sprintf('<span class="grid-%s">%s</span>', $status, $text);
 	}
 
 	public function decorateDuration($value, $row, $column, $isExport) {
@@ -174,7 +173,8 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	public function decorateLink($value, $row, $column, $isExport) {
 
-		$data = addslashes(base64_encode($row->getData('details')));
-		return '<a href="#" onclick="return versioning.history(this, \''.$data.'\');">'.$this->__('View').'</a>';
+		return sprintf('<button type="button" onclick="versioning.history(this, \'%s\');">%s</button>',
+			addslashes(base64_encode($row->getData('details'))),
+			$this->__('View'));
 	}
 }

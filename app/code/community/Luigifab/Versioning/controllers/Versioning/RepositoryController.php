@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/19/11/2016
+ * Updated V/04/08/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -60,7 +60,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 
-			if ($this->getRequest()->getParam('isAjax', false))
+			if (!empty($this->getRequest()->getParam('isAjax')))
 				$this->getResponse()->setBody($this->getLayout()->createBlock('versioning/adminhtml_history_grid')->toHtml());
 			else
 				$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
@@ -75,11 +75,9 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addUpgradeFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-
 			$file = Mage::helper('versioning')->getUpgradeFlag();
-
 			if (!is_file($file))
-				file_put_contents($file, 'Flag from '.((getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown').' by '.Mage::getSingleton('admin/session')->getUser()->getUsername());
+				file_put_contents($file, sprintf('Flag from %s by %s', getenv('REMOTE_ADDR'), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
 		}
 
 		$this->_redirect('*/*/index');
@@ -88,11 +86,9 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addMaintenanceFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-
 			$file = Mage::helper('versioning')->getMaintenanceFlag();
-
 			if (!is_file($file))
-				file_put_contents($file, 'Flag from '.((getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown').' by '.Mage::getSingleton('admin/session')->getUser()->getUsername());
+				file_put_contents($file, sprintf('Flag from %s by %s', getenv('REMOTE_ADDR'), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
 		}
 
 		$this->_redirect('*/*/index');
@@ -100,36 +96,32 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 	public function delUpgradeFlagAction() {
 
-		$file = Mage::helper('versioning')->getUpgradeFlag();
-
-		if (is_file($file))
-			unlink($file);
+		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
+			$file = Mage::helper('versioning')->getUpgradeFlag();
+			if (is_file($file))
+				unlink($file);
+		}
 
 		$this->_redirect('*/*/index');
 	}
 
 	public function delMaintenanceFlagAction() {
 
-		$file = Mage::helper('versioning')->getMaintenanceFlag();
-
-		if (is_file($file))
-			unlink($file);
+		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
+			$file = Mage::helper('versioning')->getMaintenanceFlag();
+			if (is_file($file))
+				unlink($file);
+		}
 
 		$this->_redirect('*/*/index');
 	}
 
 	// mise à jour
-	public function confirmAction() {
-		$this->loadLayout();
-		$this->renderLayout();
-	}
-
 	public function upgradeAction() {
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		$revision = $this->getRequest()->getParam('revision', ''); // string
-		$askconf = ($this->getRequest()->getParam('confirm',  '') !== '1'); // boolean
 		$useflag = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
 
 		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
@@ -137,12 +129,8 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			$this->_redirect('adminhtml/system_config/edit', array('section' => 'versioning'));
 			return;
 		}
-		else if (Mage::getSingleton('admin/session')->isFirstPageAfterLogin() || (strlen($revision) < 1)) {
+		else if (Mage::getSingleton('admin/session')->isFirstPageAfterLogin() || empty($revision)) {
 			$this->_redirect('*/versioning_repository/index');
-			return;
-		}
-		else if ($askconf) {
-			$this->_forward('confirm');
 			return;
 		}
 
@@ -174,23 +162,24 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", 'div.obj object { display:block; box-shadow:#444 0 0 0.3em; }';
 		echo "\n", 'div.content {';
 		echo "\n", ' position:absolute; top:0; left:160px; right:-2em; bottom:25%; padding:2em 4em 0 1.5em; overflow-x:hidden; overflow-y:scroll;';
-		echo "\n", ' border-radius:0 0 0 1.2em; background-color:white; background-color:rgba(255, 255, 255, 0.2); box-shadow:#444 0 0 0.3em;';
+		echo "\n", ' border-radius:0 0 0 1.2em; background-color:white; background-color:rgba(255, 255, 255, 0.25); box-shadow:#444 0 0 0.3em;';
 		echo "\n", '}';
 		echo "\n", 'p { padding-bottom:0.8em; }';
 		echo "\n", 'p em { font-size:0.8em; }';
 		echo "\n", 'pre { padding-bottom:1.4em; font:0.8em Verdana, sans-serif; line-height:140%; white-space:pre-wrap; }';
 		echo "\n", 'pre code {';
-		echo "\n", ' display:inline-block; margin-top:0.2em;';
+		echo "\n", ' display:inline-block; margin-top:0.25em;';
 		echo "\n", ' font:0.85em Verdana, sans-serif; font-style:italic; line-height:16px; color:#222;';
 		echo "\n", '}';
-		echo "\n", 'pre code span { color:#333; }';
+		echo "\n", 'pre code span { color:#444; }'; // les commandes
 		echo "\n", 'pre > span.notice { font-size:0.85em; font-style:italic; }';
 		echo "\n", 'pre > span.error { font-size:0.85em; font-style:italic; color:red; }';
 		echo "\n", 'pre > span.event {';
 		echo "\n", ' display:block; margin:1em -2em 0; padding:0.5em 5em 0.5em 2em; width:100%;';
 		echo "\n", ' font-style:italic; background-color:rgba(255,255,255, 0.18);';
 		echo "\n", '}';
-		echo "\n", 'pre > span.event::first-line { font-size:0.85em; }'; // first-line = nom de l'événement
+		echo "\n", 'pre > span.event::first-line { font-size:0.85em; color:#444; }'; // first-line = nom de l'événement
+		echo "\n", 'pre > span.event code:not(:first-of-type) { margin-top:0; }';
 		echo "\n",'</style>';
 		// script
 		// désactive toutes les touches du clavier et empèche la fermeture de la page
@@ -238,12 +227,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",  'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
 		echo "\n", '}';
 		echo "\n", 'catch (ee) {';
-		echo "\n",  'if (!document.getElementById("state").getSVGDocument()) {';
-		echo "\n",   'document.getElementById("state").onload = function () {';
-		echo "\n",    'var svg = document.getElementById("state").getSVGDocument();';
-		echo "\n",    'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
-		echo "\n",   '};';
-		echo "\n",  '}';
+		echo "\n",  'document.getElementById("state").onload = function () {';
+		echo "\n",   'var svg = document.getElementById("state").getSVGDocument();';
+		echo "\n",   'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
+		echo "\n",  '};';
 		echo "\n", '}';
 		echo "\n",'</script>';
 

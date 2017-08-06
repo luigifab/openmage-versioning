@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/11/2016
+ * Updated D/16/07/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -25,7 +25,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
-		$this->_headerText = (!is_null($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+		$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
 			$this->__('Commits history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
 			$this->__('Commits history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
@@ -33,39 +33,40 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_addButton('diff', array(
 			'label'   => $this->__('Show diff'),
-			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');"
+			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');",
+			'class'   => 'go'
 		));
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
 			$this->_addButton('maintenance_flag', array(
 				'label'   => $this->__('Remove the maintenance page'),
-				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delMaintenanceFlag')."');",
+				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delMaintenanceFlag')."');",
 				'class'   => 'delpage delete'
 			));
 		}
 		else {
 			$this->_addButton('maintenance_flag', array(
 				'label'   => $this->__('Enable the maintenance page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
 			));
 		}
 
 		if (is_file($this->helper('versioning')->getUpgradeFlag())) {
 			$this->_addButton('upgrade_flag', array(
 				'label'   => $this->__('Remove the update page'),
-				'onclick' => "versioning.cancelFlag(this, '".$this->getUrl('*/*/delUpgradeFlag')."');",
+				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delUpgradeFlag')."');",
 				'class'   => 'delpage delete'
 			));
 		}
 		else {
 			$this->_addButton('upgrade_flag', array(
 				'label'   => $this->__('Enable the update page'),
-				'onclick' => "versioning.confirmFlag(this, '".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
 			));
 		}
 
 		$this->_addButton('history', array(
-			'label'   => $this->__('Updates history'),
+			'label'   => $this->__('History'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
 		));
@@ -90,15 +91,15 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		foreach ($commits as $commit) {
 
 			$hash .= "\n";
-			$hash .= '"'.$commit->getRevision().'": {';
-			$hash .=  '"revision": "'.$commit->getRevision().'",';
-			$hash .=  '"parents": ["'.implode('","', $commit->getParents()).'"],';
-			$hash .=  '"branch": "'.$commit->getBranch().'",';
-			$hash .=  '"col": '.$commit->getColumn().',';
+			$hash .= '"'.$commit->getData('revision').'": {';
+			$hash .=  '"revision": "'.$commit->getData('revision').'",';
+			$hash .=  '"parents": ["'.implode('","', $commit->getData('parents')).'"],';
+			$hash .=  '"branch": "'.$commit->getData('branch').'",';
+			$hash .=  '"col": '.$commit->getData('column').',';
 			$hash .=  '"row": '.$count--;
 			$hash .= '},';
 
-			$cols = ($commit->getColumn() > $cols) ? $commit->getColumn() : $cols;
+			$cols = ($commit->getData('column') > $cols) ? $commit->getData('column') : $cols;
 		}
 
 		return $this->getChildHtml('grid')."\n".

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated M/08/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -26,7 +26,8 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 	// avec un jolie bricolage mais c'est pas très important
 	public function init($page, $size) {
 
-		$file = Mage::helper('versioning')->getHistoryLog();
+		$help = Mage::helper('versioning');
+		$file = $help->getHistoryLog();
 
 		if (is_file($file) && is_readable($file)) {
 
@@ -36,36 +37,37 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
 
-				if (strlen($line[0]) > 1) {
+				if (!empty($line[0])) {
 
 					$item = new Varien_Object();
-					$item->setDate($line[0]);
-					$item->setFrom($line[1]);
-					$item->setTo($line[2]);
-					$item->setRemoteAddr($line[3]);
-					$item->setUser($line[4]);
-					$item->setDuration($line[5]);
+					$item->setData('date', $line[0]);
+					$item->setData('from', $line[1]);
+					$item->setData('to', $line[2]);
+					$item->setData('remote_addr', $line[3]);
+					$item->setData('user', $line[4]);
+					$item->setData('duration', $line[5]);
 
 					// modifié en version 1.1.0
 					// la 7ème case contient désormais le statut suivi d'un saut de ligne suivi des détails de la mise à jour
 					if (strpos($line[6], "\n") !== false) {
 						$pos = strpos($line[6], "\n");
-						$item->setStatus(substr($line[6], 0, $pos));
-						$item->setDetails(substr($line[6], $pos + 1));
+						$item->setData('status', substr($line[6], 0, $pos));
+						$item->setData('details', substr($line[6], $pos + 1));
 					}
 					else {
-						$item->setStatus($line[6]);
-						$item->setDetails($line[6]);
+						$item->setData('status', $line[6]);
+						$item->setData('details', $line[6]);
 					}
 
 					// ajouté en version 1.1.0
 					// la 8ème case contient l'éventuel nom de la branche
-					$item->setBranch((isset($line[7])) ? $line[7] : '');
+					$item->setData('branch', (!empty($line[7])) ? $line[7] : '');
 
 					// an upgrade is already...
 					// remplace le texte par sa version traduite
-					if (strpos($item->getDetails(), 'An upgrade is already underway') !== false)
-						$item->setDetails(Mage::helper('versioning')->__('Stop! Stop! Stop! An update is in progress.'));
+					if ((strpos($item->getData('details'), 'An upgrade is already underway') === 0) ||
+					    (strpos($item->getData('details'), 'An update is in progress') === 0))
+						$item->setData('details', $help->__('Stop! Stop! Stop! An update is in progress.'));
 
 					array_push($this->_items, $item);
 				}

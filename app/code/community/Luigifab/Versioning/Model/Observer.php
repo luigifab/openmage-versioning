@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated M/08/11/2016
+ * Updated S/06/05/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -19,7 +19,7 @@
 
 class Luigifab_Versioning_Model_Observer {
 
-	// EVENT admin_system_config_changed_section_versioning
+	// EVENT admin_system_config_changed_section_versioning (adminhtml)
 	// Erreur 503 (maintenance.flag)
 	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html / Texte avec délai du rechargement automatique
 	// = (error503.ip) Désactiver la page à partir des adresses IP suivantes
@@ -84,21 +84,21 @@ class Luigifab_Versioning_Model_Observer {
 				// versioning/downtime/*title
 				if (strpos($key, 'title') !== false) {
 
-					if (strlen($value) > 0)
+					if (!empty($value))
 						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
 				}
 				// versioning/downtime/*content
 				else if (strpos($key, 'content') !== false) {
 
-					if ((strlen($value) > 0) && (strpos($value, '<') === 0))
+					if (!empty($value) && (strpos($value, '<') === 0))
 						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
-					else if (strlen($value) > 0)
+					else if (!empty($value))
 						$translations[$locale][] =  '`'.$key.'`,`<p>'.str_replace("\n", '<br />', $value).'</p>`';
 				}
 				// versioning/downtime/*autoreload
 				else if (strpos($key, 'autoreload') !== false) {
 
-					if ((strlen($value) > 0) && (strpos($value, '[') !== false) && (strpos($value, ']') !== false))
+					if (!empty($value) && (strpos($value, '[') !== false) && (strpos($value, ']') !== false))
 						$translations[$locale][] = '`'.$key.'`,`'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'`';
 				}
 			}
@@ -121,7 +121,7 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (reset($global) as $key => $value) {
 
 			$value = trim($value);
-			if (strlen($value) < 1)
+			if (empty($value))
 				continue;
 
 			if (strpos($key, '_email') !== false)
@@ -143,11 +143,11 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (reset($global) as $key => $value) {
 
 			$value = trim($value);
-			if (strlen($value) < 1)
+			if (empty($value))
 				continue;
 
 			if (strpos($key, '_byip') !== false) {
-				$value = explode(' ', $value);
+				$value = preg_split('#\s#', $value);
 				$config[substr($key, 0, strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
 			}
 		}

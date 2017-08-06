@@ -1,10 +1,10 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated M/08/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -33,7 +33,7 @@ else {
 
 $processor->init('report');
 
-if (isset($reportData) && is_array($reportData))
+if (!empty($reportData) && is_array($reportData))
 	$processor->saveReport($reportData);
 
 $processor->renderPage(503);

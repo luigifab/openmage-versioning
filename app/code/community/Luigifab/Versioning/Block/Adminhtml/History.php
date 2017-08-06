@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/08/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -25,7 +25,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 		$this->_controller = 'adminhtml_history';
 		$this->_blockGroup = 'versioning';
-		$this->_headerText = (!is_null($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+		$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
 			$this->__('Updates history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
 			$this->__('Updates history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 

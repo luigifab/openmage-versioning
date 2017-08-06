@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated M/08/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -26,8 +26,8 @@
 				<Mage_Core />
 				<Mage_Adminhtml />
 			</depends>
-			<!-- see https://redmine.luigifab.info/projects/magento/wiki/modules for more information -->
-			<update>http://www.luigifab.info/magento/rss.xml</update>
+			<!-- see https://www.luigifab.info/magento/modules for more information -->
+			<update>https://www.luigifab.info/magento/rss.xml</update>
 		</Luigifab_Versioning>
 	</modules>
 </config>

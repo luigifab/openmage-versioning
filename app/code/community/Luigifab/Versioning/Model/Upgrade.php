@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated V/11/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -50,7 +50,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	}
 
 
-	// log toutes les informations de la mise à jour
+	// log toutes les informations de la mise à jour (enfin presque)
 	// déroule le processus de mise à jour
 	public function process($targetRevision, $useFlag) {
 
@@ -65,8 +65,8 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 				'date'        => date('c'), // 0
 				'current_rev' => $repository->getCurrentRevision(), // 1
 				'target_rev'  => $targetRevision, // 2
-				'remote_addr' => (getenv('REMOTE_ADDR') !== false) ? getenv('REMOTE_ADDR') : 'unknown', // 3
-				'user'        => Mage::getSingleton('admin/session')->getUser()->getUsername(), // 4
+				'remote_addr' => getenv('REMOTE_ADDR'), // 3
+				'user'        => Mage::getSingleton('admin/session')->getData('user')->getData('username'), // 4
 				'duration'    => microtime(true), // 5
 				'status'      => 'Upgrade in progress', // 6
 				'branch'      => $repository->getCurrentBranch(), // 7
@@ -79,22 +79,21 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 				throw new Exception('Not authorized');
 
 			if (is_file($lock))
-				throw new Exception('An upgrade is already underway');
+				throw new Exception('An update is in progress');
 
 			if (is_file($log))
 				unlink($log);
 
-			if (is_string($H['branch']) && (strlen($H['branch']) > 0))
+			if (!empty($H['branch']))
 				$this->writeNotice($this->__('Repository: %s / Branch: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['branch'], $H['current_rev'], $targetRevision));
 			else
 				$this->writeNotice($this->__('Repository: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['current_rev'], $targetRevision));
 
+			file_put_contents($lock, $H['current_rev'].' ➩ '.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
 			if ($useFlag)
-				file_put_contents($this->getUpgradeFlag(), $H['current_rev'].' » '.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user']);
-
-			file_put_contents($lock, $H['current_rev'].' » '.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user']);
+				file_put_contents($this->getUpgradeFlag(), file_get_contents($lock));
 
 			// ÉTAPE 2 et 3
 			// avec les événements before et after
@@ -117,7 +116,6 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			unlink($lock);
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
-			$H['duration'] = ($H['duration'] < 1000) ? $H['duration'] : 1;
 			$H['status']   = (is_file($log) && is_readable($log)) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
 
 			$result = array(
@@ -130,17 +128,16 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 		}
 		catch (Exception $e) {
 
-			$H['duration'] = ceil(microtime(true) - $H['duration']);
-			$H['duration'] = ($H['duration'] < 1000) ? $H['duration'] : 1;
-			$H['status']   = (is_file($log) && is_readable($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
+			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
+				$H['duration'] = ceil(microtime(true) - $H['duration']);
+				$H['status']   = (is_file($log) && is_readable($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
+			}
+			else {
+				$H['duration'] = ceil(microtime(true) - $H['duration']);
+				$H['status']   = $e->getMessage();
+			}
 
-			if (!in_array($e->getMessage(), array('Not authorized', 'An upgrade is already underway'))) {
-
-				$result = array(
-					'url'   => '*/versioning_repository/history',
-					'title' => $this->__('Update error (revision %s)', $targetRevision),
-					'error' => true
-				);
+			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
 
 				$this->writeError($e->getMessage());
 				Mage::getSingleton('adminhtml/session')->addError(nl2br($e->getMessage()));
@@ -150,18 +147,17 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e));
 
 				$this->writeTitle($this->__('4) Unlocking'));
-
 				if (is_file($lock))
 					unlink($lock);
-			}
-			else {
+
 				$result = array(
-					'url'   => '*/versioning_repository/index',
+					'url'   => '*/versioning_repository/history',
 					'title' => $this->__('Update error (revision %s)', $targetRevision),
 					'error' => true
 				);
-
-				if ($e->getMessage() === 'An upgrade is already underway') {
+			}
+			else {
+				if (in_array($e->getMessage(), array('An update is in progress'))) {
 					$this->writeError($this->__('Stop! Stop! Stop! An update is in progress.'));
 					Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an update is in progress.'));
 				}
@@ -169,6 +165,12 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 					$this->writeError($this->__('You are not authorized to perform this operation.'));
 					Mage::getSingleton('adminhtml/session')->addError($this->__('You are not authorized to perform this operation.'));
 				}
+
+				$result = array(
+					'url'   => '*/versioning_repository/index',
+					'title' => $this->__('Update error (revision %s)', $targetRevision),
+					'error' => true
+				);
 			}
 		}
 

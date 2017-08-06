@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated M/08/11/2016
+ * Updated D/16/07/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -17,7 +17,8 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface {
+class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_Abstract
+  implements Varien_Data_Form_Element_Renderer_Interface {
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
@@ -26,10 +27,10 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		// exemple d'une adresse de base : http://mario/sites/14/web/(xyz/)(index.php/)
 		// exemple d'une adresse finale  : http://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
-		$url = preg_replace('#/[^/]+\.php#', '', $url);
+		$url = preg_replace('#/[^/]+\.php[0-9]*/#', '/', $url);
 
 		if (Mage::getStoreConfigFlag('web/url/use_store'))
-			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getCode().'/', '/', $url);
+			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getData('code').'/', '/', $url);
 
 		// versioning_downtime_error503.php versioning_downtime_error404.php
 		// versioning_downtime_upgrade.php versioning_downtime_report.php
@@ -37,9 +38,9 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$url = str_replace(array('versioning_downtime_error', 'versioning_downtime_'), '', $url);
 
 		if ($element->getHtmlId() === 'versioning_downtime_report')
-			$url .= '&amp;demo';
+			$url .= '&amp;demo=1';
 
-		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getLabel(), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
 	}
 
 	private function getStoreId() {
@@ -47,9 +48,9 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$website = $this->getRequest()->getParam('website');
 		$store = $this->getRequest()->getParam('store');
 
-		if (strlen($store) > 0)
+		if (!empty($store))
 			$storeId = Mage::getModel('core/store')->load($store)->getStoreId();
-		else if (strlen($website) > 0)
+		else if (!empty($website))
 			$storeId = Mage::getModel('core/website')->load($website)->getDefaultStore()->getStoreId();
 		else
 			$storeId = Mage::app()->getDefaultStoreView()->getStoreId();

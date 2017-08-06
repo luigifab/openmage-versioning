@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated M/08/11/2016
+ * Updated S/08/07/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -91,12 +91,6 @@
 			<block type="versioning/adminhtml_history" name="versioning_history" />
 		</reference>
 	</adminhtml_versioning_repository_history>
-
-	<adminhtml_versioning_repository_confirm>
-		<block type="core/text_list" name="root" output="toHtml">
-			<block type="core/template" name="content" template="luigifab/versioning/confirm.phtml" />
-		</block>
-	</adminhtml_versioning_repository_confirm>
 
 	<adminhtml_index_login>
 		<reference name="content">

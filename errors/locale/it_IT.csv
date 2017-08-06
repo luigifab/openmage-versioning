@@ -1,0 +1,13 @@
+`error404_pagetitle`,`Ops`
+`error404_title`,`Pagina introvabile`
+`error404_content`,`<p>La pagina richiesta non esiste o non esiste piú.</p>`
+`error503_pagetitle`,`Ops`
+`error503_title`,`Servizio temporaneamente indisponibile`
+`error503_content`,`<p>Il server é temporaneamente indisponibile a causa di un'operazione di manutenzione o di un problema tecnico.</p>`
+`upgrade_pagetitle`,`Ops`
+`upgrade_title`,`Servizio temporaneamente indisponibile`
+`upgrade_content`,`<p>Il server é temporaneamente indisponibile a causa di un'operazione di manutenzione.</p>`
+`report_pagetitle`,`Ops`
+`report_title`,`Un errore é survenuto al trattamento della vostra domanda`
+`report_content`,`<p>Il server é temporaneamente non disponibile a causa di un problema tecnico.</p>`
+`Error number: §`,`Errore numero: §`

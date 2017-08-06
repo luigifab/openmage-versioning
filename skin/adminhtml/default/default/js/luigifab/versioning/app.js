@@ -1,17 +1,16 @@
 /**
+ * Created J/22/12/2011, Updated L/27/07/2017
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated M/08/11/2016
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
  */
 
-// dépend de Prototype, versioningIds/versioningCols dans Repository.php
+// dépend de Prototype et de Raphaël, versioningIds/versioningCols dans Repository.php
 var versioning = {
 
-	// ATTENTION, confirmFlag confirmUpgrade history, pas avant IE 10 !
-	// avant IE 10, atob n'existe pas - http://caniuse.com/atob-btoa
+	// avant IE 10 atob n'existe pas - http://caniuse.com/atob-btoa
 	// prise en charge de l'utf-8 avec Webkit - http://stackoverflow.com/q/3626183
 	decode: function (data) {
 		return decodeURIComponent(escape(window.atob(data)));
@@ -20,34 +19,38 @@ var versioning = {
 	// initialisation
 	start: function () {
 
-		if (!document.querySelector('body[class*="adminhtml-versioning-repository-"]'))
-			return;
+		if (document.querySelector('body[class*="adminhtml-versioning-repository-"]')) {
 
-		console.info('versioning.app hello!');
+			console.info('versioning.app - hello');
 
-		if (document.getElementById('history_grid')) {
-			document.querySelector('table.data tbody tr td a').click();
+			if (document.getElementById('history_grid') && document.querySelector('table.data tbody button'))
+				document.querySelector('table.data tbody button').click();
+
+			if (document.getElementById('versioning_grid_table') && (typeof versioningIds !== 'undefined')) {
+				versioning.drawGraph(versioningIds, versioningCols);
+				versioning.initDiff();
+			}
 		}
+	},
 
-		if (typeof versioningIds !== 'undefined') {
-			versioning.drawGraph(versioningIds, versioningCols);
-			versioning.initDiff();
-		}
+	enableLoader: function () {
+		document.body.style.cursor = 'progress';
+		document.querySelector('div.content-header td.form-buttons').setAttribute('style', 'visibility:hidden');
+		document.querySelector('div.content-header-floating td.form-buttons').setAttribute('style', 'visibility:hidden');
 	},
 
 
 	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 13
-	// » Demande de confirmation de mise en maintenance avec l'apijs (si disponible)
-	// » Demande de confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
-	// » En cas de problème active quand même la page de maintenance ou de mise à jour en redirigeant directement sur l'action
-	// » Pour la désactivation, redirige simplement sur l'action
-	confirmFlag: function (that, url, title, content, credits) {
-
-		that.blur();
+	// = révision : 20
+	// » Demande confirmation avec l'apijs
+	// » Demande confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
+	// » Pour la désactivation redirige simplement sur l'action
+	confirmFlag: function (url, title, content, credits) {
 
 		try {
-			if (apijs.version < 520)
+			// avec l'apijs
+			// utilise une jolie boîte de dialogue
+			if (apijs.version < 530)
 				throw new Error('Invalid apijs version');
 
 			url.match(/revision\/([0-9a-z]+)\//);
@@ -62,102 +65,139 @@ var versioning = {
 			var elem = document.createElement('p');
 			elem.setAttribute('class', 'credits');
 			elem.appendChild(document.createTextNode(credits));
-			document.getElementById('apijsDialog').appendChild(elem);
+			apijs.dialog.t1.appendChild(elem);
 		}
 		catch (e) {
 			console.log(e);
+
 			try {
+				// sans l'apijs
+				// demande de confirmation
 				if (confirm(this.decode(content).replace(/\[[^\]]+\]/g, ''))) {
+					this.enableLoader();
 					location.href = url;
-					that.parentNode.style.visibility = 'hidden';
 				}
 			}
 			catch (ee) {
 				console.log(ee);
-				location.href = url;
-				that.parentNode.style.visibility = 'hidden';
+
+				// en dernier recours
+				// demande de confirmation
+				if (confirm(Translator.translate('Are you sure?'))) {
+					this.enableLoader();
+					location.href = url;
+				}
 			}
 		}
 	},
 
 	actionConfirmFlag: function (url) {
-
-		apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
+		versioning.enableLoader();
+		apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
 		location.href = url;
 	},
 
-	cancelFlag: function (that, url) {
-
-		that.blur();
-		that.parentNode.style.visibility = 'hidden';
-
+	cancelFlag: function (url) {
+		this.enableLoader();
 		location.href = url;
 	},
 
 
 	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 23
-	// » Demande de confirmation de mise à jour avec l'apijs (si disponible)
-	// » Dans le cas contraire on laisse le navigateur suivre le lien vers la page de demande de confirmation
+	// = révision : 40
+	// » Demande confirmation avec l'apijs
+	// » Demande confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
 	confirmUpgrade: function (url, title, content, credits) {
 
 		try {
-			if (apijs.version >= 520) {
+			// avec l'apijs
+			// utilise une jolie boîte de dialogue
+			if (apijs.version < 530)
+				throw new Error('Invalid apijs version');
 
-				url.match(/revision\/([0-9a-z]+)\//);
-				apijs.dialog.dialogFormOptions(
-					title.replace('§', RegExp.$1), // title
-					this.decode(content), // text
-					url,  // action
-					versioning.actionConfirmUpgrade, // callback (en deux temps : vérification puis redirection)
-					null, // args
-					'notransition versioning ' + document.getElementById('scmtype').textContent // icon
-				);
+			url.match(/revision\/([0-9a-z]+)\//);
+			apijs.dialog.dialogFormOptions(
+				title.replace('§', RegExp.$1), // title
+				this.decode(content), // text
+				url,  // action
+				versioning.actionConfirmUpgrade, // callback (en deux temps, vérification puis redirection)
+				null, // args
+				'notransition versioning ' + document.getElementById('scmtype').textContent // icon
+			);
 
-				var elem = document.createElement('p');
-				elem.setAttribute('class', 'credits');
-				elem.appendChild(document.createTextNode(credits));
-				document.getElementById('apijsDialog').appendChild(elem);
+			var elem = document.createElement('p');
+			elem.setAttribute('class', 'credits');
+			elem.appendChild(document.createTextNode(credits));
+			apijs.dialog.t1.appendChild(elem);
 
-				window.setTimeout(function () {
-					document.querySelector('button.confirm').focus();
-				}, 100);
-
-				return false;
-			}
+			return false;
 		}
 		catch (e) {
 			console.log(e);
+			try { apijs.dialog.actionClose(); } catch (ee) { }
+
+			try {
+				// sans l'apijs
+				// simule la boite de dialogue de l'apijs
+				var data = document.createElement('div'),
+				    text = this.decode(content).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/\]/g, '>'),
+				    icon = document.getElementById('scmtype').textContent;
+
+				url.match(/revision\/([0-9a-z]+)\//);
+				data.innerHTML =
+					'<div class="fake options versioning ' + icon + ' ready" id="apijsDialog">' +
+						'<form method="get" action="' + url + '" class="fake options versioning ' + icon + ' ready" onsubmit="return versioning.actionConfirmUpgrade(true);" id="apijsBox">' +
+							'<h1>' + title.replace('§', RegExp.$1) + '</h1>' +
+							'<div class="bbcode">' + text + '</div>' +
+							'<div class="control">' +
+								'<button type="submit" class="confirm">Valider</button>' +
+								'<button type="button" class="cancel" onclick="versioning.closeConfirmUpgrade();">Annuler</button>' +
+							'</div>' +
+						'</form>' +
+						'<p class="credits">' + credits + '</p>' +
+					'</div>';
+
+				document.body.appendChild(data);
+				document.querySelector('div.bbcode input').focus();
+
+				return false;
+			}
+			catch (ee) {
+				console.log(ee);
+
+				// en dernier recours
+				// demande de confirmation
+				return confirm(Translator.translate('Are you sure?'));
+			}
 		}
 	},
 
-	actionConfirmUpgrade: function (action) {
+	closeConfirmUpgrade: function () {
+		document.getElementById('apijsDialog').parentNode.removeChild(document.getElementById('apijsDialog'));
+	},
 
+	actionConfirmUpgrade: function (action, args) {
+
+		// avec l'apijs, en deux temps
+		// validation du formulaire si la fonction callback avec son paramètre args renvoie true, callback(false, args)
+		// appelle la fonction callback avec ses paramètres action et args après la validation du dialogue, callback(action, args)
 		if (action === false)
 			return true;
 
-		apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
-		location.href = action + 'confirm/1/' + apijs.serialize(document.getElementById('apijsBox')).replace(/=|&/g, '/');
-	},
+		versioning.enableLoader();
 
-	valid: function (data) {
-
-		document.querySelector('form div.bbcode').style.visibility = 'hidden'; // cache, ne supprime surtout pas
-		document.querySelector('form').removeChild(document.querySelector('form div.buttons'));
-
-		// valider (data = texte)
-		if (data.indexOf('http') < 0) {
-
-			var elem = document.createElement('p');
-			elem.setAttribute('class', 'saving');
-			elem.appendChild(document.createTextNode(data));
-
-			document.querySelector('form').appendChild(elem);
+		// sans l'apijs
+		if (action === true) {
+			document.querySelector('div.bbcode').setAttribute('style', 'visibility:hidden');
+			document.querySelector('div.control').setAttribute('style', 'visibility:hidden');
 		}
-		// annuler (data = url)
+		// avec l'apijs, en deux temps
 		else {
-			location.href = data;
+			apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
+			location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/=|&/g, '/');
 		}
+
+		return true;
 	},
 
 
@@ -182,25 +222,23 @@ var versioning = {
 
 
 	// #### Représentation des branches ######################################### //
-	// = révision : 120
-	// » Est basé sur le script de Redmine (revision_graph.js - rev 9835) - http://www.redmine.org/
-	// » Utilise Raphael.js 2.2.0 (90,6 ko) pour la création de l'image SVG - http://raphaeljs.com/
+	// = révision : 125
+	// » Utilise Raphael.js 2.2.7 (93,5 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
-	// » Commence par rechercher les branches (dans tous les cas, passe la branche actuelle en premier)
-	// » Pour chaque commit, crée un point suivi d'une étiquette avec le nom de la branche
-	// » Crée ensuite les lignes entres les points
+	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
+	// » Crée ensuite les lignes entres les points sans utiliser des trucs dépréciés de prototype
 	drawGraph: function (data, cols) {
 
-		var graph, colors = [], k, x, y, pX, pY, elem, grad = 0, names = [], alone,
+		var graph, colors = [], k, x, y, pX, pY, elem, grad = 0, names = [], innerSvg = '',
 			commitsHash  = new Hash(data),
 			commitsArray = commitsHash.values(),
 			rows = commitsHash.keys().length - 1,
-			tableRows = $$('#versioning_grid_table tbody tr'),
+			tableRows = $$('table.data tbody tr'),
 			offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0;
 
 		// http://stackoverflow.com/a/1129270/2980105
-		// mais dans l'ordre inverse
-		commitsArray.sort(function (a,b) {
+		// inverse l'ordre du tableau
+		commitsArray.sort(function (a, b) {
 			if (a.row > b.row)
 				return -1;
 			if (a.row < b.row)
@@ -210,22 +248,22 @@ var versioning = {
 
 		// recheche de la hauteur et de la position du graphique (avec Prototype > 1.7 ou non)
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
-		//  topPoint = la position du haut de la ligne du commit dans le tableau (à partir du haut du document)
+		//  topPoint = la position du haut de la première ligne dans le tableau (à partir du haut du document)
 		if (typeof Element.Layout === 'function') {
 			offsetTop   = tableRows.first().getLayout().get('top') - 1;
 			graphHeight = tableRows.last().getLayout().get('top') + tableRows.last().getLayout().get('height') - offsetTop - 1;
 		}
 		else {
-			offsetTop   = Position.positionedOffset(tableRows.first())[1] - 1;
-			graphHeight = Position.positionedOffset(tableRows.last())[1] + tableRows.last().getDimensions().height - offsetTop - 1;
+			offsetTop   = Element.positionedOffset(tableRows.first())[1] - 1;
+			graphHeight = Element.positionedOffset(tableRows.last())[1] + tableRows.last().getDimensions().height - offsetTop - 1;
 		}
 
 		// initialisation du graphique (dimensions et positionnement en hauteur)
+		// largeur fixé à 197px (voir aussi dans le css body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg)
 		graph = new Raphael(document.getElementById('versioning_grid_table').parentNode);
 		graph.setSize(197, graphHeight);
 
 		document.querySelector('svg').style.top = offsetTop + 'px';
-		document.querySelector('svg defs').innerSVG = '';
 
 		// génération des couleurs
 		Raphael.getColor.reset();
@@ -234,16 +272,12 @@ var versioning = {
 			colors.push(Raphael.getColor());
 		}
 
-		// Pour chaque commit :
-		// » on commence par chercher la position sur Y du point
+		// Pour chaque commit (du haut vers le bas) :
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
-		//  topPoint = la position du haut de la ligne du commit dans le tableau (à partir du haut du document)
-		//  miHeight = le milieu de la ligne du commit dans le tableau
-		//      rows = le nombre de ligne de commit dans le tableau (de 0 à...)
-		//       row = le numéro de la ligne du commit dans le tableau, max = la première ligne, 0 = la dernière ligne
-		// » on en déduit ensuite la position sur X de ce même point en fonction de la branche du commit
-		// » à partir des coordonnées on dessine un point et on en profite pour écrire le nom de la branche
-		// » ensuite on dessine les lignes vers les points des parents en calculant le point de la même manière
+		//  topPoint = la position du haut de la première ligne dans le tableau (à partir du haut du document)
+		//  miHeight = le milieu de la ligne dans le tableau
+		//      rows = le nombre de ligne dans le tableau (de 0 à...)
+		//       row = le numéro de la ligne dans le tableau (max = la première ligne, 0 = la dernière ligne)
 		commitsArray.each(function (commit) {
 
 			// recherche de la position du point
@@ -253,20 +287,20 @@ var versioning = {
 				miHeight = tableRows[rows - commit.row].getLayout().get('height') / 2;
 			}
 			else {
-				topPoint = Position.positionedOffset(tableRows[rows - commit.row])[1] - offsetTop;
+				topPoint = Element.positionedOffset(tableRows[rows - commit.row])[1] - offsetTop;
 				miHeight = tableRows[rows - commit.row].getDimensions().height / 2;
 			}
 
-			// sur X le 25 correspond à l'espace entre les colonnes, donc entre deux branches
-			// sur X le +20 permet de ne pas coller la première branche au bord
+			// sur X (position horizontale) le 25 correspond à l'espace entre les colonnes, donc entre deux branches
+			// sur X (position horizontale) le +20 permet de ne pas coller la première branche au bord
 			y = topPoint + miHeight;
 			x = 25 * commit.col + 20;
 
-			// dessine le point
+			// dessine un point
 			graph.circle(x, y, 3.4).attr('fill', colors[commit.col]).attr('stroke', 'none');
 
-			// écrit le texte dans une étiquette
-			// en profite pour vérifier la largeur du graphique
+			// dessine un texte dans une étiquette
+			// en profite également pour vérifier la largeur du graphique
 			if ((commit.branch.length > 0) && (names.indexOf(commit.branch) < 0)){
 
 				names.push(commit.branch);
@@ -289,13 +323,13 @@ var versioning = {
 				}
 			}
 
-			// ligne vers le parent
+
+			// ligne vers le parent (donc un peu plus bas)
+			// s'il existe, sinon vers le bas du graphique
 			commit.parents.each(function (ref, parent) {
 
 				parent = (ref.length > 0) ? commitsHash.get(ref) : undefined;
 
-				// ligne verticale vers un commit
-				// ou ligne plus ou moins arrondie vers un commit dans une branche différente
 				if (typeof parent === 'object') {
 
 					// recherche de la position du point
@@ -305,49 +339,29 @@ var versioning = {
 						miHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
 					}
 					else {
-						topPoint = Position.positionedOffset(tableRows[rows - parent.row])[1] - offsetTop;
+						topPoint = Element.positionedOffset(tableRows[rows - parent.row])[1] - offsetTop;
 						miHeight = tableRows[rows - parent.row].getDimensions().height / 2;
 					}
 
-					// sur X le 25 correspond à l'espace entre les colonnes, donc entre deux branches
-					// sur X le +20 permet de ne pas coller la première branche au bord
+					// sur X (position horizontale) le 25 correspond à l'espace entre les colonnes, donc entre deux branches
+					// sur X (position horizontale) le +20 permet de ne pas coller la première branche au bord
 					pY = topPoint + miHeight;
 					pX = 25 * parent.col + 20;
 
-					// ligne verticale vers un commit
 					if (parent.col === commit.col) {
+						// dessine une ligne verticale
 						graph.path(['M', x, y, 'V', pY]).attr('stroke', colors[commit.col]).attr('stroke-width', 1.7).toBack();
 					}
-					// ligne plus ou moins arrondie vers un commit dans une branche différente
 					else {
-						// dégradé manuel de gauche à droite ou dans le sens l'inverse
+						// dégradé manuel de gauche à droite ou dans le sens inverse
 						// car Raphael.js ne permet pas de définir un dégradé sur un path sur stroke
-						if (x > pX) {
-							document.querySelector('svg defs').innerSVG += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[parent.col] + '"></stop><stop offset="100%" stop-color="' + colors[commit.col] + '"></stop></linearGradient>';
-						}
-						else {
-							document.querySelector('svg defs').innerSVG += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[commit.col] + '"></stop><stop offset="100%" stop-color="' + colors[parent.col] + '"></stop></linearGradient>';
-						}
+						if (x > pX)
+							innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[parent.col] + '"></stop><stop offset="100%" stop-color="' + colors[commit.col] + '"></stop></linearGradient>';
+						else
+							innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[commit.col] + '"></stop><stop offset="100%" stop-color="' + colors[parent.col] + '"></stop></linearGradient>';
 
-						// si le commit vers lequel on va n'est pas lié à un autre commit hormis le commit actuel
-						// on prolonge au maximum la ligne verticale si la ligne verticale est prolongeable
-						alone = false;
-						if ((parent.parents.length === 1) && ((y + miHeight * 4) < pY)) {
-							alone = true;
-							commitsArray.each(function (test) {
-								if ((test.revision !== commit.revision) && (test.parents.indexOf(parent.revision) > -1)) {
-									alone = false;
-									throw $break;
-								}
-							});
-						}
-
-						// dessine la ligne arrondie entre les deux commits
-						// soit en prenant la hauteur de la cellule (de y à pY=y+trihauteur) pour la ligne arrondie
-						//   suivi d'une ligne verticale (de y=y+trihauteur à pY)
-						// soit en prenant la différence de hauteur total (de y à pY)
-						if (alone === true) {
-
+						if ((y + miHeight * 4) < pY) {
+							// dessine une ligne arrondie
 							pY = y + 3 * miHeight;
 							elem = graph.path(['M', x, y,
 								'C', x, y, x, y + (pY - y) / 2, x + (pX - x) / 2, y + (pY - y) / 2,
@@ -355,11 +369,13 @@ var versioning = {
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
 							elem.attr('stroke-width', 1.7).toBack();
 
+							// dessine une ligne verticale
 							y = y + 3 * miHeight;
 							pY = topPoint + miHeight;
 							graph.path(['M', pX	, y, 'V', pY]).attr('stroke', colors[parent.col]).attr('stroke-width', 1.7).toBack();
 						}
 						else {
+							// dessine une ligne arrondie
 							elem = graph.path(['M', x, y,
 								'C', x, y, x, y + (pY - y) / 2, x + (pX - x) / 2, y + (pY - y) / 2,
 								'C', x + (pX - x) / 2, y + (pY - y) / 2, pX, pY - (pY - y) / 2, pX, pY]);
@@ -370,8 +386,8 @@ var versioning = {
 						grad += 1;
 					}
 				}
-				// ligne verticale vers le bas du graphique
 				else if (ref.length > 0) {
+					// dessine une ligne verticale vers le bas du graphique
 					graph.path(['M', x, y, 'V', graphHeight]).attr('stroke', colors[commit.col]).attr('stroke-width', 1.7).toBack();
 				}
 			});
@@ -379,43 +395,66 @@ var versioning = {
 			if (commit.col > 0)
 				tableRows[rows - commit.row].setAttribute('class', tableRows[rows - commit.row].getAttribute('class') + ' outside');
 		});
+
+		// une seule fois, sinon ça ne fonctionne que pour le dernier ajout avec Edge 14
+		if (innerSvg.length > 0)
+			document.querySelector('svg defs').innerSVG = innerSvg;
 	},
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 5
+	// = révision : 11
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
 	initDiff: function () {
 
-		var elems = document.querySelectorAll('table.data input[type="radio"]'), elem;
+		var elems = document.querySelectorAll('table.data input[type="radio"]'), elem, d1 = 1, d2 = 1, bis = true;
 		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
-			elems[elem].setAttribute('onchange', 'versioning.goDiff();');
+			elems[elem].setAttribute('onchange', 'versioning.goDiff(' + (bis ? (d1++) : (d2++)) + ', ' + (bis ? 'false' : 'true') + ');');
+			elems[elem].removeAttribute('disabled'); // lors d'un F5 c'est utile
+			bis = !bis;
 		}
 
 		document.querySelector('table.data tr:last-child input[name="diff1"]').setAttribute('disabled', 'disabled');
 		document.querySelector('table.data tr:first-child input[name="diff2"]').setAttribute('disabled', 'disabled');
-		document.querySelector('input[name="diff1"]:not([disabled])').checked = true;
-		document.querySelector('input[name="diff2"]:not([disabled])').checked = true;
-		document.querySelector('td.form-buttons button').setAttribute('class', 'scalable');
+		document.querySelector('table.data input[name="diff1"]:not([disabled])').checked = true;
+		document.querySelector('table.data input[name="diff2"]:not([disabled])').checked = true;
 
 		this.goDiff();
 	},
 
-	goDiff: function (url) {
+	goDiff: function (url, two) {
 
-		var diff1 = document.querySelector('input[name="diff1"]:checked'),
-		    diff2 = document.querySelector('input[name="diff2"]:checked'), onclick;
+		var diff1 = document.querySelector('table.data input[name="diff1"]:checked'),
+		    diff2 = document.querySelector('table.data input[name="diff2"]:checked'),
+		    pos1 = parseInt(diff1.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
+		    pos2 = parseInt(diff2.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
+		    onclick;
 
 		if (typeof url === 'string') {
+			this.enableLoader();
 			location.href = url;
 		}
 		else {
-			onclick = document.querySelector('td.form-buttons button').getAttribute('onclick');
+			if (two === true) {
+				if (pos1 >= pos2) {
+					diff1 = diff2.parentNode.parentNode.previousElementSibling.querySelector('input[name="diff1"]');
+					diff1.checked = true;
+				}
+			}
+			else {
+				if (pos1 >= pos2) {
+					diff2 = diff1.parentNode.parentNode.nextElementSibling.querySelector('input[name="diff2"]');
+					diff2.checked = true;
+				}
+			}
+
+			onclick = document.querySelector('div.content-header td.form-buttons button').getAttribute('onclick');
 			onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff2.value);
 			onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff1.value);
 
-			document.querySelector('td.form-buttons button').setAttribute('onclick', onclick);
+			document.querySelector('div.content-header td.form-buttons button').setAttribute('onclick', onclick);
+			document.querySelector('div.content-header-floating td.form-buttons button').setAttribute('onclick', onclick);
 		}
 	}
 };

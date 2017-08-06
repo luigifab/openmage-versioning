@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/20/02/2016
- * Updated M/08/11/2016
+ * Updated V/07/07/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -17,11 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-$head = Mage::getBlockSingleton('adminhtml/page_head');
-$head->addItem('skin_css', 'css/luigifab/versioning/styles.min.css');    // évite que _data['items'] soit inexistant
-$head->removeItem('skin_css', 'css/luigifab/versioning/styles.min.css'); // sur le foreach du getCssJsHtml
-$cssjs = trim($head->getCssJsHtml());
-
+$cssjs = $this->helper('versioning')->getCssJsHtml();
 $lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -32,7 +28,7 @@ $lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
-	<?php if (strlen($cssjs) > 10): ?>
+	<?php if (is_string($cssjs)): ?>
 		<?php echo $cssjs ?>
 		<link rel="icon" type="image/x-icon" href="<?php echo $this->getSkinUrl('favicon.ico') ?>" />
 	<?php else: ?>
@@ -70,7 +66,6 @@ $lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 						<input type="submit" class="form-button" value="<?php echo $this->__('Login') ?>" />
 					</div>
 				</div>
-				<p class="legal"><?php echo $this->__('Magento is a trademark of Magento Inc. Copyright &copy; %s Magento Inc.', date('Y')) ?></p>
 			</form>
 			<div class="bottom"></div>
 		</div>

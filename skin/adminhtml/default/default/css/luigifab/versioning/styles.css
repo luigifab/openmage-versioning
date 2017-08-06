@@ -1,7 +1,7 @@
 /**
+ * Created J/22/12/2011, Updated J/20/07/2017
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * Created J/22/12/2011, updated M/08/11/2016
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
@@ -33,24 +33,7 @@ body.adminhtml-versioning-repository-status h3.icon-head.darcs {
 	background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center;
 }
 
-body.adminhtml-versioning-repository-index table.data tr:hover,
-body.adminhtml-versioning-repository-history table.data tr:hover { background-color:#DEDEDE; }
-
-body.adminhtml-versioning-repository-history #loading-mask { background-color:rgba(255,255,255, 0.5); }
-body.adminhtml-versioning-repository-history #loading_mask_loader { margin-left:-120px; margin-top:-30px; }
-
-/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
-#config_edit_form[action*="system_config/save/section/versioning"] { padding-top:0; }
-#config_edit_form[action*="system_config/save/section/versioning"] fieldset a[onclick]:before { content:"[↗] "; font-size:0.85em; }
-#config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
-#config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
-#config_edit_form[action*="system_config/save/section/versioning"] p.note { padding-top:4px; line-height:125%; }
-
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value input { width:400px; }
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value textarea { width:400px; height:10em; }
-#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value p.note { width:400px; }
-
-/* &&&&&&&&&&&&& versioning/repository/history,status &&& */
+/* &&&&&&&&&&&&& versioning/repository/history+status &&& */
 body.adminhtml-versioning-repository-status pre ins { display:inline-block; width:100%; text-decoration:none; background-color:#CFC; }
 body.adminhtml-versioning-repository-status pre del { display:inline-block; width:100%; text-decoration:none; background-color:#FCC; }
 body.adminhtml-versioning-repository-status pre strong { display:inline-block; width:100%; }
@@ -61,12 +44,23 @@ body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repos
 	color:#666; border:1px solid #DADFE0; background-color:#F6F6F6;
 }
 
-body.adminhtml-versioning-repository-history pre span, body.adminhtml-versioning-repository-status pre span { color:black; }
+body.adminhtml-versioning-repository-status pre span, body.adminhtml-versioning-repository-history pre span { color:black; }
+body.adminhtml-versioning-repository-status pre span.help { color:#666; }
+body.adminhtml-versioning-repository-status pre span.help strong { display:inline; }
+
+body.adminhtml-versioning-repository-index table.data tbody button,
+body.adminhtml-versioning-repository-history table.data tbody button {
+	margin:0; padding:0;
+	font-weight:500; text-decoration:underline;
+	color:#EA7601; border:0; background:none;
+}
+
 body.adminhtml-versioning-repository-history pre { height:20em; margin-bottom:2em; overflow:auto; }
 
 body.adminhtml-versioning-repository-history table.data tr.headings th.no-link { padding:3px 4px; text-align:center; }
 body.adminhtml-versioning-repository-history table.data tr.current { background-color:#DEDEDE; }
-body.adminhtml-versioning-repository-history table.data tr.current td a { display:none; }
+body.adminhtml-versioning-repository-history table.data tr.current button { display:none; }
+body.adminhtml-versioning-repository-history table.data td:not([class*="a-"]) { padding:0 !important; }
 
 body.adminhtml-versioning-repository-history table.data td.a-status span {
 	display:block; height:17px; line-height:17px; text-align:center;
@@ -74,18 +68,17 @@ body.adminhtml-versioning-repository-history table.data td.a-status span {
 }
 
 body.adminhtml-versioning-repository-history table.data td.a-status span.grid-success { background-color:#3CB861; }
-body.adminhtml-versioning-repository-history table.data td.a-status span.grid-error { background-color:#E41101; }
+body.adminhtml-versioning-repository-history table.data td.a-status span.grid-error   { background-color:#E41101; }
 
 /* &&&&&&&&&&&&&&&&&&&&&& versioning/repository/index &&& */
 body.adminhtml-versioning-repository-index button.delpage.delete span { padding-left:0; background-image:none; }
-body.adminhtml-versioning-repository-index div.content-header td { width:auto !important; }
+body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
 
 body.adminhtml-versioning-repository-index table.data tr.headings th.no-link { padding:3px 4px; text-align:center; color:#666; }
-
 body.adminhtml-versioning-repository-index table.data tr.outside { color:#AAA; font-style:italic; }
-body.adminhtml-versioning-repository-index table.data tr.outside a { color:#AAA; }
+body.adminhtml-versioning-repository-index table.data tr.outside button { color:#AAA; }
 body.adminhtml-versioning-repository-index table.data tr.outside:hover { color:#888; }
-body.adminhtml-versioning-repository-index table.data tr.outside:hover a { color:#AAA; }
+body.adminhtml-versioning-repository-index table.data tr.outside:hover button { color:#AAA; }
 
 body.adminhtml-versioning-repository-index table.data td { vertical-align:middle; }
 body.adminhtml-versioning-repository-index table.data td.revision { padding:2px 0; }
@@ -94,25 +87,55 @@ body.adminhtml-versioning-repository-index table.data td a.issue { float:right; 
 body.adminhtml-versioning-repository-index table.data td input { cursor:pointer; visibility:hidden; }
 body.adminhtml-versioning-repository-index table.data td input[onchange]:not([disabled]) { visibility:visible; }
 
-body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
-
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
-	position:absolute !important; left:147px; width:197px; pointer-events:none;
+	position:absolute !important; left:157px; width:197px; pointer-events:none;
 	background-color:rgba(0,0,0, 0.09); transition:width 0.4s;
 }
 
+@media screen and (max-width:1500px),(max-device-width:1500px) {
+	body.adminhtml-versioning-repository-index div.content-header button { padding:1px 4px 2px; }
+	body.adminhtml-versioning-repository-index div.content-header button::-moz-focus-inner { padding:0; border:0; }
+}
+
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& fake-apijs/confirm &&& */
+#apijsDialog.fake * { margin:0; padding:0; }
+#apijsDialog.fake { position:fixed; top:0; right:0; bottom:0; left:0; width:100%; height:100%; text-align:center; z-index:99000; }
+
+#apijsBox.fake {
+	position:relative; top:23%; display:inline-block; padding:0.6em 0.8em 2.4em; min-height:15em; overflow:hidden; text-align:left;
+	font:0.8rem sans-serif; color:black; border-radius:0.8em;
+}
+
+#apijsBox.fake h1 { margin:0.15em 0 1em; font-weight:700; }
+#apijsBox.fake p { margin:1em auto; line-height:140%; font-size:1em; }
+#apijsBox.fake ul { margin:-0.4em auto 1em; }
+
+#apijsBox.fake div.control { position:absolute; right:0.8em; bottom:0.6em; }
+#apijsBox.fake div.control button.cancel { float:left; margin-right:0.5em; }
+
+#apijsBox.fake div.control button {
+	padding:0 0.7em; height:24px; line-height:24px;
+	font-size:0.85em; font-weight:500; white-space:nowrap; cursor:pointer; text-decoration:none;
+	color:black; border:1px solid #BBB; border-radius:0.4em; background-color:#E2E2E2;
+	font-family:sans-serif; background-image:none;
+}
+
+#apijsBox.fake div.control button::-moz-focus-inner { margin:-1px; padding:0; outline:0; border:0; }
+#apijsBox.fake div.control button:hover, #apijsBox.fake div.control button:active,
+#apijsBox.fake div.control button:focus { outline:0; border-color:#555; background-color:#F4F4F4; }
+
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
 body.adminhtml-versioning-repository-index { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); }
-body.adminhtml-versioning-repository-index > div.wrapper { padding-bottom:1px; }
 body.adminhtml-versioning-repository-index p.credits { position:absolute; bottom:1.2em; left:1em; color:#CCC; }
+body.adminhtml-versioning-repository-index #anchor-content { margin-top:1px; padding-top:22px; }
 
 body.adminhtml-versioning-repository-index #apijsDialog {
 	background-color:#111; background-size:100% 100%;
 	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 
-#apijsBox.versioning { background-color:rgba(255,255,255, 0.6); opacity:1; box-shadow:none; }
-#apijsBox.versioning h1 { padding-left:23px; height:1.2em; min-height:1.2em; font-size:1.2em; line-height:1.2em; color:#EB5E00; }
+#apijsBox.versioning { width:30rem; box-shadow:none; background-color:rgba(255,255,255, 0.6); opacity:1; }
+#apijsBox.versioning h1 { padding-left:23px; margin-bottom:1em; height:1.2em; line-height:1.2em; font-size:1.2em; color:#EB5E00; }
 #apijsBox.versioning h1:before { display:none; }
 #apijsBox.versioning.bzr   h1 { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
 #apijsBox.versioning.git   h1 { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
@@ -126,49 +149,6 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 #apijsBox.versioning div.bbcode input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
 #apijsBox.versioning p.reload { display:none; }
 
-/* &&&&&&&&&&&&&&&&&&&& versioning/repository/confirm &&& */
-body.adminhtml-versioning-repository-confirm {
-	height:100%; line-height:140%; overflow-y:scroll;
-	background-color:#111; background-size:100% 100%;
-	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
-}
-
-body.adminhtml-versioning-repository-confirm form {
-	position:relative; display:block; top:23%; margin:auto; padding:0.6em 0.8em 2.4em; width:26rem; min-height:12.5em;
-	font:0.8rem sans-serif; border-radius:0.8em; background-clip:padding-box; background-color:rgba(255,255,255, 0.6);
-}
-
-body.adminhtml-versioning-repository-confirm h1 {
-	margin:0.15em 0 0.7em; padding-left:23px; min-height:1.2em;
-	font-size:1.2em; line-height:1.2em; color:#EB5E00;
-}
-
-body.adminhtml-versioning-repository-confirm h1.bzr { background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center; }
-body.adminhtml-versioning-repository-confirm h1.git { background:url("../../../images/luigifab/versioning/git.png") no-repeat left center; }
-body.adminhtml-versioning-repository-confirm h1.svn { background:url("../../../images/luigifab/versioning/svn.png") no-repeat left center; }
-body.adminhtml-versioning-repository-confirm h1.hg  { background:url("../../../images/luigifab/versioning/hg.png") no-repeat left center; }
-body.adminhtml-versioning-repository-confirm h1.darcs { background:url("../../../images/luigifab/versioning/darcs.png") no-repeat left center; }
-
-body.adminhtml-versioning-repository-confirm ul { margin-top:0.5em; font-size:0.9em; }
-body.adminhtml-versioning-repository-confirm li + li { margin-top:0.35em; }
-body.adminhtml-versioning-repository-confirm label { cursor:pointer; }
-body.adminhtml-versioning-repository-confirm input { margin-right:0.2em; vertical-align:text-bottom; cursor:pointer; }
-body.adminhtml-versioning-repository-confirm input:focus, body.adminhtml-versioning-repository-confirm input:active { outline:1px dotted gray; }
-
-body.adminhtml-versioning-repository-confirm p { margin:1em auto; line-height:140%; }
-body.adminhtml-versioning-repository-confirm p.credits { position:absolute; bottom:0.25em; left:1em; color:#CCC; }
-body.adminhtml-versioning-repository-confirm p.saving { position:absolute; top:4.35em; margin:0; }
-
-body.adminhtml-versioning-repository-confirm div.buttons { position:absolute; right:0.9em; bottom:0.7em; }
-body.adminhtml-versioning-repository-confirm div.buttons button { height:1.7em; }
-body.adminhtml-versioning-repository-confirm div.buttons button[type="submit"] { float:right; margin-left:0.4em; }
-
-body.adminhtml-versioning-repository-confirm button { opacity:0.7; }
-body.adminhtml-versioning-repository-confirm button:hover, body.adminhtml-versioning-repository-confirm button:active,
-body.adminhtml-versioning-repository-confirm button:focus { opacity:1; }
-body.adminhtml-versioning-repository-confirm button:focus { outline:1px dotted black; }
-body.adminhtml-versioning-repository-confirm button::-moz-focus-inner { margin:-1px; padding:0; border:0; outline:none; }
-
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&& adminhtml/index/login &&& */
 #page-login {
 	overflow-y:scroll; color:white; background-color:#111; background-size:100% 100%;
@@ -177,10 +157,20 @@ body.adminhtml-versioning-repository-confirm button::-moz-focus-inner { margin:-
 
 #page-login div.login-container { padding:0; background:none; }
 #page-login div.login-box div.login-form { background:none; }
-#page-login div.login-box p.legal { background:none; }
 #page-login div.login-box div.bottom { display:none; }
-#page-login div.login-box label, #page-login div.login-box a { font-weight:normal; text-decoration:none; color:white; }
 #page-login div.login-box input { padding:0.4em 0.2em; border:none; }
 #page-login div.login-box input.form-button { border:none; background:none; }
+#page-login div.login-box label { font-weight:500; text-decoration:none; color:white; }
+#page-login div.login-box a { text-decoration:none; color:white; }
 
 #page-login p.credits { position:absolute; bottom:0.7em; left:1em; color:#CCC; }
+
+/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
+#config_edit_form[action*="system_config/save/section/versioning"] { padding-top:0; }
+#config_edit_form[action*="system_config/save/section/versioning"] fieldset a[onclick]:before { content:"[↗] "; font-size:0.85em; }
+#config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
+#config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
+
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value input { width:400px; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value textarea { width:400px; height:10em; }
+#config_edit_form[action*="system_config/save/section/versioning"] [id*="downtime"] td.value p.note { width:400px; }

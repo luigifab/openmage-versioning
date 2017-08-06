@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/08/11/2016
+ * Updated J/11/05/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -21,6 +21,10 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function getVersion() {
 		return (string) Mage::getConfig()->getModuleConfig('Luigifab_Versioning')->version;
+	}
+
+	public function _($data, $a = null, $b = null) {
+		return (strpos($txt = $this->__(' '.$data, $a, $b), ' ') === 0) ? $this->__($data, $a, $b) : $txt;
 	}
 
 
@@ -40,12 +44,12 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 		$file = BP.'/errors/config/error503.ip';
 		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
-		$nobody = (!is_file($file) || (strlen(trim(Mage::getStoreConfig('versioning/downtime/error503_byip'))) < 1));
+		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/error503_byip')));
 
 		$html = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the maintenance page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: %s', getenv('REMOTE_ADDR'));
+		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', getenv('REMOTE_ADDR'));
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
@@ -62,12 +66,12 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 		$file = BP.'/errors/config/upgrade.ip';
 		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
-		$nobody = (!is_file($file) || (strlen(trim(Mage::getStoreConfig('versioning/downtime/upgrade_byip'))) < 1));
+		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/upgrade_byip')));
 
 		$html = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the update page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: %s', getenv('REMOTE_ADDR'));
+		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', getenv('REMOTE_ADDR'));
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
@@ -99,5 +103,16 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function getMaintenanceFlag() {
 		return Mage::getBaseDir().'/maintenance.flag';
+	}
+
+
+	public function getCssJsHtml() {
+
+		$head = Mage::getBlockSingleton('adminhtml/page_head');
+		$head->addItem('skin_css', 'css/luigifab/versioning/styles.min.css');    // évite que _data['items'] soit inexistant
+		$head->removeItem('skin_css', 'css/luigifab/versioning/styles.min.css'); // sur le foreach du getCssJsHtml
+
+		$data = trim($head->getCssJsHtml());
+		return (strlen($data) > 10) ? $data : null;
 	}
 }

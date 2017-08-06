@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated M/08/11/2016
+ * Updated M/28/02/2017
  *
  * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://redmine.luigifab.info/projects/magento/wiki/versioning
+ * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.4.4</version>
+			<version>3.5.0</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -45,7 +45,7 @@
 			<adminhtml>
 				<args>
 					<modules>
-						<luigifab_versioning before="Mage_Adminhtml">Luigifab_Versioning</luigifab_versioning>
+						<Luigifab_Versioning before="Mage_Adminhtml">Luigifab_Versioning</Luigifab_Versioning>
 					</modules>
 				</args>
 			</adminhtml>

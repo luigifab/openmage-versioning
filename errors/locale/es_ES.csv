@@ -1,0 +1,13 @@
+`error404_pagetitle`,`Oh`
+`error404_title`,`Página no encontrada`
+`error404_content`,`<p>La página que buscas no existe o no existe más.</p>`
+`error503_pagetitle`,`Oh`
+`error503_title`,`Servicio temporalmente indisponible`
+`error503_content`,`<p>El servidor está temporalmente indisponible a causa de una operación de mantenimiento o de un problema técnico.</p>`
+`upgrade_pagetitle`,`Oh`
+`upgrade_title`,`Servicio temporalmente indisponible`
+`upgrade_content`,`<p>El servidor está temporalmente indisponible a causa de una operación de mantenimiento.</p>`
+`report_pagetitle`,`Oh`
+`report_title`,`Ha habido un error en el tratamiento de vuestro pedido`
+`report_content`,`<p>El servidor está temporalmente indisponible a causa de un problema técnico.</p>`
+`Error number: §`,`Error número: §`
