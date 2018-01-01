@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated W/10/05/2017
+ * Updated S/30/09/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -106,7 +106,7 @@
 				</scm>
 				<downtime translate="label comment">
 					<label>Maintenance pages</label>
-					<comment><![CDATA[Warning! Here, [store view] = [lang].<br />The <em>maintenance.flag</em> page takes priority over the <em>upgrade.flag</em> page.]]></comment>
+					<comment><![CDATA[[special] = all languages of all stores views.<br />The <em>maintenance.flag</em> page takes priority over the <em>upgrade.flag</em> page.]]></comment>
 					<sort_order>3</sort_order>
 					<show_in_default>1</show_in_default>
 					<show_in_website>0</show_in_website>
@@ -124,6 +124,7 @@
 						<error503_pagetitle translate="label">
 							<label>Page title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>21</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -132,6 +133,7 @@
 						<error503_title translate="label">
 							<label>Main title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>22</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -140,6 +142,7 @@
 						<error503_content translate="label">
 							<label><![CDATA[Content text or <abbr title="HyperText Markup Language">HTML</abbr>]]></label>
 							<frontend_type>textarea</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>23</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -149,6 +152,7 @@
 							<label>Text with automatic reload period</label>
 							<comment><![CDATA[Use <strong>[10]</strong> for a 10-seconds delay.]]></comment>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
 							<sort_order>24</sort_order>
 							<show_in_default>1</show_in_default>
@@ -184,6 +188,7 @@
 						<upgrade_pagetitle translate="label">
 							<label>Page title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>31</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -192,6 +197,7 @@
 						<upgrade_title translate="label">
 							<label>Main title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>32</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -200,6 +206,7 @@
 						<upgrade_content translate="label">
 							<label><![CDATA[Content text or <abbr title="HyperText Markup Language">HTML</abbr>]]></label>
 							<frontend_type>textarea</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>33</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -209,6 +216,7 @@
 							<label>Text with automatic reload period</label>
 							<comment><![CDATA[Use <strong>[10]</strong> for a 10-seconds delay.]]></comment>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
 							<sort_order>34</sort_order>
 							<show_in_default>1</show_in_default>
@@ -244,6 +252,7 @@
 						<report_pagetitle translate="label">
 							<label>Page title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>41</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -252,6 +261,7 @@
 						<report_title translate="label">
 							<label>Main title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>42</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -260,6 +270,7 @@
 						<report_content translate="label">
 							<label><![CDATA[Content text or <abbr title="HyperText Markup Language">HTML</abbr>]]></label>
 							<frontend_type>textarea</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>43</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -285,6 +296,7 @@
 						<error404_pagetitle translate="label">
 							<label>Page title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>51</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -293,6 +305,7 @@
 						<error404_title translate="label">
 							<label>Main title</label>
 							<frontend_type>text</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>52</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -301,6 +314,7 @@
 						<error404_content translate="label">
 							<label><![CDATA[Content text or <abbr title="HyperText Markup Language">HTML</abbr>]]></label>
 							<frontend_type>textarea</frontend_type>
+							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>53</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>

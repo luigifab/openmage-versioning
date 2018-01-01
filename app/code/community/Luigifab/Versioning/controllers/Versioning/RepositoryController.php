@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/04/08/2017
+ * Updated S/11/11/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -60,7 +60,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 
-			if (!empty($this->getRequest()->getParam('isAjax')))
+			if ($this->getRequest()->isXmlHttpRequest() || !empty($this->getRequest()->getParam('isAjax')))
 				$this->getResponse()->setBody($this->getLayout()->createBlock('versioning/adminhtml_history_grid')->toHtml());
 			else
 				$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
@@ -122,7 +122,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		$revision = $this->getRequest()->getParam('revision', ''); // string
-		$useflag = ($this->getRequest()->getParam('use_flag', '') === '1'); // boolean
+		$useflag = ($this->getRequest()->getParam('use_flag', '') == '1'); // boolean
 
 		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
@@ -148,7 +148,6 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'<meta http-equiv="Content-Language" content="',$lang,'" />';
 		echo "\n",'<link rel="icon" type="image/x-icon" href="',Mage::getDesign()->getSkinUrl('favicon.ico'),'" />';
 		// styles
-		// http://commons.wikimedia.org/wiki/File:MarsSunset.jpg
 		echo "\n",'<style type="text/css">';
 		echo "\n", '* { margin:0; padding:0; }';
 		echo "\n", 'html { height:100%; cursor:wait; }';
@@ -214,8 +213,8 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		sleep(3);
 
 		// procédure de mise à jour
-		// action !
-		echo '<pre>';
+		// action
+		echo '<pre lang="mul">';
 		$result = $upgrade->process($revision, $useflag);
 		echo '</pre>';
 		// script

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated M/28/02/2017
+ * Updated S/18/11/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -91,7 +91,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 				$this->writeNotice($this->__('Repository: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['current_rev'], $targetRevision));
 
-			file_put_contents($lock, $H['current_rev'].' ➩ '.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
+			file_put_contents($lock, $H['current_rev'].'/'.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
 			if ($useFlag)
 				file_put_contents($this->getUpgradeFlag(), file_get_contents($lock));
 

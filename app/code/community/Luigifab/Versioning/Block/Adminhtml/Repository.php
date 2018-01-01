@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/16/07/2017
+ * Updated D/10/12/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -32,8 +32,23 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_removeButton('add');
 
 		$this->_addButton('diff', array(
-			'label'   => $this->__('Show diff'),
+			'label'   => 'diff',
+			'title'   => $this->__('Show diff'),
 			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');",
+			'class'   => 'go'
+		));
+
+		$this->_addButton('history', array(
+			'label'   => 'log',
+			'title'   => $this->__('Updates history'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
+			'class'   => 'go'
+		));
+
+		$this->_addButton('status', array(
+			'label'   => 'status',
+			'title'   => $this->__('Repository status'),
+			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
 			'class'   => 'go'
 		));
 
@@ -64,24 +79,12 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
 			));
 		}
-
-		$this->_addButton('history', array(
-			'label'   => $this->__('History'),
-			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
-			'class'   => 'go'
-		));
-
-		$this->_addButton('status', array(
-			'label'   => $this->__('Repository status'),
-			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
-			'class'   => 'go'
-		));
 	}
 
 	public function getGridHtml() {
 
 		$commits = Mage::registry('versioning')->getCommitCollection();
-		$count  = count($commits) - 1;
+		$count = count($commits) - 1;
 		$cols = 0;
 		$hash = '';
 
@@ -106,7 +109,6 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			'<script type="text/javascript">'."\n".
 			'var versioningIds = {'.substr($hash, 0, -1).'}, versioningCols = '.$cols.';'."\n".
 			'</script>';
-
 	}
 
 	public function getHeaderCssClass() {

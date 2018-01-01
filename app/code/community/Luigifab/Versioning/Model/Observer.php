@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated S/06/05/2017
+ * Updated V/10/11/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -48,8 +48,8 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (Mage::app()->getWebsites() as $website) {
 			foreach ($website->getGroups() as $group) {
 				foreach ($group->getStores() as $store) {
-					$locale = Mage::getStoreConfig('general/locale/code', $store->getStoreId());
-					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getStoreId());
+					$locale = Mage::getStoreConfig('general/locale/code', $store->getId());
+					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getId());
 				}
 			}
 		}
@@ -79,27 +79,27 @@ class Luigifab_Versioning_Model_Observer {
 			// extraction de la configuration pour la locale
 			foreach ($config as $key => $value) {
 
-				$value = trim($value);
+				$value = str_replace('"', '""', trim($value));
 
 				// versioning/downtime/*title
 				if (strpos($key, 'title') !== false) {
 
 					if (!empty($value))
-						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
+						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 				}
 				// versioning/downtime/*content
 				else if (strpos($key, 'content') !== false) {
 
 					if (!empty($value) && (strpos($value, '<') === 0))
-						$translations[$locale][] = '`'.$key.'`,`'.$value.'`';
+						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 					else if (!empty($value))
-						$translations[$locale][] =  '`'.$key.'`,`<p>'.str_replace("\n", '<br />', $value).'</p>`';
+						$translations[$locale][] =  '"'.$key.'","<p>'.str_replace("\n", '<br />', $value).'</p>"';
 				}
 				// versioning/downtime/*autoreload
 				else if (strpos($key, 'autoreload') !== false) {
 
 					if (!empty($value) && (strpos($value, '[') !== false) && (strpos($value, ']') !== false))
-						$translations[$locale][] = '`'.$key.'`,`'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'`';
+						$translations[$locale][] = '"'.$key.'","'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'"';
 				}
 			}
 		}

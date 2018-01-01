@@ -1,9 +1,9 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated L/15/05/2017
+ * Updated J/07/12/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -28,7 +28,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 
 		$type = Mage::getStoreConfig('versioning/scm/type');
 		$from = $this->getRequest()->getParam('from');
-		$to = $this->getRequest()->getParam('to');
+		$to   = $this->getRequest()->getParam('to');
 
 		if (!empty($from) && !empty($to)) {
 			$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
@@ -71,9 +71,10 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$to = $this->getRequest()->getParam('to');
 
 		if (!empty($from) && !empty($to))
-			return '<pre>'.$model->getCurrentDiffStatus($from, $to).'</pre><pre>'.$model->getCurrentDiff($from, $to).'</pre>';
+			return '<pre lang="mul">'.$model->getCurrentDiffStatus($from, $to).'</pre>'.
+			       '<pre lang="mul">'.$model->getCurrentDiff($from, $to).'</pre>';
 		else
-			return '<pre>'.$model->getCurrentStatus().'</pre><pre>'.$model->getCurrentDiff().'</pre>';
+			return '<pre lang="mul">'.$model->getCurrentStatus().'</pre><pre lang="mul">'.$model->getCurrentDiff().'</pre>';
 	}
 
 	public function getHeaderCssClass() {

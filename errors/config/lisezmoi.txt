@@ -1,35 +1,43 @@
-Vous devez mettre à jour votre index.php avec le code suivant.
-Faites attention si vous n'utilisez pas /admin/ pour votre back-office.
+Premièrement, pour le fichier gitignore :
+
+/errors/config/*.ip
+/errors/config/*.dat
+/errors/config/*.csv
+/maintenance.flag
+/upgrade.flag
+
+Deuxièmement, pour le fichier index.php :
 
 ## remplacer ##
 if (file_exists($maintenanceFile)) {
-	include_once dirname(__FILE__).'/errors/503.php';
-	exit;
+    include_once dirname(__FILE__).'/errors/503.php';
+    exit;
 }
 ## par ##
 // https://www.luigifab.info/magento/versioning
 if (is_file('./maintenance.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
-	$ips = './errors/config/error503.ip';
-	if (!is_file($ips) || (is_file($ips) && (strpos(file_get_contents($ips), '-'.getenv('REMOTE_ADDR').'-') === false))) {
-		include_once('./errors/503.php');
-		exit(0);
-	}
+    $ips = './errors/config/error503.ip';
+    if (!is_file($ips) || (is_file($ips) && (strpos(file_get_contents($ips), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/503.php');
+        exit(0);
+    }
 }
 if (is_file('./upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
-	$ips = './errors/config/upgrade.ip';
-	if (!is_file($ips) || (is_file($ips) && (strpos(file_get_contents($ips), '-'.getenv('REMOTE_ADDR').'-') === false))) {
-		include_once('./errors/upgrade.php');
-		exit(0);
-	}
+    $ips = './errors/config/upgrade.ip';
+    if (!is_file($ips) || (is_file($ips) && (strpos(file_get_contents($ips), '-'.getenv('REMOTE_ADDR').'-') === false))) {
+        include_once('./errors/upgrade.php');
+        exit(0);
+    }
 }
 ## fin ##
 
-Vous pouvez aussi surcharger les fichiers :
+
+Vous pouvez surcharger les fichiers :
  - errors/processor.php       » errors/config/processor.php  (utilisez UserProcessor comme nom de classe, votre classe doit étendre Processor)
  - errors/page.phtml          » errors/config/page.phtml
 
-Le dossier errors/config va contenir d'autres fichiers texte et vous devez les ignorer (*ip *dat *csv).
-Ces fichiers seront créés automatiquement lorsque vous sauvegarderez la configuration du module dans le back-office :
+Le dossier errors/config va contenir d'autres fichiers texte.
+Ils seront créés automatiquement lorsque vous sauvegarderez la configuration du module dans le back-office :
  - errors/config/error503.ip  » liste d'adresses ip
  - errors/config/upgrade.ip   » liste d'adresses ip
  - errors/config/config.dat   » configuration

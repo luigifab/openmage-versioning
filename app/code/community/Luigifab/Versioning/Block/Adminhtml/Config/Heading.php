@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated D/16/07/2017
+ * Updated S/11/11/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -24,8 +24,8 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 		$lang = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
 
-		// exemple d'une adresse de base : http://mario/sites/14/web/(xyz/)(index.php/)
-		// exemple d'une adresse finale  : http://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
+		// exemple d'une adresse de base : https://mario/sites/14/web/(xyz/)(index.php/)
+		// exemple d'une adresse finale  : https://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
 		$url = preg_replace('#/[^/]+\.php[0-9]*/#', '/', $url);
 
@@ -37,8 +37,8 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$url = $url.'errors/'.$element->getHtmlId().'.php?lang='.$lang;
 		$url = str_replace(array('versioning_downtime_error', 'versioning_downtime_'), '', $url);
 
-		if ($element->getHtmlId() === 'versioning_downtime_report')
-			$url .= '&amp;demo=1';
+		if ($element->getHtmlId() == 'versioning_downtime_report')
+			$url = str_replace('?lang', '?demo=1&amp;lang', $url);
 
 		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
 	}
@@ -49,11 +49,11 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$store = $this->getRequest()->getParam('store');
 
 		if (!empty($store))
-			$storeId = Mage::getModel('core/store')->load($store)->getStoreId();
+			$storeId = Mage::getModel('core/store')->load($store)->getId();
 		else if (!empty($website))
-			$storeId = Mage::getModel('core/website')->load($website)->getDefaultStore()->getStoreId();
+			$storeId = Mage::getModel('core/website')->load($website)->getDefaultStore()->getId();
 		else
-			$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
+			$storeId = Mage::app()->getDefaultStoreView()->getId();
 
 		return $storeId;
 	}
@@ -64,7 +64,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 		foreach ($locales as $locale) {
 
-			if ($locale['value'] === $lang)
+			if ($locale['value'] == $lang)
 				return $locale['label'];
 		}
 	}

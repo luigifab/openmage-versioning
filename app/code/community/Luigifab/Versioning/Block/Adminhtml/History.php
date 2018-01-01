@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/28/02/2017
+ * Updated D/29/10/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -46,7 +46,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 	public function getGridHtml() {
 		$file = $this->helper('versioning')->getLastLog();
-		return '<pre>'.((is_file($file) && is_readable($file)) ? file_get_contents($file) : '')."\n".'</pre> '.$this->getChildHtml('grid');
+		return '<pre lang="mul">'.((is_file($file) && is_readable($file)) ? file_get_contents($file) : '')."\n".'</pre> '.$this->getChildHtml('grid');
 	}
 
 	public function getHeaderCssClass() {

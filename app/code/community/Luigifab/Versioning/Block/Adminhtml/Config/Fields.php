@@ -1,7 +1,7 @@
 <?php
 /**
- * Created W/30/05/2012
- * Updated M/28/02/2017
+ * Created S/30/09/2017
+ * Updated D/01/10/2017
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -17,19 +17,15 @@
  * GNU General Public License (GPL) for more details.
  */
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
+class Luigifab_Versioning_Block_Adminhtml_Config_Fields extends Mage_Adminhtml_Block_System_Config_Form_Field {
 
-if (is_file(ROOT.'/errors/config/processor.php')) {
-	require_once(ROOT.'/errors/config/processor.php');
-	require_once(ROOT.'/errors/processor.php');
-	$processor = new UserProcessor();
-}
-else {
-	require_once(ROOT.'/errors/processor.php');
-	$processor = new Processor();
-}
+	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-$processor->init('error503');
-$processor->renderPage(503);
+		if ($element->getCanUseWebsiteValue() || $element->getCanUseDefaultValue())
+			$element->unsScopeLabel();
+		else
+			$element->setScopeLabel($this->__('[SPECIAL]'));
+
+		return parent::render($element);
+	}
+}

@@ -1,29 +1,32 @@
 /**
- * Created J/22/12/2011, Updated L/27/07/2017
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Created J/22/12/2011, Updated J/07/12/2017
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL).
  */
 
-// dépend de Prototype et de Raphaël, versioningIds/versioningCols dans Repository.php
+// dépend de Prototype/Raphaël/Translator, et de versioningIds/versioningCols dans Repository.php
+// totalement testé sur Firefox 27/45, Chrome 29/63, Opera 49, IE 11, Edge 14
 var versioning = {
 
-	// avant IE 10 atob n'existe pas - http://caniuse.com/atob-btoa
-	// prise en charge de l'utf-8 avec Webkit - http://stackoverflow.com/q/3626183
+	svg: null,
+	width: 197,
+
+	// initialisation
+	// et prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
 	decode: function (data) {
 		return decodeURIComponent(escape(window.atob(data)));
 	},
 
-	// initialisation
 	start: function () {
 
 		if (document.querySelector('body[class*="adminhtml-versioning-repository-"]')) {
 
 			console.info('versioning.app - hello');
 
-			if (document.getElementById('history_grid') && document.querySelector('table.data tbody button'))
+			if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
 				document.querySelector('table.data tbody button').click();
 
 			if (document.getElementById('versioning_grid_table') && (typeof versioningIds !== 'undefined')) {
@@ -35,15 +38,14 @@ var versioning = {
 
 	enableLoader: function () {
 		document.body.style.cursor = 'progress';
-		document.querySelector('div.content-header td.form-buttons').setAttribute('style', 'visibility:hidden');
-		document.querySelector('div.content-header-floating td.form-buttons').setAttribute('style', 'visibility:hidden');
+		document.querySelector('div.content-header td.form-buttons').setAttribute('style', 'visibility:hidden;');
+		document.querySelector('div.content-header-floating td.form-buttons').setAttribute('style', 'visibility:hidden;');
 	},
 
 
 	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 20
-	// » Demande confirmation avec l'apijs
-	// » Demande confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
+	// = révision : 21
+	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
 	confirmFlag: function (url, title, content, credits) {
 
@@ -104,9 +106,9 @@ var versioning = {
 
 
 	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 40
-	// » Demande confirmation avec l'apijs
-	// » Demande confirmation même si l'apijs n'est pas disponible, avec les mêmes informations
+	// = révision : 41
+	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
+	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
 	confirmUpgrade: function (url, title, content, credits) {
 
 		try {
@@ -138,7 +140,7 @@ var versioning = {
 
 			try {
 				// sans l'apijs
-				// simule la boite de dialogue de l'apijs
+				// simule la boîte de dialogue de l'apijs
 				var data = document.createElement('div'),
 				    text = this.decode(content).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/\]/g, '>'),
 				    icon = document.getElementById('scmtype').textContent;
@@ -176,7 +178,7 @@ var versioning = {
 		document.getElementById('apijsDialog').parentNode.removeChild(document.getElementById('apijsDialog'));
 	},
 
-	actionConfirmUpgrade: function (action, args) {
+	actionConfirmUpgrade: function (action) {
 
 		// avec l'apijs, en deux temps
 		// validation du formulaire si la fonction callback avec son paramètre args renvoie true, callback(false, args)
@@ -188,8 +190,8 @@ var versioning = {
 
 		// sans l'apijs
 		if (action === true) {
-			document.querySelector('div.bbcode').setAttribute('style', 'visibility:hidden');
-			document.querySelector('div.control').setAttribute('style', 'visibility:hidden');
+			document.querySelector('div.bbcode').setAttribute('style', 'visibility:hidden;');
+			document.querySelector('div.control').setAttribute('style', 'visibility:hidden;');
 		}
 		// avec l'apijs, en deux temps
 		else {
@@ -203,7 +205,7 @@ var versioning = {
 
 	// #### Affichage de l'historique ########################################### //
 	// = révision : 10
-	// » Affiche les détails d'une mise à jour dans la balise pre (isNaN pour Webkit)
+	// » Affiche les détails d'une mise à jour dans la balise pre
 	// » Marque la ligne active du tableau avec la classe current
 	history: function (link, content) {
 
@@ -222,21 +224,20 @@ var versioning = {
 
 
 	// #### Représentation des branches ######################################### //
-	// = révision : 125
+	// = révision : 132
 	// » Utilise Raphael.js 2.2.7 (93,5 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
-	// » Crée ensuite les lignes entres les points sans utiliser des trucs dépréciés de prototype
+	// » Crée ensuite les lignes entres les points sans utiliser les trucs dépréciés de prototype
 	drawGraph: function (data, cols) {
 
-		var graph, colors = [], k, x, y, pX, pY, elem, grad = 0, names = [], innerSvg = '',
+		var elem, x, y, pX, pY, colors = [], styles = [], names = [], tops = [], bottoms = [], innerSvg = '', that = versioning,
 			commitsHash  = new Hash(data),
 			commitsArray = commitsHash.values(),
-			rows = commitsHash.keys().length - 1,
-			tableRows = $$('table.data tbody tr'),
-			offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0;
+			tableRows    = $$('table.data tbody tr'), rows = tableRows.length - 1,   // les lignes du tableau
+			grad = 0, offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0, dMiHeight = 0;
 
-		// http://stackoverflow.com/a/1129270/2980105
+		// https://stackoverflow.com/a/1129270
 		// inverse l'ordre du tableau
 		commitsArray.sort(function (a, b) {
 			if (a.row > b.row)
@@ -258,25 +259,48 @@ var versioning = {
 			graphHeight = Element.positionedOffset(tableRows.last())[1] + tableRows.last().getDimensions().height - offsetTop - 1;
 		}
 
-		// initialisation du graphique (dimensions et positionnement en hauteur)
-		// largeur fixé à 197px (voir aussi dans le css body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg)
-		graph = new Raphael(document.getElementById('versioning_grid_table').parentNode);
-		graph.setSize(197, graphHeight);
-
-		document.querySelector('svg').style.top = offsetTop + 'px';
+		// initialisation du graphique
+		// canvas = l'élément svg
+		this.svg = new Raphael(document.getElementById('versioning_grid_table').parentNode);
+		this.svg.setSize(this.width, graphHeight);
+		this.svg.canvas.setAttribute('style', 'top:' + offsetTop + 'px;');
+		this.svg.canvas.setAttribute('class', 'k k0');
+		this.svg.canvas.setAttribute('id', 'versioning_graph');
+		this.svg.canvas.setAttribute('onmouseover', 'versioning.mouseOver(true);');
+		this.svg.canvas.parentNode.setAttribute('onmouseleave', 'versioning.mouseOver(false);');
 
 		// génération des couleurs
+		// mémorise en même temps le point le plus haut/bas de chaque branche
 		Raphael.getColor.reset();
-		for (k = 0; k <= cols; k++) {
+		Raphael.getColor();
+		colors.push(Raphael.getColor());
+
+		for (x = 0; x <= cols; x++) {
+
+			Raphael.getColor();
 			Raphael.getColor();
 			colors.push(Raphael.getColor());
+
+			styles.push('svg.k' + x + ' .k:not(.k' + x + ') { opacity:0.4; }');
+			styles.push('table.k' + x + ' .k:not(.k' + x + ') { color:#CCC; }');
+			styles.push('table.k' + x + ' .k:not(.k' + x + ') button { opacity:0; visibility:hidden; }');
 		}
 
-		// Pour chaque commit (du haut vers le bas) :
+		commitsArray.each(function (commit) {
+
+			commit.color = colors[commit.col];
+			commit.klass = 'k k' + commit.col;
+
+			bottoms[commit.col] = commit.revision;
+			if (!tops[commit.col])
+				tops[commit.col] = commit.revision;
+		});
+
+		// Pour chaque commit (du haut vers le bas)
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
 		//  topPoint = la position du haut de la première ligne dans le tableau (à partir du haut du document)
 		//  miHeight = le milieu de la ligne dans le tableau
-		//      rows = le nombre de ligne dans le tableau (de 0 à...)
+		//      rows = le nombre de ligne dans le tableau (de 0 à tableRows-1)
 		//       row = le numéro de la ligne dans le tableau (max = la première ligne, 0 = la dernière ligne)
 		commitsArray.each(function (commit) {
 
@@ -291,38 +315,47 @@ var versioning = {
 				miHeight = tableRows[rows - commit.row].getDimensions().height / 2;
 			}
 
-			// sur X (position horizontale) le 25 correspond à l'espace entre les colonnes, donc entre deux branches
+			// sur X (position horizontale) le  25 correspond à l'espace entre les colonnes, donc entre deux branches
 			// sur X (position horizontale) le +20 permet de ne pas coller la première branche au bord
 			y = topPoint + miHeight;
 			x = 25 * commit.col + 20;
 
 			// dessine un point
-			graph.circle(x, y, 3.4).attr('fill', colors[commit.col]).attr('stroke', 'none');
+			that.svg.circle(x, y, 3.5)
+				.attr('fill', commit.color)
+				.attr('stroke', 'none')
+				.attr('class', commit.klass);
 
-			// dessine un texte dans une étiquette
+			// écrit un texte dans une étiquette
 			// en profite également pour vérifier la largeur du graphique
-			if ((commit.branch.length > 0) && (names.indexOf(commit.branch) < 0)){
+			if ((commit.branch.length > 0) && (names.indexOf(commit.branch) < 0)) {
 
 				names.push(commit.branch);
 
-				elem = graph.text(x + 13, y - 0.3, commit.branch).attr('fill', colors[commit.col]).attr('text-anchor', 'start');
-				graph.path(
-					'M ' + (x + 3.2) + ',' + (y - 0.4) + // point de départ au niveau du point
+				elem = that.svg.text(x + 13, y - 0.3, commit.branch)
+					.attr('fill', commit.color)
+					.attr('text-anchor', 'start')
+					.attr('class', commit.klass);
+
+				pX = x + 3.2 + 8 + elem.getBBox().width + 7;       // variable temporaire
+				that.svg.path(
+					'M ' + (x + 3.2) + ',' + (y - 0.4) +          // point de départ au niveau du point
 					' L ' + (x + 3.2 + 8) + ',' + (y - 0.4 - 8) + // en haut à gauche
-					' L ' + (x + 3.2 + 8 + elem.getBBox().width + 7) + ',' + (y - 0.4 - 8) + // en haut à droite
-					' L ' + (x + 3.2 + 8 + elem.getBBox().width + 7) + ',' + (y - 0.4 + 8) + // en bas à droite
+					' L ' + (pX) + ',' + (y - 0.4 - 8) +          // en haut à droite
+					' L ' + (pX) + ',' + (y - 0.4 + 8) +          // en bas à droite
 					' L ' + (x + 3.2 + 8) + ',' + (y - 0.4 + 8) + // en bas à gauche
-					' Z'
-				).attr('stroke', colors[commit.col]).attr('fill', 'white').attr('fill-opacity', '0.7').attr('stroke-opacity', '0.2').toFront();
+					' Z')
+					.attr('stroke', commit.color)
+					.attr('fill', 'white')
+					.attr('fill-opacity', '0.7')
+					.attr('stroke-opacity', '0.2')
+					.attr('class', commit.klass)
+					.toFront();
 				elem.toFront(); // repasse le texte au dessus de l'étiquette
 
-				if ((k = (x + 3.2 + 8 + elem.getBBox().width + 7)) > 197) {
-					document.querySelector('svg').setAttribute('onmouseover', 'this.style.width = "' + k + 'px";');
-					document.querySelector('svg').setAttribute('onmouseout', 'this.style.width = "197px";');
-					document.querySelector('svg').style.pointerEvents = 'inherit';
-				}
+				if (pX > versioning.width)
+					versioning.width = pX;
 			}
-
 
 			// ligne vers le parent (donc un peu plus bas)
 			// s'il existe, sinon vers le bas du graphique
@@ -350,37 +383,57 @@ var versioning = {
 
 					if (parent.col === commit.col) {
 						// dessine une ligne verticale
-						graph.path(['M', x, y, 'V', pY]).attr('stroke', colors[commit.col]).attr('stroke-width', 1.7).toBack();
+						that.svg.path(['M', x, y, 'V', pY])
+							.attr('stroke', commit.color)
+							.attr('stroke-width', 1.7)
+							.attr('class', commit.klass)
+							.toBack();
 					}
 					else {
-						// dégradé manuel de gauche à droite ou dans le sens inverse
-						// car Raphael.js ne permet pas de définir un dégradé sur un path sur stroke
-						if (x > pX)
-							innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[parent.col] + '"></stop><stop offset="100%" stop-color="' + colors[commit.col] + '"></stop></linearGradient>';
+						// dégradé manuel car Raphael.js ne permet pas de définir un dégradé sur un path sur stroke
+						// dans un sens ou dans l'autre, bref on veut pas savoir
+						// attention pour les lignes en travers pas de kX
+						innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0">' +
+							'<stop offset="0" stop-color="' + ((x > pX) ? parent.color : commit.color) + '"></stop>' +
+							'<stop offset="100%" stop-color="' + ((x > pX) ? commit.color : parent.color) + '"></stop>' +
+						'</linearGradient>';
+
+						// avec Prototype > 1.7 ou non
+						if (typeof Element.Layout === 'function')
+							dMiHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
 						else
-							innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0"><stop offset="0" stop-color="' + colors[commit.col] + '"></stop><stop offset="100%" stop-color="' + colors[parent.col] + '"></stop></linearGradient>';
+							dMiHeight = tableRows[rows - parent.row].getDimensions().height / 2;
+						dMiHeight = dMiHeight + miHeight;
 
-						if ((y + miHeight * 4) < pY) {
-							// dessine une ligne arrondie
-							pY = y + 3 * miHeight;
-							elem = graph.path(['M', x, y,
-								'C', x, y, x, y + (pY - y) / 2, x + (pX - x) / 2, y + (pY - y) / 2,
-								'C', x + (pX - x) / 2, y + (pY - y) / 2, pX, pY - (pY - y) / 2, pX, pY]);
+						if ((parent.revision === tops[parent.col]) && (y + dMiHeight < pY)) {
+							// dessine une ligne en travers
+							elem = that.svg.path(['M', x, y, 'T', pX, y + dMiHeight]);
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
-							elem.attr('stroke-width', 1.7).toBack();
-
-							// dessine une ligne verticale
-							y = y + 3 * miHeight;
-							pY = topPoint + miHeight;
-							graph.path(['M', pX	, y, 'V', pY]).attr('stroke', colors[parent.col]).attr('stroke-width', 1.7).toBack();
+							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
+							// dessise une ligne verticale
+							that.svg.path(['M', pX, y + dMiHeight, 'V', pY])
+								.attr('stroke', parent.color)
+								.attr('stroke-width', 1.7)
+								.attr('class', 'k')
+								.toBack();
+						}
+						else if ((commit.revision === bottoms[commit.col]) && (pY > y + dMiHeight) && (commit.parents.length === 1)) {
+							// dessise une ligne verticale
+							that.svg.path(['M', x, y, 'V', pY - dMiHeight])
+								.attr('stroke', commit.color)
+								.attr('stroke-width', 1.7)
+								.attr('class', 'k')
+								.toBack();
+							// dessine une ligne en travers
+							elem = that.svg.path(['M', x, pY - dMiHeight, 'T', pX, pY]);
+							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
+							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
 						}
 						else {
-							// dessine une ligne arrondie
-							elem = graph.path(['M', x, y,
-								'C', x, y, x, y + (pY - y) / 2, x + (pX - x) / 2, y + (pY - y) / 2,
-								'C', x + (pX - x) / 2, y + (pY - y) / 2, pX, pY - (pY - y) / 2, pX, pY]);
+							// dessine une ligne en travers
+							elem = that.svg.path(['M', x, y, 'T', pX, pY]);
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
-							elem.attr('stroke-width', 1.7).toBack();
+							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
 						}
 
 						grad += 1;
@@ -388,17 +441,40 @@ var versioning = {
 				}
 				else if (ref.length > 0) {
 					// dessine une ligne verticale vers le bas du graphique
-					graph.path(['M', x, y, 'V', graphHeight]).attr('stroke', colors[commit.col]).attr('stroke-width', 1.7).toBack();
+					that.svg.path(['M', x, y, 'V', graphHeight])
+						.attr('stroke', commit.color)
+						.attr('stroke-width', 1.7)
+						.attr('class', commit.klass)
+						.toBack();
 				}
 			});
 
-			if (commit.col > 0)
-				tableRows[rows - commit.row].setAttribute('class', tableRows[rows - commit.row].getAttribute('class') + ' outside');
+			elem = tableRows[rows - commit.row];
+			elem.setAttribute('onclick', "versioning.updateClass(this.getAttribute('class'));");
+			elem.setAttribute('class', ((commit.row % 2) < 1) ? commit.klass : 'even ' + commit.klass);
+			elem.removeAttribute('title');
 		});
 
-		// une seule fois, sinon ça ne fonctionne que pour le dernier ajout avec Edge 14
+		// une seule fois sinon ok que pour le dernier ajout avec Edge 14
 		if (innerSvg.length > 0)
 			document.querySelector('svg defs').innerSVG = innerSvg;
+
+		// ajoute les styles pour les animations
+		elem = document.createElement('style');
+		elem.setAttribute('type', 'text/css');
+		elem.setAttribute('id', 'versioning_styles');
+		elem.appendChild(document.createTextNode(styles.join("\n")));
+		document.querySelector('head').appendChild(elem);
+	},
+
+	mouseOver: function (yes) {
+		this.svg.canvas.style.width = (yes) ? versioning.width + 'px' : '197px';
+		this.svg.canvas.style.pointerEvents = (yes) ? 'none' : 'inherit';
+	},
+
+	updateClass: function (klass) {
+		this.svg.canvas.setAttribute('class', klass);
+		document.getElementById('versioning_grid_table').setAttribute('class', 'data ' + klass);
 	},
 
 

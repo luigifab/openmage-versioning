@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated D/16/07/2017
+ * Updated J/07/12/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -23,7 +23,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 		parent::__construct();
 
-		$this->setId('history_grid');
+		$this->setId('versioning_history_grid');
 		$this->setDefaultSort('date');
 		$this->setDefaultDir('desc');
 
@@ -131,10 +131,6 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		return parent::_prepareColumns();
 	}
 
-	public function getCount() {
-		return $this->getCollection()->getSize();
-	}
-
 
 	public function getRowClass($row) {
 		return '';
@@ -148,7 +144,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ?
 			'success' : 'error'; // il y avait Upgrade avant 3.4.2
-		$text = ($status === 'success') ? $this->helper('versioning')->_('Success') : $this->__('Error');
+		$text = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->__('Error');
 
 		return sprintf('<span class="grid-%s">%s</span>', $status, $text);
 	}

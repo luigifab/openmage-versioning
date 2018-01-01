@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/03/08/2017
+ * Updated W/06/12/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -29,7 +29,7 @@ class Processor {
 
 
 	// #### Initialisation ########################################################## public ### //
-	// = révision : 33
+	// = révision : 35
 	// » Recherche la liste des langues disponibles en fonction des fichiers CSV (définie la langue en fonction du navigateur)
 	// » Charge les fichiers de traductions et les données de configuration
 	// » Prend en charge les fichiers utilisateur (dossier config)
@@ -44,11 +44,12 @@ class Processor {
 		// gestion des langues
 		// le premier fichier contient les traductions configurées dans le back-office
 		// le second fichier contient les traductions par défaut (n'écrase pas les valeurs du back-office)
-		$files = array_merge(scandir(ROOT.'/errors/config/'), scandir(ROOT.'/errors/locale/'));
+		$files = array_merge(scandir(ROOT.'/errors/config/'), glob(ROOT.'/app/locale/*/Luigifab_Versioning.csv'));
 		setlocale(LC_ALL, $this->searchLang($files).'utf8');
 
 		$this->loadCSV(ROOT.'/errors/config/'.$this->getData('locale').'.csv');
-		$this->loadCSV(ROOT.'/errors/locale/'.$this->getData('locale').'.csv');
+		$this->loadCSV(ROOT.'/app/locale/'.$this->getData('locale').'/Luigifab_Versioning.csv');
+		$this->loadCSV(ROOT.'/app/locale/en_US/Luigifab_Versioning.csv'); // si les fichiers de traductions sont incomplet
 
 		// chargement de la configuration
 		// remplace 0 et 1 par false et true
@@ -71,50 +72,59 @@ class Processor {
 			$this->setData('report', 123456789);
 	}
 
-	private function searchLang($files) {
+	private function searchLang($files, $result = 'en_US') {
 
-		// http://stackoverflow.com/a/33748742/2980105
 		$data = array();
 
 		foreach ($files as $file) {
-			if (strpos($file, '.csv') !== false)
-				$data[str_replace('-', '_', substr($file, 0, 5))] = substr($file, 6, -4);
+			// app/locale/en_US/Luigifab_Versioning.csv
+			if (strpos($file, 'Luigifab_Versioning.csv') !== false) {
+				$code = substr($file, strpos($file, 'locale/') + 7);
+				$code = substr($code, 0, strpos($code, '/'));
+				$data[$code] = $code;
+			}
+			// en-US.csv
+			else if ((strpos($file, '.csv') !== false) && (strpos($file, '.') !== 0)) {
+				$code = str_replace('-', '_', substr($file, 0, -4));
+				$data[$code] = $code;
+			}
 		}
 
-		$langUrl = (!empty($_GET['lang'])) ? str_replace('-', '_', $_GET['lang']) : null;
-
-		// recherche dans HTTP_ACCEPT_LANGUAGE
-		$result = 'en_US';
+		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
+		// https://stackoverflow.com/a/33748742
 		$languages = array_reduce(
 			(getenv('HTTP_ACCEPT_LANGUAGE') !== false) ? explode(',', getenv('HTTP_ACCEPT_LANGUAGE')) : array(),
-			function ($res, $el) {
-				list($l, $q) = array_merge(explode(';q=', $el), array(1));
-				$res[str_replace('-', '_', $l)] = (float) $q;
+			function ($res, $item) {
+				list($code, $q) = array_merge(explode(';q=', $item), array(1));
+				$res[str_replace('-', '_', $code)] = floatval($q);
 				return $res;
 			},
 			array()
 		);
 
 		arsort($languages);
-		$languages = array_keys($languages);  // la liste triée de HTTP_ACCEPT_LANGUAGE (xx-XX devenu xx_XX ou xx)
-		$locales = array_keys($data);         // la liste des langues autorisées (déjà en xx_XX)
-		if (!empty($langUrl)) {               // ajoute la langue présente dans l'url (déjà en xx_XX) car la langue dans l'url est prioritaire
-			if (strlen($langUrl) >= 2)
-				array_unshift($languages, substr($langUrl, 0, 2));
-			array_unshift($languages, $langUrl);
+		$languages = array_keys($languages);  // la liste triée de HTTP_ACCEPT_LANGUAGE
+		$locales   = array_keys($data);       // la liste des langues possibles
+
+		// ajoute la langue présente dans l'url en premier
+		// car elle est prioritaire
+		if (!empty($_GET['lang'])) {
+			$code = str_replace('-', '_', $_GET['lang']);
+			array_unshift($languages, substr($code, 0, strpos($code, '_')));
+			array_unshift($languages, $code);
 		}
 
 		// la bonne trouvaille
 		foreach ($languages as $language) {
 
-			if (strlen($language) === 2) {
+			if (strpos($language, '_') === false) {
 				// par exemple es devient es_ES
 				// de manière à prioriser es_ES au lieu d'utiliser es_AR
 				if (in_array($language.'_'.strtoupper($language), $locales)) {
 					$result = $language.'_'.strtoupper($language);
 					break;
 				}
-				// par exemple es est cherché dans la liste des langues autorisées
+				// par exemple es
 				foreach ($locales as $locale) {
 					if (stripos($locale, $language) === 0) {
 						$result = $locale;
@@ -122,8 +132,8 @@ class Processor {
 					}
 				}
 			}
-			else if (strlen($language) === 5) {
-				// par exemple es_ES
+			else {
+				// par exemple es_ES ou fil_PH
 				if (in_array($language, $locales)) {
 					$result = $language;
 					break;
@@ -172,7 +182,7 @@ class Processor {
 		$base = substr($base, 0, strrpos($base, '/'));                         // /sites/14/web/errors           /sites/14/web
 		$base = (strpos($base, 'errors') === false) ? $base.'/errors' : $base; // /sites/14/web/errors           /sites/14/web/errors
 
-		if ($file === 'favicon.ico')
+		if ($file == 'favicon.ico')
 			return substr($base, 0, strrpos($base, '/')).'/favicon.ico';
 		else if (strpos($file, '/config/') === false)
 			return (is_file(ROOT.'/errors/config/'.$file)) ? $base.'/config/'.$file : $base.'/'.$file;
@@ -182,13 +192,18 @@ class Processor {
 
 
 	// #### Génération de la page ################################################### public ### //
-	// = révision : 5
+	// = révision : 6
 	// » Définie les entêtes (404/503) de la page et génère la code HTML final
 	// » Prend en charge les fichiers utilisateur (dossier config)
 	public function renderPage($code) {
 
-		header(($code === 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
+		header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
 		header('Cache-Control: no-cache, must-revalidate');
+		header('Expires: Tue, 07 Nov 1989 20:30:00 GMT'); //echo gmdate('D, d M Y H:i:s', 626472000);
+		header('X-UA-Compatible: IE=edge');
+		header('X-XSS-Protection: 1; mode=block');
+		header('X-Content-Type-Options: nosniff');
+		header('X-Frame-Options: DENY');
 
 		ob_start();
 		require_once((is_file(ROOT.'/errors/config/page.phtml')) ? ROOT.'/errors/config/page.phtml' : ROOT.'/errors/page.phtml');
@@ -200,7 +215,7 @@ class Processor {
 
 
 	// #### Gestion du rapport d'erreur ############################################# public ### //
-	// = révision : 16
+	// = révision : 17
 	// » Enregistre le rapport d'erreur dans le dossier var/report (fait un peu comme Magento à la base)
 	// » Envoi ce rapport par email au format HTML si la configuration le permet
 	public function saveReport($data) {
@@ -228,8 +243,9 @@ class Processor {
 
 			$to      = implode(', ', $email);
 			$subject = 'Fatal error #'.$id;
-			$message = '<pre style="font-size:0.85em; white-space:pre-wrap;"><strong>'.$data[0]."</strong>\n".$data['url']."\n\n".$data[1].'</pre>';
-			$headers = 'Content-type: text/html; charset=utf-8'."\r\n".'From: root'.substr($email[0], strrpos($email[0], '@'));
+			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.substr($email[0], strrpos($email[0], '@'));
+			$message = '<pre style="font-size:0.85em; white-space:pre-wrap;"><strong>'.$data[0]."</strong>\n".
+				$data['url']."\n\n".$data[1].'</pre>';
 
 			mail($to, $subject, $message, $headers);
 		}
@@ -257,10 +273,9 @@ class Processor {
 
 
 	// #### Chargement d'un fichier de traduction ################################## private ### //
-	// = révision : 19
-	// » Récupère le contenu du fichier de traduction et le sauvegarde dans deux tableaux
+	// = révision : 21
+	// » Récupère le contenu du fichier de traduction et le sauvegarde dans trois tableaux
 	// » Le premier tableau contient le nom du fichier, le second le mot anglais et le troisième la traduction
-	// » Prend soin de vérifier si le fichier existe avant de faire n'importe quoi
 	private function loadCSV($file) {
 
 		if (is_file($file) && is_readable($file)) {
@@ -268,7 +283,7 @@ class Processor {
 			$ressource = fopen($file, 'r');
 			$file = basename($file);
 
-			while (($line = fgetcsv($ressource, 5000, ',', '`')) !== false) {
+			while (($line = fgetcsv($ressource, 5000, ',', '"')) !== false) {
 
 				if (!empty($line[0]) && !empty($line[1])) {
 					array_push($this->dataFile, $file);

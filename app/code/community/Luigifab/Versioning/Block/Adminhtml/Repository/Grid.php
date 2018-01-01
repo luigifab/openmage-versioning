@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/16/07/2017
+ * Updated S/11/11/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -119,10 +119,6 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		return parent::_prepareColumns();
 	}
 
-	public function getCount() {
-		return $this->getCollection()->getSize();
-	}
-
 
 	public function getRowClass($row) {
 		return '';
@@ -132,8 +128,16 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		return false;
 	}
 
+	public function canDisplayContainer() {
+		return false;
+	}
+
+	public function getMessagesBlock() {
+		return Mage::getBlockSingleton('core/template');
+	}
+
 	public function decorateRevision($value, $row, $column, $isExport) {
-		return ($value === $row->getData('current_revision')) ? sprintf('<strong>%s</strong>', $value) : $value;
+		return ($value == $row->getData('current_revision')) ? sprintf('<strong>%s</strong>', $value) : $value;
 	}
 
 	public function decorateDiff($value, $row, $column, $isExport) {
@@ -167,6 +171,12 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			$this->__('Update to revision %s', '§'),
 			$this->helper('versioning')->getFields(true),
 			$this->__('Martian sunset seen by Spirit.'),
-			$this->__('Deliver'));
+			$this->__('Deliver')
+		);
+	}
+
+
+	public function _toHtml() {
+		return str_replace('class="data', 'class="data k k0', parent::_toHtml());
 	}
 }

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/29/04/2017
+ * Updated S/16/12/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -88,7 +88,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 			$data = (strpos($data, '<log') !== false) ? substr($data, 0, strpos($data, '<log')) : $data;
 			$data = '<u>Response:</u>'."\n".$data;
 
-			$config = '<u>The git/config file:</u>'."\n".htmlspecialchars(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'));
+			$config = '<u>The git/config file:</u>'."\n".
+				htmlspecialchars(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'));
 
 			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
 		}
@@ -196,13 +197,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				unset($lines[$i]);
 			else if (strpos($line, '+++ b/') === 0)
 				unset($lines[$i]);
-			else if ($line === '\\ No newline at end of file')
+			else if ($line == '\\ No newline at end of file')
 				unset($lines[$i]);
 			else if (strpos($line ,'diff --git a') === 0)                 // 13 = strlen('diff --git a/')
 				$line = "\n".'<strong>=== '.substr(htmlspecialchars($line), 13, strpos($line, ' b/') - 13).'</strong>';
-			else if ($line[0] === '+')
+			else if ($line[0] == '+')
 				$line = '<ins>'.htmlspecialchars($line).' </ins>';
-			else if ($line[0] === '-')
+			else if ($line[0] == '-')
 				$line = '<del>'.htmlspecialchars($line).' </del>';
 			else
 				$line = htmlspecialchars($line);
@@ -232,18 +233,19 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
+		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
 		foreach ($lines as &$line) {
 
 			if (strpos($line, 'A') === 0)
 				$line = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $help->__('new file:-------')), $line);
 			else if (strpos($line, 'C') === 0)
-				$line = str_replace('C'."\t", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
+				$line = preg_replace("#C[0-9]*\t#", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
 			else if (strpos($line, 'D') === 0)
 				$line = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $help->__('deleted:--------')), $line);
 			else if (strpos($line, 'M') === 0)
 				$line = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
 			else if (strpos($line, 'R') === 0)
-				$line = str_replace('R'."\t", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
+				$line = preg_replace("#R[0-9]*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
 			else if (strpos($line, 'T') === 0)
 				$line = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $help->__('type changed:---')), $line);
 			else if (strpos($line, 'U') === 0)
@@ -254,7 +256,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
 				$line = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
 		}
 
-		return '<span>'.$command.'</span>'."\n".$help->__('For the current diff')."\n\n".str_replace("\t", '    ', implode("\n", $lines));
+		return '<span>'.$command.'</span>'."\n".$help->__('For the current diff')."\n\n".
+			str_replace("\t", '    ', htmlspecialchars(implode("\n", $lines)));
 	}
 
 	public function getCurrentStatus() {

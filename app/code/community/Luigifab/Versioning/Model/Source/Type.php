@@ -1,9 +1,9 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated M/28/02/2017
+ * Updated W/11/10/2017
  *
- * Copyright 2011-2017 | Fabrice Creuzot (luigifab) <code~luigifab~info>
+ * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -17,21 +17,19 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_Source_Type extends Luigifab_Versioning_Helper_Data {
+class Luigifab_Versioning_Model_Source_Type {
 
 	public function toOptionArray() {
 
-		$models = $this->searchFiles(BP.'/app/code/community/Luigifab/Versioning/Model/Scm');
+		$help    = Mage::helper('versioning');
+		$models  = $this->searchFiles(Mage::getModuleDir('', 'Luigifab_Versioning').'/Model/Scm');
 		$options = array();
 
 		foreach ($models as $model) {
-
 			$model = Mage::getSingleton($model);
-
 			$label = ($model->isSoftwareInstalled()) ?
-				$this->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :
-				$this->__('%s (not available)', strtoupper($model->getType()));
-
+				$help->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :
+				$help->__('%s (not available)', strtoupper($model->getType()));
 			$options[strtolower($model->getType())] = array('value' => strtolower($model->getType()), 'label' => $label);
 		}
 
