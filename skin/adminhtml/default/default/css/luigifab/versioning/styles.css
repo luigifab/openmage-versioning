@@ -1,5 +1,5 @@
 /**
- * Created J/22/12/2011, Updated D/10/12/2017
+ * Created J/22/12/2011, Updated S/06/01/2018
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
@@ -39,7 +39,7 @@ body.adminhtml-versioning-repository-status pre del { display:inline-block; widt
 body.adminhtml-versioning-repository-status pre strong { display:inline-block; width:100%; }
 
 body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repository-history pre {
-	margin-bottom:1em; padding:0.8em 1em 1em; overflow:hidden;
+	margin-bottom:1em; padding:0.8em 1em 1em; min-height:20em; overflow:hidden;
 	font:11px monospace; line-height:16px; white-space:pre-wrap;
 	color:#666; border:1px solid #DADFE0; background-color:#F6F6F6;
 }
@@ -50,9 +50,10 @@ body.adminhtml-versioning-repository-status pre span.help strong { display:inlin
 
 body.adminhtml-versioning-repository-history pre { height:20em; margin-bottom:2em; overflow:auto; }
 body.adminhtml-versioning-repository-history table.data tr.headings th.no-link { padding:3px 4px; text-align:center; }
-body.adminhtml-versioning-repository-history table.data tr.current { background-color:#DEDEDE; }
+body.adminhtml-versioning-repository-history table.data tr.current { font-weight:700; }
 body.adminhtml-versioning-repository-history table.data tr.current button { display:none; }
 body.adminhtml-versioning-repository-history table.data td:not([class*="a-"]) { padding:0 !important; }
+body.adminhtml-versioning-repository-history table.data strong { color:red; }
 
 body.adminhtml-versioning-repository-history table.data td.a-status span {
 	display:block; height:17px; line-height:18px; text-align:center;

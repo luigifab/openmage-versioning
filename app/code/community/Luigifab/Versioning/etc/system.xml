@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/30/09/2017
+ * Updated S/06/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -75,7 +75,7 @@
 							<show_in_store>0</show_in_store>
 						</options>
 						<number translate="label">
-							<label>Number of commits per page</label>
+							<label>Number of revisions per page</label>
 							<frontend_type>select</frontend_type>
 							<source_model>versioning/source_number</source_model>
 							<sort_order>11</sort_order>

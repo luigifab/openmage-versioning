@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/10/12/2017
+ * Updated S/06/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -26,8 +26,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
 		$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
-			$this->__('Commits history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
-			$this->__('Commits history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
+			$this->__('Revisions history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
+			$this->__('Revisions history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
 		$this->_removeButton('add');
 
