@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/11/11/2017
+ * Updated V/19/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -40,7 +40,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		if ($element->getHtmlId() == 'versioning_downtime_report')
 			$url = str_replace('?lang', '?demo=1&amp;lang', $url);
 
-		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s" onclick="window.open(this.href); return false;">%s</a></h4></td></tr>', $element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s">%s</a></h4></td></tr>', $element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
 	}
 
 	private function getStoreId() {

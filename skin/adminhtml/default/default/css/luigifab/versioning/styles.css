@@ -1,5 +1,5 @@
 /**
- * Created J/22/12/2011, Updated S/06/01/2018
+ * Created J/22/12/2011, Updated V/19/01/2018
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
@@ -161,7 +161,6 @@ body.adminhtml-versioning-repository-index #apijsDialog {
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
 #config_edit_form[action*="system_config/save/section/versioning"] { padding-top:0; }
-#config_edit_form[action*="system_config/save/section/versioning"] fieldset a[onclick]:before { content:"[↗]\0000A0"; font-size:0.85em; }
 #config_edit_form[action*="system_config/save/section/versioning"] fieldset > .comment { padding:5px; line-height:130%; color:red; }
 #config_edit_form[action*="system_config/save/section/versioning"] h4 a { float:right; font-size:12px; text-decoration:none; }
 

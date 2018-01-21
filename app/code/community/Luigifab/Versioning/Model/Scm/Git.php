@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/16/12/2017
+ * Updated J/18/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -17,7 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_Scm_Git extends Mage_Core_Model_Abstract {
+class Luigifab_Versioning_Model_Scm_Git {
 
 	private $version = null;
 	private $revision = null;

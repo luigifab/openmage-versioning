@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated S/18/11/2017
+ * Updated J/18/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -17,13 +17,9 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data {
+class Luigifab_Versioning_Model_Upgrade {
 
-	// attention, ceci est un singleton
-	// comme chaque model dans Scm
-	private $event = false;
-
-
+	// attention, ceci est un singleton comme chaque model dans Scm
 	// met fin aux temporisations de sortie activés par Magento
 	// est incapable de mettre fin à la temporisation de zlib.output_compression
 	// n'utilise surtout pas le fichier versioning.log pour Mage::log
@@ -55,8 +51,9 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 	public function process($targetRevision, $useFlag) {
 
 		$repository = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
-		$lock = $this->getLock();
-		$log = $this->getLastLog();
+		$help = Mage::helper('versioning');
+		$lock = $help->getLock();
+		$log  = $help->getLastLog();
 
 		try {
 			// données de l'historique
@@ -73,7 +70,7 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			);
 
 			// ÉTAPE 1
-			$this->writeTitle($this->__('1) Locking and configuration check'));
+			$this->writeTitle($help->__('1) Locking and configuration check'));
 
 			if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning/upgrade') !== true)
 				throw new Exception('Not authorized');
@@ -85,15 +82,15 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 				unlink($log);
 
 			if (!empty($H['branch']))
-				$this->writeNotice($this->__('Repository: %s / Branch: %s / Current revision: %s / Requested revision: %s',
+				$this->writeNotice($help->__('Repository: %s / Branch: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['branch'], $H['current_rev'], $targetRevision));
 			else
-				$this->writeNotice($this->__('Repository: %s / Current revision: %s / Requested revision: %s',
+				$this->writeNotice($help->__('Repository: %s / Current revision: %s / Requested revision: %s',
 					$repository->getType(), $H['current_rev'], $targetRevision));
 
 			file_put_contents($lock, $H['current_rev'].'/'.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
 			if ($useFlag)
-				file_put_contents($this->getUpgradeFlag(), file_get_contents($lock));
+				file_put_contents($help->getUpgradeFlag(), file_get_contents($lock));
 
 			// ÉTAPE 2 et 3
 			// avec les événements before et after
@@ -101,18 +98,18 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 			Mage::dispatchEvent('admin_versioning_upgrade_before',
 				array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
 
-			$this->writeTitle($this->__('2) Updating'));
+			$this->writeTitle($help->__('2) Updating'), true);
 			$repository->upgradeToRevision($this, $log, $targetRevision);
 
 			$this->writeEvent('admin_versioning_upgrade_after...');
 			Mage::dispatchEvent('admin_versioning_upgrade_after',
 				array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
 
-			$this->writeTitle($this->__('3) Cache'));
+			$this->writeTitle($help->__('3) Cache'), true);
 			$this->clearAllCache();
 
 			// ÉTAPE 4
-			$this->writeTitle($this->__('4) Unlocking'));
+			$this->writeTitle($help->__('4) Unlocking'));
 			unlink($lock);
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
@@ -120,11 +117,11 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 
 			$result = array(
 				'url'   => '*/versioning_repository/index',
-				'title' => $this->__('Update completed (revision %s)', $targetRevision),
+				'title' => $help->__('Update completed (revision %s)', $targetRevision),
 				'error' => false
 			);
 
-			Mage::getSingleton('adminhtml/session')->addSuccess($this->__('Update to revision %s completed.', $targetRevision));
+			Mage::getSingleton('adminhtml/session')->addSuccess($help->__('Update to revision %s completed.', $targetRevision));
 		}
 		catch (Exception $e) {
 
@@ -146,53 +143,46 @@ class Luigifab_Versioning_Model_Upgrade extends Luigifab_Versioning_Helper_Data 
 				Mage::dispatchEvent('admin_versioning_upgrade_after',
 					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e));
 
-				$this->writeTitle($this->__('4) Unlocking'));
+				$this->writeTitle($help->__('4) Unlocking'), true);
 				if (is_file($lock))
 					unlink($lock);
 
 				$result = array(
 					'url'   => '*/versioning_repository/history',
-					'title' => $this->__('Update error (revision %s)', $targetRevision),
+					'title' => $help->__('Update error (revision %s)', $targetRevision),
 					'error' => true
 				);
 			}
 			else {
 				if (in_array($e->getMessage(), array('An update is in progress'))) {
-					$this->writeError($this->__('Stop! Stop! Stop! An update is in progress.'));
-					Mage::getSingleton('adminhtml/session')->addError($this->__('Please wait, an update is in progress.'));
+					$this->writeError($help->__('Stop! Stop! Stop! An update is in progress.'));
+					Mage::getSingleton('adminhtml/session')->addError($help->__('Please wait, an update is in progress.'));
 				}
 				else {
-					$this->writeError($this->__('You are not authorized to perform this operation.'));
-					Mage::getSingleton('adminhtml/session')->addError($this->__('You are not authorized to perform this operation.'));
+					$this->writeError($help->__('You are not authorized to perform this operation.'));
+					Mage::getSingleton('adminhtml/session')->addError($help->__('You are not authorized to perform this operation.'));
 				}
 
 				$result = array(
 					'url'   => '*/versioning_repository/index',
-					'title' => $this->__('Update error (revision %s)', $targetRevision),
+					'title' => $help->__('Update error (revision %s)', $targetRevision),
 					'error' => true
 				);
 			}
 		}
 
-		file_put_contents($this->getHistoryLog(), '`'.implode('`,`', $H).'`'."\n", FILE_APPEND | LOCK_EX);
+		file_put_contents($help->getHistoryLog(), '`'.implode('`,`', $H).'`'."\n", FILE_APPEND | LOCK_EX);
 		return $result;
 	}
 
 
 	// affiche une commande ou une information pour savoir ce qu'il se passe
 	// ajoute un peu de code HTML pour faire plus jolie
-	private function writeTitle($data) {
-		if ($this->event) {
-			echo '</span>',"\n",$data,"\n";
-			$this->event = false;
-		}
-		else {
-			echo "\n",$data,"\n";
-		}
+	private function writeTitle($data, $endEvent = false) {
+		echo ($endEvent) ? '</span>'."\n".$data."\n" : "\n".$data."\n";
 	}
 
 	private function writeEvent($data) {
-		$this->event = true;
 		echo '<span class="event">',$data,"\n";
 	}
 

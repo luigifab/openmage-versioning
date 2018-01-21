@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated S/28/10/2017
+ * Updated V/19/01/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -22,7 +22,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
 		return sprintf(
-			'<p class="box">Luigifab/Versioning %s <a href="https://www.%s" onclick="window.open(this.href); return false;" style="float:right;">%2$s</a></p>',
+			'<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>',
 			$this->helper('versioning')->getVersion(),
 			'luigifab.info/magento/versioning'
 		);
