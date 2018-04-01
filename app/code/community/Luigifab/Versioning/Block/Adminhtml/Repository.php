@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/06/01/2018
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -62,7 +62,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		else {
 			$this->_addButton('maintenance_flag', array(
 				'label'   => $this->__('Enable the maintenance page'),
-				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo()."');"
 			));
 		}
 
@@ -76,38 +76,40 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		else {
 			$this->_addButton('upgrade_flag', array(
 				'label'   => $this->__('Enable the update page'),
-				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo(true)."', '".$this->__('Martian sunset seen by Spirit.')."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo()."');"
 			));
 		}
 	}
 
 	public function getGridHtml() {
 
-		$commits = Mage::registry('versioning')->getCommitCollection();
-		$count = count($commits) - 1;
-		$cols = 0;
-		$hash = '';
+		$commits = Mage::registry('versioning')->getCommitsCollection();
+		$columns = $commits->getColumnValues('column'); sort($columns);
+		$total   = count($commits) - 1;
+		$hash    = '';
 
 		// comptage dans l'ordre inverse
 		// le commit le plus récent = count($commits) - 1
 		// le commit le plus ancien = 0
 		foreach ($commits as $commit) {
-
 			$hash .= "\n";
 			$hash .= '"'.$commit->getData('revision').'": {';
 			$hash .=  '"revision": "'.$commit->getData('revision').'",';
 			$hash .=  '"parents": ["'.implode('","', $commit->getData('parents')).'"],';
 			$hash .=  '"branch": "'.$commit->getData('branch').'",';
 			$hash .=  '"col": '.$commit->getData('column').',';
-			$hash .=  '"row": '.$count--;
+			$hash .=  '"row": '.$total--;
 			$hash .= '},';
-
-			$cols = ($commit->getData('column') > $cols) ? $commit->getData('column') : $cols;
 		}
 
 		return $this->getChildHtml('grid')."\n".
 			'<script type="text/javascript">'."\n".
-			'var versioningIds = {'.substr($hash, 0, -1).'}, versioningCols = '.$cols.';'."\n".
+			'window.versioningIds = {'.substr($hash, 0, -1).'};'."\n".
+			'window.versioningCols = '.array_pop($columns).';'."\n".
+			'window.versioningConfirm = ['."\n".
+				'"'.$this->helper('versioning')->getFields().'", '."\n".
+				'"'.$this->__('Martian sunset seen by Spirit.').'" '."\n".
+			'];'."\n".
 			'</script>';
 	}
 

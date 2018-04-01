@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated J/07/12/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -48,7 +48,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Current revision'),
 			'index'    => 'from',
 			'align'    => 'center',
-			'width'    => '110px',
+			'width'    => '130px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -57,7 +57,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'header'   => $this->__('Requested revision'),
 			'index'    => 'to',
 			'align'    => 'center',
-			'width'    => '110px',
+			'width'    => '130px',
 			'sortable' => false,
 			'filter'   => false
 		));
@@ -111,7 +111,6 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		$this->addColumn('status', array(
 			'header'    => $this->__('Status'),
 			'index'     => 'status',
-			'align'     => 'status',
 			'width'     => '125px',
 			'filter'    => false,
 			'sortable'  => false,
@@ -140,37 +139,21 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		return false;
 	}
 
+
 	public function decorateStatus($value, $row, $column, $isExport) {
 
-		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ?
-			'success' : 'error'; // il y avait Upgrade avant 3.4.2
-		$text = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->__('Error');
+		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ? 'success' : 'error';
+		$text   = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->helper('versioning')->_('Error');
 
-		return sprintf('<span class="grid-%s">%s</span>', $status, $text);
+		return sprintf('<span class="versioning-status grid-%s">%s</span>', $status, $text);
 	}
 
 	public function decorateDuration($value, $row, $column, $isExport) {
-
-		$data = $row->getData('duration');
-		$minutes = intval($data / 60);
-		$seconds = intval($data % 60);
-
-		if ($data > 599)
-			$data = '<strong>'.(($seconds > 9) ? $minutes.':'.$seconds : $minutes.':0'.$seconds).'</strong>';
-		else if ($data > 59)
-			$data = '<strong>'.(($seconds > 9) ? '0'.$minutes.':'.$seconds : '0'.$minutes.':0'.$seconds).'</strong>';
-		else if ($data > 1)
-			$data = ($seconds > 9) ? '00:'.$data : '00:0'.$data;
-		else
-			$data = '⩽ 1';
-
-		return $data;
+		return $this->helper('versioning')->getHumanDuration($row);
 	}
 
 	public function decorateLink($value, $row, $column, $isExport) {
-
 		return sprintf('<button type="button" onclick="versioning.history(this, \'%s\');">%s</button>',
-			addslashes(base64_encode($row->getData('details'))),
-			$this->__('View'));
+			addslashes(base64_encode($row->getData('details'))), $this->__('View'));
 	}
 }

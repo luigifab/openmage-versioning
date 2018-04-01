@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated W/06/12/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -29,7 +29,7 @@ class Processor {
 
 
 	// #### Initialisation ########################################################## public ### //
-	// = révision : 35
+	// = révision : 37
 	// » Recherche la liste des langues disponibles en fonction des fichiers CSV (définie la langue en fonction du navigateur)
 	// » Charge les fichiers de traductions et les données de configuration
 	// » Prend en charge les fichiers utilisateur (dossier config)
@@ -37,19 +37,22 @@ class Processor {
 
 		$this->setData('type', $type);
 
-		// vérification du répertoire
 		if (!is_dir(ROOT.'/errors/config/'))
 			mkdir(ROOT.'/errors/config/', 0755);
 
 		// gestion des langues
+		$files  = array_merge(scandir(ROOT.'/errors/config/'), glob(ROOT.'/app/locale/*/Luigifab_Versioning.csv'));
+		$result = $this->searchLang($files);
+
+		setlocale(LC_ALL, $result.'utf8');
+		$this->setData('locale', $result);
+
 		// le premier fichier contient les traductions configurées dans le back-office
 		// le second fichier contient les traductions par défaut (n'écrase pas les valeurs du back-office)
-		$files = array_merge(scandir(ROOT.'/errors/config/'), glob(ROOT.'/app/locale/*/Luigifab_Versioning.csv'));
-		setlocale(LC_ALL, $this->searchLang($files).'utf8');
-
+		// le troisième fichier sert si les fichiers précédents sont incomplets
 		$this->loadCSV(ROOT.'/errors/config/'.$this->getData('locale').'.csv');
 		$this->loadCSV(ROOT.'/app/locale/'.$this->getData('locale').'/Luigifab_Versioning.csv');
-		$this->loadCSV(ROOT.'/app/locale/en_US/Luigifab_Versioning.csv'); // si les fichiers de traductions sont incomplet
+		$this->loadCSV(ROOT.'/app/locale/en_US/Luigifab_Versioning.csv');
 
 		// chargement de la configuration
 		// remplace 0 et 1 par false et true
@@ -103,8 +106,8 @@ class Processor {
 		);
 
 		arsort($languages);
-		$languages = array_keys($languages);  // la liste triée de HTTP_ACCEPT_LANGUAGE
-		$locales   = array_keys($data);       // la liste des langues possibles
+		$languages = array_keys($languages); // la liste triée de HTTP_ACCEPT_LANGUAGE
+		$locales = array_keys($data);        // la liste des langues possibles
 
 		// ajoute la langue présente dans l'url en premier
 		// car elle est prioritaire
@@ -116,6 +119,9 @@ class Processor {
 
 		// la bonne trouvaille
 		foreach ($languages as $language) {
+
+			if (strlen($language) < 2)
+				continue;
 
 			if (strpos($language, '_') === false) {
 				// par exemple es devient es_ES
@@ -141,7 +147,6 @@ class Processor {
 			}
 		}
 
-		$this->setData('locale', $result);
 		return $result;
 	}
 
@@ -241,7 +246,7 @@ class Processor {
 
 		if (!empty($email)) {
 
-			$to      = implode(', ', $email);
+			$to = implode(', ', $email);
 			$subject = 'Fatal error #'.$id;
 			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.substr($email[0], strrpos($email[0], '@'));
 			$message = '<pre style="font-size:0.85em; white-space:pre-wrap;"><strong>'.$data[0]."</strong>\n".

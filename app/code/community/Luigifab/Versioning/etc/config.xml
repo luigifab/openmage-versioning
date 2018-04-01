@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated V/19/01/2018
+ * Updated D/25/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.6.2</version>
+			<version>3.6.3</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -69,7 +69,7 @@
 					</versioning_demo_addfields>
 				</observers>
 			</admin_versioning_add_fields-->
-			<!--admin_versioning_upgrade_before>  BEFORE EVENT EXAMPLE
+			<!--admin_versioning_upgrade_before>  BEFORE UPGRADE EVENT EXAMPLE
 				<observers>
 					<versioning_demo_before>
 						<class>versioning/demo</class>
@@ -77,7 +77,7 @@
 					</versioning_demo_before>
 				</observers>
 			</admin_versioning_upgrade_before-->
-			<!--admin_versioning_upgrade_after>   AFTER EVENT EXAMPLE
+			<!--admin_versioning_upgrade_after>   AFTER UPGRADE EVENT EXAMPLE
 				<observers>
 					<versioning_demo_after>
 						<class>versioning/demo</class>

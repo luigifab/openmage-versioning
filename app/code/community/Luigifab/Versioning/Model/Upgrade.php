@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/18/01/2018
+ * Updated J/22/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -19,7 +19,6 @@
 
 class Luigifab_Versioning_Model_Upgrade {
 
-	// attention, ceci est un singleton comme chaque model dans Scm
 	// met fin aux temporisations de sortie activés par Magento
 	// est incapable de mettre fin à la temporisation de zlib.output_compression
 	// n'utilise surtout pas le fichier versioning.log pour Mage::log
@@ -28,11 +27,12 @@ class Luigifab_Versioning_Model_Upgrade {
 		header('Content-Encoding: chunked', true);
 		header('Connection: Keep-Alive', true);
 
-		ini_set('max_execution_time', 450); // 7 minutes 30
+		ini_set('max_execution_time', 600);
 		ini_set('output_buffering', false);
 		ini_set('implicit_flush', true);
 		ini_set('display_errors', true);
 		ob_implicit_flush(true);
+		ignore_user_abort(true);
 
 		try {
 			for ($i = 0; $i < ob_get_level(); $i++)
@@ -62,7 +62,7 @@ class Luigifab_Versioning_Model_Upgrade {
 				'date'        => date('c'), // 0
 				'current_rev' => $repository->getCurrentRevision(), // 1
 				'target_rev'  => $targetRevision, // 2
-				'remote_addr' => getenv('REMOTE_ADDR'), // 3
+				'remote_addr' => $help->getIpAddr(), // 3
 				'user'        => Mage::getSingleton('admin/session')->getData('user')->getData('username'), // 4
 				'duration'    => microtime(true), // 5
 				'status'      => 'Upgrade in progress', // 6

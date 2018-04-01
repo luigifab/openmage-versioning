@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/11/11/2017
+ * Updated M/20/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -75,9 +75,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addUpgradeFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-			$file = Mage::helper('versioning')->getUpgradeFlag();
+			$help = Mage::helper('versioning');
+			$file = $help->getUpgradeFlag();
 			if (!is_file($file))
-				file_put_contents($file, sprintf('Flag from %s by %s', getenv('REMOTE_ADDR'), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
+				file_put_contents($file, sprintf('Flag from %s by %s', $help->getIpAddr(), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
 		}
 
 		$this->_redirect('*/*/index');
@@ -86,9 +87,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addMaintenanceFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-			$file = Mage::helper('versioning')->getMaintenanceFlag();
+			$help = Mage::helper('versioning');
+			$file = $help->getMaintenanceFlag();
 			if (!is_file($file))
-				file_put_contents($file, sprintf('Flag from %s by %s', getenv('REMOTE_ADDR'), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
+				file_put_contents($file, sprintf('Flag from %s by %s', $help->getIpAddr(), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
 		}
 
 		$this->_redirect('*/*/index');

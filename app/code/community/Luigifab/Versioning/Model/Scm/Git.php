@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/18/01/2018
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -19,9 +19,9 @@
 
 class Luigifab_Versioning_Model_Scm_Git {
 
-	private $version = null;
+	private $version  = null;
 	private $revision = null;
-	private $items = null;
+	private $items    = null;
 
 
 	// indique si le gestionnaire de version est installé
@@ -45,7 +45,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
 	// utilise GIT_SSH si le fichier de configuration existe
-	public function getCommitCollection() {
+	public function getCommitsCollection() {
 
 		if (!empty($this->items))
 			return $this->items;
@@ -122,7 +122,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 				}
 
 				if (!in_array($branch, $branchs))
-					$branchs[] = $branch;
+					array_push($branchs, $branch);
 
 				$item = new Varien_Object();
 				$item->setData('current_revision', $this->getCurrentRevision());

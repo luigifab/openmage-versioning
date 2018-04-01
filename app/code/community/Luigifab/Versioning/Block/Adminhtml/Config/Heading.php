@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated V/19/01/2018
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -17,8 +17,8 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_Abstract
-  implements Varien_Data_Form_Element_Renderer_Interface {
+use Varien_Data_Form_Element_Renderer_Interface as Varien_DFER_Interface;
+class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_Abstract implements Varien_DFER_Interface {
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
@@ -40,13 +40,14 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		if ($element->getHtmlId() == 'versioning_downtime_report')
 			$url = str_replace('?lang', '?demo=1&amp;lang', $url);
 
-		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s">%s</a></h4></td></tr>', $element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s">%s</a></h4></td></tr>',
+			$element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($lang)));
 	}
 
 	private function getStoreId() {
 
 		$website = $this->getRequest()->getParam('website');
-		$store = $this->getRequest()->getParam('store');
+		$store   = $this->getRequest()->getParam('store');
 
 		if (!empty($store))
 			$storeId = Mage::getModel('core/store')->load($store)->getId();
@@ -63,7 +64,6 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$locales = Mage::getSingleton('core/locale')->getOptionLocales();
 
 		foreach ($locales as $locale) {
-
 			if ($locale['value'] == $lang)
 				return $locale['label'];
 		}

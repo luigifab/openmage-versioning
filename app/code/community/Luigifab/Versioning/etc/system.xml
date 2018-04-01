@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/06/01/2018
+ * Updated V/23/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -28,7 +28,7 @@
 		<versioning translate="label">
 			<label>Version control</label>
 			<tab>luigifab</tab>
-			<sort_order>72</sort_order>
+			<sort_order>85</sort_order>
 			<show_in_default>1</show_in_default>
 			<show_in_website>1</show_in_website>
 			<show_in_store>1</show_in_store>

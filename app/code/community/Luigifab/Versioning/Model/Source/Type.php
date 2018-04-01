@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated W/11/10/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -45,7 +45,7 @@ class Luigifab_Versioning_Model_Source_Type {
 		while (($file = readdir($ressource)) !== false) {
 
 			if ((strpos($file, '.') !== 0) && is_file($source.'/'.$file))
-				$files[] = 'versioning/scm_'.strtolower(substr($file, 0, -4));
+				array_push($files, 'versioning/scm_'.strtolower(substr($file, 0, -4)));
 		}
 
 		closedir($ressource);

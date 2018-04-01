@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/11/05/2017
+ * Updated D/04/03/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -27,29 +27,48 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return (strpos($txt = $this->__(' '.$data, $a, $b), ' ') === 0) ? $this->__($data, $a, $b) : $txt;
 	}
 
+	public function getHumanDuration($row) {
 
-	public function getFields($grid = false) {
+		$data = $row->getData('duration');
+		$minutes = intval($data / 60);
+		$seconds = intval($data % 60);
+
+		if ($data > 599)
+			$data = ($seconds > 9) ? $minutes.':'.$seconds : $minutes.':0'.$seconds;
+		else if ($data > 59)
+			$data = ($seconds > 9) ? '0'.$minutes.':'.$seconds : '0'.$minutes.':0'.$seconds;
+		else if ($data > 1)
+			$data = ($seconds > 9) ? '00:'.$data : '00:0'.$data;
+		else
+			$data = '⩽ 1';
+
+		return $data;
+	}
+
+
+	public function getFields() {
 
 		$fields = new ArrayObject();
 		$fields->append('<label><input type="checkbox" name="use_flag" value="1" /> '.$this->__('Use update page').'</label>');
 
 		Mage::dispatchEvent('admin_versioning_add_fields', array('fields' => $fields));
 
-		$html = '<p>'.$this->__('Are you sure you want to launch the update process?<br />Be careful, you can\'t cancel this operation.').'</p><ul><li>'.implode('</li><li>', $fields->getArrayCopy()).'</li></ul>';
+		$html = $this->__('Are you sure you want to launch the update process?<br />Be careful, you can\'t cancel this operation.');
+		$html = '<p>'.$html.'</p><ul><li>'.implode('</li><li>', $fields->getArrayCopy()).'</li></ul>';
 
-		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
+		return base64_encode(str_replace(array('<','>'), array('[',']'), $html));
 	}
 
-	public function getMaintenanceInfo($grid = false) {
+	public function getMaintenanceInfo() {
 
-		$file = BP.'/errors/config/error503.ip';
-		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$file   = BP.'/errors/config/error503.ip';
+		$byip   = (is_file($file) && (strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
 		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/error503_byip')));
 
-		$html = array();
+		$html   = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the maintenance page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', getenv('REMOTE_ADDR'));
+		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr());
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
@@ -59,19 +78,19 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 			$html[] = '<br />'.$this->__('<strong>You will not have</strong> access to the frontend.').'</p>';
 
 		$html = implode("\n", $html);
-		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
+		return base64_encode(str_replace(array('<','>'), array('[',']'), $html));
 	}
 
-	public function getUpgradeInfo($grid = false) {
+	public function getUpgradeInfo() {
 
-		$file = BP.'/errors/config/upgrade.ip';
-		$byip = (is_file($file) && (strpos(file_get_contents($file), '-'.getenv('REMOTE_ADDR').'-') !== false));
+		$file   = BP.'/errors/config/upgrade.ip';
+		$byip   = (is_file($file) && (strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
 		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/upgrade_byip')));
 
-		$html = array();
+		$html   = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the update page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', getenv('REMOTE_ADDR'));
+		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr());
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
@@ -81,7 +100,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 			$html[] = '<br />'.$this->__('<strong>You will not have</strong> access to the frontend.').'</p>';
 
 		$html = implode("\n", $html);
-		return ($grid) ? base64_encode(str_replace(array('<','>'), array('[',']'), $html)) : $html;
+		return base64_encode(str_replace(array('<','>'), array('[',']'), $html));
 	}
 
 
@@ -106,13 +125,21 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 
+	public function getIpAddr() {
+
+		$ip = (!empty(getenv('HTTP_X_FORWARDED_FOR'))) ? explode(',', getenv('HTTP_X_FORWARDED_FOR')) : false;
+		$ip = (!empty($ip)) ? array_pop($ip) : getenv('REMOTE_ADDR');
+		$ip = (preg_match('#^::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
+
+		return $ip;
+	}
+
 	public function getCssJsHtml() {
 
 		$head = Mage::getBlockSingleton('adminhtml/page_head');
 		$head->addItem('skin_css', 'css/luigifab/versioning/styles.min.css');    // évite que _data['items'] soit inexistant
 		$head->removeItem('skin_css', 'css/luigifab/versioning/styles.min.css'); // sur le foreach du getCssJsHtml
 
-		$data = trim($head->getCssJsHtml());
-		return (strlen($data) > 10) ? $data : null;
+		return (strlen($data = trim($head->getCssJsHtml())) > 10) ? $data : null;
 	}
 }

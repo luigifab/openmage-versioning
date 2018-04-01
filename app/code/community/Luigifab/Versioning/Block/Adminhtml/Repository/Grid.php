@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/19/01/2018
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -34,7 +34,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	protected function _prepareCollection() {
-		$this->setCollection(Mage::registry('versioning')->getCommitCollection());
+		$this->setCollection(Mage::registry('versioning')->getCommitsCollection());
 		return parent::_prepareCollection();
 	}
 
@@ -99,15 +99,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		));
 
 		$this->addColumn('action', array(
-			'type'    => 'action',
-			'getter'  => 'getRevision',
-			'actions' => array(
-				array(
-					'caption' => $this->__('Deliver'),
-					'url'     => array('base' => '*/*/upgrade'),
-					'field'   => 'revision'
-				)
-			),
+			'type'      => 'action',
 			'align'     => 'center',
 			'width'     => '85px',
 			'filter'    => false,
@@ -136,26 +128,26 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		return Mage::getBlockSingleton('core/template');
 	}
 
+
 	public function decorateRevision($value, $row, $column, $isExport) {
 		return ($value == $row->getData('current_revision')) ? sprintf('<strong>%s</strong>', $value) : $value;
 	}
 
 	public function decorateDiff($value, $row, $column, $isExport) {
-		return sprintf('<input type="radio" name="diff1" value="%s" /> <input type="radio" name="diff2" value="%1$s" />',
-			$row->getData('revision'));
+		return sprintf('<input type="radio" name="d1" value="%s" /> <input type="radio" name="d2" value="%1$s" />', $row->getData('revision'));
 	}
 
 	public function decorateDescription($value, $row, $column, $isExport) {
 
-		$bugtracker = Mage::getStoreConfig('versioning/scm/bugtracker');
+		$bugtracker  = Mage::getStoreConfig('versioning/scm/bugtracker');
 		$description = nl2br($row->getData('description'));
 
 		if (!empty($bugtracker)) {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1">$1</a>', $description);
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
 			$description = preg_replace('#\#([0-9]+)#', '<a href="'.$bugtracker.'$1" class="issue">$1</a>', $description);
 		}
 		else {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1">$1</a>', $description);
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
 		}
 
 		return $description;
@@ -163,16 +155,10 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 	public function decorateLink($value, $row, $column, $isExport) {
 
-		$link = array();
-		preg_match('#href="([^"]+)"#', $value, $link);
+		$url = $this->getUrl('*/*/upgrade', array('revision' => $row->getData('revision')));
 
-		return sprintf('<button type="button" onclick="versioning.confirmUpgrade(\'%s\', \'%s\', \'%s\', \'%s\');">%s</button>',
-			array_pop($link),
-			$this->__('Update to revision %s', '§'),
-			$this->helper('versioning')->getFields(true),
-			$this->__('Martian sunset seen by Spirit.'),
-			$this->__('Deliver')
-		);
+		return sprintf('<button type="button" onclick="versioning.confirmUpgrade(\'%s\', \'%s\');">%s</button>',
+			$url, $this->__('Update to revision %s', '§'), $this->__('Deliver'));
 	}
 
 

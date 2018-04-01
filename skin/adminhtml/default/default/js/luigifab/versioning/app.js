@@ -1,5 +1,5 @@
 /**
- * Created J/22/12/2011, Updated J/07/12/2017
+ * Created J/22/12/2011, Updated L/26/02/2018
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
@@ -7,8 +7,8 @@
  * it under the terms of the GNU General Public License (GPL).
  */
 
-// dépend de Prototype/Raphaël/Translator, et de versioningIds/versioningCols dans Repository.php
-// totalement testé sur Firefox 27/45, Chrome 29/63, Opera 49, IE 11, Edge 14
+// dépend de Prototype/Raphaël/Translator, et de window.versioningIds/versioningCols/versioningConfirm dans Repository.php
+// totalement testé sur Firefox 27/45, Chrome 29/65, Opera 51, IE 11, Edge 14
 var versioning = {
 
 	svg: null,
@@ -29,8 +29,8 @@ var versioning = {
 			if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
 				document.querySelector('table.data tbody button').click();
 
-			if (document.getElementById('versioning_grid_table') && (typeof versioningIds !== 'undefined')) {
-				versioning.drawGraph(versioningIds, versioningCols);
+			if (document.getElementById('versioning_grid_table') && (typeof window.versioningIds === 'object')) {
+				versioning.drawGraph(window.versioningIds, window.versioningCols);
 				versioning.initDiff();
 			}
 		}
@@ -44,10 +44,10 @@ var versioning = {
 
 
 	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 21
+	// = révision : 22
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
-	confirmFlag: function (url, title, content, credits) {
+	confirmFlag: function (url, title, content) {
 
 		try {
 			// avec l'apijs
@@ -66,7 +66,7 @@ var versioning = {
 
 			var elem = document.createElement('p');
 			elem.setAttribute('class', 'credits');
-			elem.appendChild(document.createTextNode(credits));
+			elem.appendChild(document.createTextNode(window.versioningConfirm[1]));
 			apijs.dialog.t1.appendChild(elem);
 		}
 		catch (e) {
@@ -106,12 +106,13 @@ var versioning = {
 
 
 	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 41
+	// = révision : 42
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
-	confirmUpgrade: function (url, title, content, credits) {
+	confirmUpgrade: function (url, title) {
 
 		try {
+			var content = window.versioningConfirm[0], credits = window.versioningConfirm[1];
 			// avec l'apijs
 			// utilise une jolie boîte de dialogue
 			if (apijs.version < 530)
@@ -479,7 +480,7 @@ var versioning = {
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 11
+	// = révision : 12
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
 	initDiff: function () {
@@ -491,20 +492,20 @@ var versioning = {
 			bis = !bis;
 		}
 
-		document.querySelector('table.data tr:last-child input[name="diff1"]').setAttribute('disabled', 'disabled');
-		document.querySelector('table.data tr:first-child input[name="diff2"]').setAttribute('disabled', 'disabled');
-		document.querySelector('table.data input[name="diff1"]:not([disabled])').checked = true;
-		document.querySelector('table.data input[name="diff2"]:not([disabled])').checked = true;
+		document.querySelector('table.data tr:last-child input[name="d1"]').setAttribute('disabled', 'disabled');
+		document.querySelector('table.data tr:first-child input[name="d2"]').setAttribute('disabled', 'disabled');
+		document.querySelector('table.data input[name="d1"]:not([disabled])').checked = true;
+		document.querySelector('table.data input[name="d2"]:not([disabled])').checked = true;
 
 		this.goDiff();
 	},
 
 	goDiff: function (url, two) {
 
-		var diff1 = document.querySelector('table.data input[name="diff1"]:checked'),
-		    diff2 = document.querySelector('table.data input[name="diff2"]:checked'),
-		    pos1 = parseInt(diff1.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
-		    pos2 = parseInt(diff2.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
+		var d1 = document.querySelector('table.data input[name="d1"]:checked'),
+		    d2 = document.querySelector('table.data input[name="d2"]:checked'),
+		    pos1 = parseInt(d1.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
+		    pos2 = parseInt(d2.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
 		    onclick;
 
 		if (typeof url === 'string') {
@@ -514,20 +515,20 @@ var versioning = {
 		else {
 			if (two === true) {
 				if (pos1 >= pos2) {
-					diff1 = diff2.parentNode.parentNode.previousElementSibling.querySelector('input[name="diff1"]');
-					diff1.checked = true;
+					d1 = d2.parentNode.parentNode.previousElementSibling.querySelector('input[name="d1"]');
+					d1.checked = true;
 				}
 			}
 			else {
 				if (pos1 >= pos2) {
-					diff2 = diff1.parentNode.parentNode.nextElementSibling.querySelector('input[name="diff2"]');
-					diff2.checked = true;
+					d2 = d1.parentNode.parentNode.nextElementSibling.querySelector('input[name="d2"]');
+					d2.checked = true;
 				}
 			}
 
 			onclick = document.querySelector('div.content-header td.form-buttons button').getAttribute('onclick');
-			onclick = onclick.replace(/from\/[^\/]+/, 'from/' + diff2.value);
-			onclick = onclick.replace(/to\/[^\/]+/, 'to/' + diff1.value);
+			onclick = onclick.replace(/from\/[^\/]+/, 'from/' + d2.value);
+			onclick = onclick.replace(/to\/[^\/]+/, 'to/' + d1.value);
 
 			document.querySelector('div.content-header td.form-buttons button').setAttribute('onclick', onclick);
 			document.querySelector('div.content-header-floating td.form-buttons button').setAttribute('onclick', onclick);

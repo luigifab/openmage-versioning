@@ -1,7 +1,7 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated J/07/12/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -55,7 +55,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 			'class'   => 'go'
 		));
 
-		if ($from && $to) {
+		if (!empty($from) && !empty($to)) {
 			$this->_addButton('status', array(
 				'label'   => $this->__('Repository status'),
 				'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
@@ -67,8 +67,8 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 	public function getGridHtml() {
 
 		$model = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
-		$from = $this->getRequest()->getParam('from');
-		$to = $this->getRequest()->getParam('to');
+		$from  = $this->getRequest()->getParam('from');
+		$to    = $this->getRequest()->getParam('to');
 
 		if (!empty($from) && !empty($to))
 			return '<pre lang="mul">'.$model->getCurrentDiffStatus($from, $to).'</pre>'.

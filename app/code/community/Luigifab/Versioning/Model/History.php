@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated M/28/02/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -81,15 +81,14 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			// collection finale
 			// construction de second tableau
-			$items = array();
-
+			$items   = array();
 			$current = 0;
-			$from = ($page - 1) * $size;
-			$to = ($page - 1) * $size + $size;
+			$from    = ($page - 1) * $size;
+			$to      = ($page - 1) * $size + $size;
 
 			foreach ($this->_items as $item) {
 				if (($current >= $from) && ($current < $to))
-					$items[] = $item;
+					array_push($items,  $item);
 				$current++;
 			}
 

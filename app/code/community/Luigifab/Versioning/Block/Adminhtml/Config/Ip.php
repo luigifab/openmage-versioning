@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/04/02/2017
- * Updated M/28/02/2017
+ * Updated M/27/02/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -20,6 +20,6 @@
 class Luigifab_Versioning_Block_Adminhtml_Config_Ip extends Mage_Adminhtml_Block_System_Config_Form_Field {
 
 	protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element) {
-		return sprintf('<span id="%s">%s</span>', $element->getHtmlId(), getenv('REMOTE_ADDR'));
+		return sprintf('<span id="%s">%s</span>', $element->getHtmlId(), $this->helper('versioning')->getIpAddr());
 	}
 }
