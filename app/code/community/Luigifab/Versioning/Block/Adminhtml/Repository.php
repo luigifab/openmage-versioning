@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/27/02/2018
+ * Updated J/17/05/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -104,9 +104,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		return $this->getChildHtml('grid')."\n".
 			'<script type="text/javascript">'."\n".
-			'window.versioningIds = {'.substr($hash, 0, -1).'};'."\n".
-			'window.versioningCols = '.array_pop($columns).';'."\n".
-			'window.versioningConfirm = ['."\n".
+			'self.versioningIds = {'.substr($hash, 0, -1).'};'."\n".
+			'self.versioningCols = '.array_pop($columns).';'."\n".
+			'self.versioningConfirm = ['."\n".
 				'"'.$this->helper('versioning')->getFields().'", '."\n".
 				'"'.$this->__('Martian sunset seen by Spirit.').'" '."\n".
 			'];'."\n".

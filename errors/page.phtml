@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated D/18/02/2018
+ * Updated J/17/05/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -49,14 +49,14 @@ div.box { margin:0 1em 1em; width:auto; }
 </style>
 <script type="text/javascript">
 var count = 0, timer;
-window.addEventListener('load', function () {
+self.addEventListener('load', function () {
 	if (document.getElementById('reload')) {
 		count = parseInt(document.getElementById('reload').querySelector('span').innerHTML, 10) - 1;
-		timer = window.setInterval(function () {
+		timer = self.setInterval(function () {
 			if (count > 1)
 				document.getElementById('reload').querySelector('span').innerHTML = count--;
 		}, 1000);
-		window.setTimeout(function () { location.reload(); }, count * 1000);
+		self.setTimeout(function () { location.reload(); }, count * 1000);
 	}
 }, false);
 </script>

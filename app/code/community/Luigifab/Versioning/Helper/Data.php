@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/04/03/2018
+ * Updated J/21/06/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -117,11 +117,11 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	public function getUpgradeFlag() {
-		return Mage::getBaseDir().'/upgrade.flag';
+		return BP.'/upgrade.flag';
 	}
 
 	public function getMaintenanceFlag() {
-		return Mage::getBaseDir().'/maintenance.flag';
+		return BP.'/maintenance.flag';
 	}
 
 
@@ -129,7 +129,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 		$ip = (!empty(getenv('HTTP_X_FORWARDED_FOR'))) ? explode(',', getenv('HTTP_X_FORWARDED_FOR')) : false;
 		$ip = (!empty($ip)) ? array_pop($ip) : getenv('REMOTE_ADDR');
-		$ip = (preg_match('#^::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
+		$ip = trim((preg_match('#^::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip);
 
 		return $ip;
 	}

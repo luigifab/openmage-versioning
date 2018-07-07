@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/22/02/2018
+ * Updated J/21/06/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -113,7 +113,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			unlink($lock);
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
-			$H['status']   = (is_file($log) && is_readable($log)) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
+			$H['status']   = (is_file($log)) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
 
 			$result = array(
 				'url'   => '*/versioning_repository/index',
@@ -127,7 +127,7 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
 				$H['duration'] = ceil(microtime(true) - $H['duration']);
-				$H['status']   = (is_file($log) && is_readable($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
+				$H['status']   = (is_file($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
 			}
 			else {
 				$H['duration'] = ceil(microtime(true) - $H['duration']);
@@ -236,7 +236,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::getBaseDir('media').'/css_secure/',
 			Mage::getBaseDir('media').'/js_secure/',
 			Mage::getBaseDir('media').'/js/',
-			Mage::getBaseDir().'/includes/src/'
+			BP.'/includes/src/'
 		);
 
 		exec('rm -rf '.implode(' ', $dirs));

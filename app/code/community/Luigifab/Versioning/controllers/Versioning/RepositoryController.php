@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/20/02/2018
+ * Updated J/17/05/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -196,13 +196,13 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",  'else { event.cancelBubble = true; event.returnValue = ""; return ""; }';
 		echo "\n", '}';
 		echo "\n", '// register events';
-		echo "\n", 'window.onbeforeunload = disableClose;';
+		echo "\n", 'self.onbeforeunload = disableClose;';
 		echo "\n", 'document.onkeydown = disableKeyboard;';
 		echo "\n", '// auto scroll page';
 		echo "\n", 'function autoScroll() {';
 		echo "\n",  'document.getElementById("scroll").scrollTop += 10000;';
 		echo "\n", '}';
-		echo "\n", 'window.setInterval(autoScroll, 100);';
+		echo "\n", 'self.setInterval(autoScroll, 100);';
 		echo "\n",'</script>';
 		echo "\n",'</head>';
 		echo "\n",'<body>';
@@ -243,11 +243,11 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'<script type="text/javascript">';
 		echo "\n", '// clear disableClose function, go to Magento backend, re-reregister disableClose function';
 		echo "\n", '// register disableClose delayed to prevent close warning in Chrome/Chromium browser';
-		echo "\n", 'window.setTimeout(function () {';
-		echo "\n",  'window.onbeforeunload = null;';
+		echo "\n", 'self.setTimeout(function () {';
+		echo "\n",  'self.onbeforeunload = null;';
 		echo "\n",  'location.href = "',$this->getUrl($result['url']),'";';
-		echo "\n",  'window.setTimeout(function () {';
-		echo "\n",   'window.onbeforeunload = disableClose;';
+		echo "\n",  'self.setTimeout(function () {';
+		echo "\n",   'self.onbeforeunload = disableClose;';
 		echo "\n",  '}, 1);';
 		echo "\n", '}, 5000);';
 		echo "\n",'</script>';

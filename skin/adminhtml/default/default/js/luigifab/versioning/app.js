@@ -1,14 +1,21 @@
 /**
- * Created J/22/12/2011, Updated L/26/02/2018
+ * Created J/22/12/2011
+ * Updated S/19/05/2018
+ *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
- * it under the terms of the GNU General Public License (GPL).
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
  */
 
-// dépend de Prototype/Raphaël/Translator, et de window.versioningIds/versioningCols/versioningConfirm dans Repository.php
-// totalement testé sur Firefox 27/45, Chrome 29/65, Opera 51, IE 11, Edge 14
 var versioning = {
 
 	svg: null,
@@ -17,7 +24,7 @@ var versioning = {
 	// initialisation
 	// et prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
 	decode: function (data) {
-		return decodeURIComponent(escape(window.atob(data)));
+		return decodeURIComponent(escape(self.atob(data)));
 	},
 
 	start: function () {
@@ -29,8 +36,8 @@ var versioning = {
 			if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
 				document.querySelector('table.data tbody button').click();
 
-			if (document.getElementById('versioning_grid_table') && (typeof window.versioningIds === 'object')) {
-				versioning.drawGraph(window.versioningIds, window.versioningCols);
+			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds === 'object')) {
+				versioning.drawGraph(self.versioningIds, self.versioningCols);
 				versioning.initDiff();
 			}
 		}
@@ -44,7 +51,7 @@ var versioning = {
 
 
 	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 22
+	// = révision : 24
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
 	confirmFlag: function (url, title, content) {
@@ -66,7 +73,7 @@ var versioning = {
 
 			var elem = document.createElement('p');
 			elem.setAttribute('class', 'credits');
-			elem.appendChild(document.createTextNode(window.versioningConfirm[1]));
+			elem.appendChild(document.createTextNode(self.versioningConfirm[1]));
 			apijs.dialog.t1.appendChild(elem);
 		}
 		catch (e) {
@@ -106,13 +113,14 @@ var versioning = {
 
 
 	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 42
+	// = révision : 44
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
 	confirmUpgrade: function (url, title) {
 
+		var content = self.versioningConfirm[0], credits = self.versioningConfirm[1];
+
 		try {
-			var content = window.versioningConfirm[0], credits = window.versioningConfirm[1];
 			// avec l'apijs
 			// utilise une jolie boîte de dialogue
 			if (apijs.version < 530)
@@ -480,7 +488,7 @@ var versioning = {
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 12
+	// = révision : 13
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
 	initDiff: function () {
@@ -536,5 +544,5 @@ var versioning = {
 	}
 };
 
-if (typeof window.addEventListener === 'function')
-	window.addEventListener('load', versioning.start, false);
+if (typeof self.addEventListener === 'function')
+	self.addEventListener('load', versioning.start, false);

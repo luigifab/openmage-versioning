@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated V/10/11/2017
+ * Updated J/21/06/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -34,7 +34,7 @@ class Luigifab_Versioning_Model_Observer {
 	public function updateConfig() {
 
 		// vérification du répertoire
-		$dir = Mage::getBaseDir().'/errors/config';
+		$dir = BP.'/errors/config';
 
 		if (!is_dir($dir))
 			@mkdir($dir, 0755);

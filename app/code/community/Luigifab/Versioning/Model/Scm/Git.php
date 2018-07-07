@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/27/02/2018
+ * Updated M/29/05/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -28,7 +28,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 	// le tout à partir de la réponse de la commande 'git'
 	public function isSoftwareInstalled() {
 		exec('git --version', $data);
-		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', implode($data), $this->version) !== 0);
+		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', trim(implode($data)), $this->version) !== 0);
 	}
 
 	public function getSoftwareVersion() {
@@ -59,20 +59,21 @@ class Luigifab_Versioning_Model_Scm_Git {
 			$configsh = realpath('../.git/ssh/config.sh');
 
 		$desc = (version_compare($this->getSoftwareVersion(), '1.7.2', '>=')) ? '%B' : '%s%n%b';
+		$nb   = intval(Mage::getStoreConfig('versioning/scm/number'));
 
 		if (is_string($configsh) && is_executable($configsh)) {
 			exec('
 				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				export GIT_SSH="'.$configsh.'";
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.$nb.' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 		else {
 			exec('
 				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				git fetch 2>&1;
-				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.Mage::getStoreConfig('versioning/scm/number').' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
+				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.$nb.' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 
@@ -89,12 +90,12 @@ class Luigifab_Versioning_Model_Scm_Git {
 			$data = '<u>Response:</u>'."\n".$data;
 
 			$config = '<u>The git/config file:</u>'."\n".
-				htmlspecialchars(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'));
+				htmlspecialchars(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config')));
 
 			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
 		}
 		else {
-			$data = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
+			$data    = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
 			$branchs = array($this->getCurrentBranch());
 
 			$xml = new DOMDocument();
@@ -152,10 +153,15 @@ class Luigifab_Versioning_Model_Scm_Git {
 	// renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
 	public function getCurrentBranch() {
 
+		if (!empty($this->branch))
+			return $this->branch;
+
 		exec('git branch | grep "*" | cut -c3-', $data);
 		$data = trim(implode($data));
+		$data = (!empty($data)) ? $data : null;
 
-		return (!empty($data)) ? $data : null;
+		$this->branch = $data;
+		return $this->branch;
 	}
 
 	public function getCurrentRevision() {
@@ -184,7 +190,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 			$command = 'git diff -U1 --diff-filter=MTUXB';
 
 		if (!empty($from) && !empty($to))
-			$command .= ' '.$from.'..'.$to;
+			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
 
 		$i = 0;
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
@@ -211,11 +217,10 @@ class Luigifab_Versioning_Model_Scm_Git {
 			$i++;
 		}
 
-		return '<span>'.$command.'</span>'."\n".'<span class="help">'.
-			'Select only files that are Added (A), Copied (C), Deleted (D), Modified (<strong>M</strong>), Renamed (R),'."\n".
-			'have their Type changed (<strong>T</strong>), are Unmerged (<strong>U</strong>), are Unknown (<strong>X</strong>),'.
-			'or have had their pairing Broken (<strong>B</strong>).'.
-			'</span>'."\n".str_replace("\t", '    ', implode("\n", $lines));
+		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
+			'Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),'."\n".
+			'have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).'."\n".
+			str_replace("\t", '    ', implode("\n", $lines));
 	}
 
 	public function getCurrentDiffStatus($from, $to) {
@@ -229,7 +234,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 		else
 			$command = 'git diff --name-status';
 
-		$command .= ' '.$from.'..'.$to;
+		$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
@@ -256,7 +261,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 				$line = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
 		}
 
-		return '<span>'.$command.'</span>'."\n".$help->__('For the current diff')."\n\n".
+		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".$help->__('For the current diff')."\n\n".
 			str_replace("\t", '    ', htmlspecialchars(implode("\n", $lines)));
 	}
 
@@ -279,7 +284,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d .. >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+				git reset --hard '.escapeshellarg($revision).' >> '.$log.' 2>&1;
 			', $data, $val);
 		}
 		else {
@@ -290,7 +295,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+				git reset --hard '.escapeshellarg($revision).' >> '.$log.' 2>&1;
 			', $data, $val);
 		}
 

@@ -1,10 +1,19 @@
 /**
- * Created J/22/12/2011, Updated D/11/03/2018
+ * Created J/22/12/2011
+ * Updated M/29/05/2018
+ *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
- * it under the terms of the GNU General Public License (GPL).
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
  */
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& global &&& */
@@ -45,8 +54,6 @@ body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repos
 }
 
 body.adminhtml-versioning-repository-status pre span, body.adminhtml-versioning-repository-history pre span { color:black; }
-body.adminhtml-versioning-repository-status pre span.help { color:#666; }
-body.adminhtml-versioning-repository-status pre span.help strong { display:inline; }
 
 body.adminhtml-versioning-repository-history pre { height:20em; margin-bottom:2em; overflow:auto; }
 body.adminhtml-versioning-repository-history table.data tr.headings th.no-link { padding:3px 4px; text-align:center; }
@@ -82,12 +89,11 @@ body.adminhtml-versioning-repository-index table.data tr.k button { transition:o
 body.adminhtml-versioning-repository-index table.data tr.k { transition:color 0.6s; }
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
-body.adminhtml-versioning-repository-index { background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg"); }
 body.adminhtml-versioning-repository-index p.credits { position:absolute; bottom:1.2em; left:1em; color:#CCC; }
 body.adminhtml-versioning-repository-index #anchor-content { margin-top:1px; padding-top:22px; }
 
-body.adminhtml-versioning-repository-index #apijsDialog {
-	background-color:#111; background-size:100% 100%;
+body.adminhtml-versioning-repository-index > div.wrapper, body.adminhtml-versioning-repository-index #apijsDialog {
+	background-color:#111; background-size:100% 100%; background-attachment:fixed;
 	background-image:url("../../../images/luigifab/versioning/mars-sunset.jpg");
 }
 

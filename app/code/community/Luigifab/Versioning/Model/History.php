@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated M/27/02/2018
+ * Updated D/20/05/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -29,7 +29,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 		$help = Mage::helper('versioning');
 		$file = $help->getHistoryLog();
 
-		if (is_file($file) && is_readable($file)) {
+		if (is_file($file)) {
 
 			// recherche des données
 			// construction d'un premier tableau

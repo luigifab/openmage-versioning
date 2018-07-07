@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated M/27/02/2018
+ * Updated J/29/03/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -50,7 +50,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		$store   = $this->getRequest()->getParam('store');
 
 		if (!empty($store))
-			$storeId = Mage::getModel('core/store')->load($store)->getId();
+			$storeId = Mage::app()->getStore($store)->getId();
 		else if (!empty($website))
 			$storeId = Mage::getModel('core/website')->load($website)->getDefaultStore()->getId();
 		else
