@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated M/22/05/2018
+ * Updated J/26/07/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -20,7 +20,30 @@
 class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface {
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
-		return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>',
-			$this->helper('versioning')->getVersion(), 'luigifab.info/magento/versioning');
+
+		if (($msg = $this->checkChanges()) === true) {
+			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>',
+				$this->helper('versioning')->getVersion(), 'luigifab.info/magento/versioning');
+		}
+		else {
+			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>'.
+				'<p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
+				$this->helper('versioning')->getVersion(), 'luigifab.info/magento/versioning',
+				$this->__('INCOMPLETE MODULE INSTALLATION'),
+				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
+		}
+	}
+
+	private function checkChanges() {
+
+		$index = file_get_contents(BP.'/index.php');
+		if (strpos($index, 'trim(array_pop($ip))') === false)
+			return 'index.php';
+		if (strpos($index, 'trim(getenv(\'REMOTE_ADDR\'))') === false)
+			return 'index.php';
+		if (strpos($index, 'config/upgrade.ip') === false)
+			return 'index.php';
+
+		return true;
 	}
 }

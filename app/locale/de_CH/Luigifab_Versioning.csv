@@ -11,7 +11,7 @@
 "Main title","Haupttitel"
 "Content text or <abbr title=""HyperText Markup Language"">HTML</abbr>","Textinhalt oder <abbr title=""Hypertext-Auszeichnungssprache (HyperText Markup Language)"">HTML</abbr>"
 "Text with automatic reload period","Text mit automatischer Ladungsfrist"
-"Use <strong>[10]</strong> for a 10-seconds delay.","Für einen 10-Sekunden-Frist <strong>[10]</strong> benutzen."
+"Use [10] for a 10-seconds delay.","Für einen 10-Sekunden-Frist [10] benutzen."
 "Disable the page from these IP addresses","Ab den folgenden IP-Adressen Seite deaktivieren"
 "Separate addresses by a space.","E-Mail-Adressen durch einen Abstand trennen."
 "Your IP address","Ihre IP-Adresse"

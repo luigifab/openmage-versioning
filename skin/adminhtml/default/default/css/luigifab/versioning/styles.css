@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated M/29/05/2018
+ * Updated L/30/07/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -76,7 +76,7 @@ body.adminhtml-versioning-repository-index table.data td { vertical-align:middle
 body.adminhtml-versioning-repository-index table.data td.revision { padding:2px 0; }
 body.adminhtml-versioning-repository-index table.data td.revision strong { font-size:115%; }
 body.adminhtml-versioning-repository-index table.data td input { cursor:pointer; visibility:hidden; }
-body.adminhtml-versioning-repository-index table.data td input[onchange]:not([disabled]) { visibility:visible; }
+body.adminhtml-versioning-repository-index table.data td input[onchange]:enabled { visibility:visible; }
 body.adminhtml-versioning-repository-index table.data td a.issue { float:right; padding-left:0.3em; color:#999; }
 
 body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {

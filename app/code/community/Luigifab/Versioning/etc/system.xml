@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated V/23/02/2018
+ * Updated S/07/07/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -150,7 +150,7 @@
 						</error503_content>
 						<error503_autoreload translate="label comment">
 							<label>Text with automatic reload period</label>
-							<comment><![CDATA[Use <strong>[10]</strong> for a 10-seconds delay.]]></comment>
+							<comment>Use [10] for a 10-seconds delay.</comment>
 							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
@@ -214,7 +214,7 @@
 						</upgrade_content>
 						<upgrade_autoreload translate="label comment">
 							<label>Text with automatic reload period</label>
-							<comment><![CDATA[Use <strong>[10]</strong> for a 10-seconds delay.]]></comment>
+							<comment>Use [10] for a 10-seconds delay.</comment>
 							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>

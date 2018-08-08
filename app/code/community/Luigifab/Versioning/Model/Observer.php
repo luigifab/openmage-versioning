@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated J/21/06/2018
+ * Updated S/21/07/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -147,7 +147,7 @@ class Luigifab_Versioning_Model_Observer {
 				continue;
 
 			if (strpos($key, '_byip') !== false) {
-				$value = preg_split('#\s#', $value);
+				$value = array_filter(preg_split('#\s+#', $value));
 				$config[substr($key, 0, strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
 			}
 		}

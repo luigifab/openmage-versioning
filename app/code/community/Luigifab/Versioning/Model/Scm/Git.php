@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/29/05/2018
+ * Updated D/22/07/2018
  *
  * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
  * https://www.luigifab.info/magento/versioning
@@ -276,27 +276,25 @@ class Luigifab_Versioning_Model_Scm_Git {
 	// n'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
 	public function upgradeToRevision($obj, $log, $revision) {
 
+		$revision = escapeshellarg($revision);
+
 		if (is_dir('../.git/')) {
-			exec('
-				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+			exec('export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d .. >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.escapeshellarg($revision).' >> '.$log.' 2>&1;
-			', $data, $val);
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;', $data, $val);
 		}
 		else {
-			exec('
-				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+			exec('export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.escapeshellarg($revision).' >> '.$log.' 2>&1;
-			', $data, $val);
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;', $data, $val);
 		}
 
 		$data  = trim(file_get_contents($log));
