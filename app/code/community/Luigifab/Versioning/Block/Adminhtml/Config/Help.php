@@ -3,8 +3,8 @@
  * Created V/23/05/2014
  * Updated J/26/07/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -23,12 +23,12 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 
 		if (($msg = $this->checkChanges()) === true) {
 			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>',
-				$this->helper('versioning')->getVersion(), 'luigifab.info/magento/versioning');
+				$this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning');
 		}
 		else {
 			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>'.
 				'<p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
-				$this->helper('versioning')->getVersion(), 'luigifab.info/magento/versioning',
+				$this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning',
 				$this->__('INCOMPLETE MODULE INSTALLATION'),
 				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
 		}

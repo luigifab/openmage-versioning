@@ -22,6 +22,8 @@
 "Version control / Tools / Magento Admin","Control de versión / Herramientas / Administración de Magento"
 "[SPECIAL]","[ESPECIAL]"
 "Preview in %s","Vista previa %s"
+"INCOMPLETE MODULE INSTALLATION","INSTALLACIÓN INCOMPLETA DEL MODULO"
+"Changes in <em>%s</em> are not present. Please read the documentation.","Los cambios en <em>%s</em> no están presentes. Por favor lea la documentación."
 "Updates history (<span id=""scmtype"">%s</span>, %s)","Historial de actualizaciones (<span id=""scmtype"">%s</span>, %s)"
 "Updates history (<span id=""scmtype"">%s</span>)","Historial de actualizaciones (<span id=""scmtype"">%s</span>)"
 "Repository status","Estado del repositorio"

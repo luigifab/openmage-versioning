@@ -1,4 +1,4 @@
-First, for the gitignore file:
+For the gitignore file:
 
 /errors/config/*.ip
 /errors/config/*.dat
@@ -6,15 +6,15 @@ First, for the gitignore file:
 /maintenance.flag
 /upgrade.flag
 
-Secondly, for the index.php file:
+For the index.php file:
 
-## replace ##
+// replace
 if (file_exists($maintenanceFile)) {
     include_once dirname(__FILE__).'/errors/503.php';
     exit;
 }
-## by ##
-// https://www.luigifab.info/magento/versioning
+// by
+// https://www.luigifab.fr/magento/versioning
 if (is_file('./maintenance.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === false)) {
     $ips = './errors/config/error503.ip';
     $ip = (!empty(getenv('HTTP_X_FORWARDED_FOR'))) ? explode(',', getenv('HTTP_X_FORWARDED_FOR')) : false;
@@ -35,16 +35,8 @@ if (is_file('./upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === f
         exit(0);
     }
 }
-## end ##
+// end
 
-
-You can rewrite files:
- - errors/processor.php       » errors/config/processor.php  (use UserProcessor as class name, your class must extends Processor)
- - errors/page.phtml          » errors/config/page.phtml
-
-The errors/config directory will contains text files.
-They will be automatically created when you will save the module configuration in the backend:
- - errors/config/error503.ip  » list of ip addresses
- - errors/config/upgrade.ip   » list of ip addresses
- - errors/config/config.dat   » configuration
- - errors/config/*.csv        » translations
+You can rewrite the following files:
+ - errors/processor.php » errors/config/processor.php  (use UserProcessor as class name, your class must extends Processor)
+ - errors/page.phtml    » errors/config/page.phtml

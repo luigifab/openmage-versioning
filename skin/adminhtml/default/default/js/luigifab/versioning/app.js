@@ -1,9 +1,9 @@
 /**
  * Created J/22/12/2011
- * Updated S/19/05/2018
+ * Updated S/22/09/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -535,8 +535,8 @@ var versioning = {
 			}
 
 			onclick = document.querySelector('div.content-header td.form-buttons button').getAttribute('onclick');
-			onclick = onclick.replace(/from\/[^\/]+/, 'from/' + d2.value);
-			onclick = onclick.replace(/to\/[^\/]+/, 'to/' + d1.value);
+			onclick = onclick.replace(/\/from\/[^\/]+/, '/from/' + d2.value);
+			onclick = onclick.replace(/\/to\/[^\/]+/, '/to/' + d1.value);
 
 			document.querySelector('div.content-header td.form-buttons button').setAttribute('onclick', onclick);
 			document.querySelector('div.content-header-floating td.form-buttons button').setAttribute('onclick', onclick);

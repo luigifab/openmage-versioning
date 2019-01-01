@@ -3,8 +3,8 @@
  * Created W/30/05/2012
  * Updated M/28/02/2017
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published

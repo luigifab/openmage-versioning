@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated S/21/07/2018
+ * Updated D/26/08/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -39,7 +39,7 @@ class Luigifab_Versioning_Model_Observer {
 		if (!is_dir($dir))
 			@mkdir($dir, 0755);
 		if (!is_dir($dir) || !is_writeable($dir))
-			throw new Exception('Directory <em>errors/config</em> does not exist or is not writable.');
+			Mage::throwException('Directory <em>errors/config</em> does not exist or is not writable.');
 
 		// récupération de toute la configuration utile
 		// enregistre le tout dans un tableau avant d'enregistrer le tout dans les fichiers *.csv, config.ip et config.dat

@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/17/05/2018
+ * Updated M/16/10/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -242,7 +242,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'</div>';
 		echo "\n",'<script type="text/javascript">';
 		echo "\n", '// clear disableClose function, go to Magento backend, re-reregister disableClose function';
-		echo "\n", '// register disableClose delayed to prevent close warning in Chrome/Chromium browser';
+		echo "\n", '// register disableClose delayed to prevent close warning in Chrome browser';
 		echo "\n", 'self.setTimeout(function () {';
 		echo "\n",  'self.onbeforeunload = null;';
 		echo "\n",  'location.href = "',$this->getUrl($result['url']),'";';

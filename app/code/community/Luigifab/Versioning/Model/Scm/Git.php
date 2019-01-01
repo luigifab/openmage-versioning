@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/22/07/2018
+ * Updated D/26/08/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -52,7 +52,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		// lecture de l'historique des commits
 		if (!is_dir('./.git/') && !is_dir('../.git/'))
-			throw new Exception('The .git directory does not exist!');
+			Mage::throwException('The .git directory does not exist!');
 
 		$configsh = realpath('./.git/ssh/config.sh');
 		if (!is_string($configsh))
@@ -92,7 +92,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 			$config = '<u>The git/config file:</u>'."\n".
 				htmlspecialchars(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config')));
 
-			throw new Exception('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
+			Mage::throwException('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
 		}
 		else {
 			$data    = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
@@ -304,10 +304,10 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		foreach ($lines as $line) {
 			if (strpos($line, 'fatal: ') === 0)
-				throw new Exception(str_replace('fatal: ', '', $line));
+				Mage::throwException(str_replace('fatal: ', '', $line));
 		}
 
 		if ($val !== 0)
-			throw new Exception($data);
+			Mage::throwException($data);
 	}
 }

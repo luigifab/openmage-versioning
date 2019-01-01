@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/21/06/2018
+ * Updated D/26/08/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -73,10 +73,10 @@ class Luigifab_Versioning_Model_Upgrade {
 			$this->writeTitle($help->__('1) Locking and configuration check'));
 
 			if (Mage::getSingleton('admin/session')->isAllowed('tools/versioning/upgrade') !== true)
-				throw new Exception('Not authorized');
+				Mage::throwException('Not authorized');
 
 			if (is_file($lock))
-				throw new Exception('An update is in progress');
+				Mage::throwException('An update is in progress');
 
 			if (is_file($log))
 				unlink($log);

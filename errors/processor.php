@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated D/27/05/2018
+ * Updated V/31/08/2018
  *
- * Copyright 2011-2018 | Fabrice Creuzot (luigifab) <code~luigifab~info>
- * https://www.luigifab.info/magento/versioning
+ * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -28,10 +28,6 @@ class Processor {
 	private $dataTranslated = array();
 
 
-	//// Initialisation
-	// Recherche la liste des langues disponibles en fonction des fichiers CSV (définie la langue en fonction du navigateur)
-	// Charge les fichiers de traductions et les données de configuration
-	// Prend en charge les fichiers utilisateur (dossier config)
 	public function init($type) {
 
 		$this->setData('type', $type);
@@ -75,9 +71,7 @@ class Processor {
 			$this->setData('report', 123456789);
 	}
 
-	//// Contenu de la page
-	// Renvoi le contenu de la page (éventuellement en utilisant des expressions régulières)
-	// En fonction de la configuration, en fonction du contexte
+
 	public function getPageTitle() {
 		return $this->__($this->getData('type').'_pagetitle');
 	}
@@ -99,9 +93,7 @@ class Processor {
 		return $this->__($this->getData('type').'_content');
 	}
 
-	//// Génération des adresses
-	// Recherche les adresses des fichiers (traitement particulier pour le favicon.ico)
-	// Prend en charge les fichiers utilisateur (dossier config)
+
 	public function getUrl($file) {
 
 		$base = getenv('SCRIPT_NAME');                                         // /sites/14/web/errors[/503.php] /sites/14/web[/index.php]
@@ -116,14 +108,11 @@ class Processor {
 			return $base.'/'.$file;
 	}
 
-	//// Génération de la page
-	// Définie les entêtes (404/503) de la page et génère la code HTML final
-	// Prend en charge les fichiers utilisateur (dossier config)
 	public function renderPage($code) {
 
 		header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
 		header('Cache-Control: no-cache, must-revalidate');
-		header('Expires: Tue, 07 Nov 1989 20:30:00 GMT'); //echo gmdate('D, d M Y H:i:s', 626472000);
+		header('Expires: Tue, 07 Nov 1989 20:30:00 GMT');
 		header('X-UA-Compatible: IE=edge');
 		header('X-XSS-Protection: 1; mode=block');
 		header('X-Content-Type-Options: nosniff');
@@ -137,17 +126,12 @@ class Processor {
 		echo str_replace(array("\n\n","\t",'  ',"\n\n",'  '), array("\n",'',' ',"\n",' '), $html);
 	}
 
-	//// Gestion du rapport d'erreur
-	// Enregistre le rapport d'erreur dans le dossier var/report (fait un peu comme Magento à la base)
-	// Envoi ce rapport par email au format HTML si la configuration le permet
 	public function saveReport($data) {
 
 		$id = abs(intval(microtime(true) * rand(100, 1000)));
 		$this->setData('report', $id);
 
-		// sauvegarde du rapport
 		$directory = str_replace('/errors', '', dirname(__FILE__)).'/var/report/';
-
 		if (!is_dir($directory))
 			@mkdir($directory, 0755, true);
 
@@ -158,9 +142,7 @@ class Processor {
 		$data['url'] = (!empty($data['url'])) ? $data['url'] : 'url not available';
 		@file_put_contents($directory.$id, $data[0]."\n".$data['url']."\n\n".$data[1]);
 
-		// envoi par email si la configuration le permet
 		$email = explode(' ', $this->getConfig('email'));
-
 		if (!empty($email)) {
 
 			$to = implode(', ', $email);
@@ -173,8 +155,7 @@ class Processor {
 		}
 	}
 
-	//// Méthodes magiques
-	// Tout simplement magnifique
+
 	public function getConfig($key) {
 		return (!empty($this->config[$this->type.'_'.$key])) ? $this->config[$this->type.'_'.$key] : false;
 	}
@@ -188,9 +169,6 @@ class Processor {
 	}
 
 
-	//// Chargement d'un fichier de traduction
-	// Récupère le contenu du fichier de traduction et le sauvegarde dans trois tableaux
-	// Le premier tableau contient le nom du fichier, le second le mot anglais et le troisième la traduction
 	private function searchLang($files, $result = 'en_US') {
 
 		$data = array();
@@ -223,7 +201,7 @@ class Processor {
 
 		arsort($languages);
 		$languages = array_keys($languages); // la liste triée de HTTP_ACCEPT_LANGUAGE
-		$locales   = array_keys($data);        // la liste des langues possibles
+		$locales   = array_keys($data);      // la liste des langues possibles
 
 		// ajoute la langue présente dans l'url en premier
 		// car elle est prioritaire
@@ -286,10 +264,6 @@ class Processor {
 		}
 	}
 
-	//// Traduction par phrase clef
-	// Recherche le numéro d'index de la phrase à traduire dans les tableaux de traduction
-	// Renvoie la phrase à traduire inchangée si la phrase n'est pas trouvée
-	// Ajoute les espaces insécables
 	public function __($words) {
 
 		if (empty($words))
@@ -299,7 +273,6 @@ class Processor {
 		$index = array_search($words, $this->dataSource);
 		$args  = func_num_args();
 
-		// chaine de caractères configurable
 		if ($args > 1) {
 
 			$array = ($index !== false) ? explode('§', $this->dataTranslated[$index]) : explode('§', $words);
@@ -308,12 +281,10 @@ class Processor {
 			foreach ($array as $value)
 				$translation .= ($i < $args) ? $value.func_get_arg($i++) : $value;
 		}
-		// chaine de caractères simple
 		else {
 			$translation = ($index !== false) ? $this->dataTranslated[$index] : $words;
 		}
 
-		// mise en place des espaces insécables
 		$translation = str_replace(' ?', '&nbsp;?', $translation);
 		$translation = str_replace(' !', '&nbsp;!', $translation);
 		$translation = str_replace(' ;', '&nbsp;;', $translation);
