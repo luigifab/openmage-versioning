@@ -1,7 +1,7 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated M/27/02/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -31,12 +31,12 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$to   = $this->getRequest()->getParam('to');
 
 		if (!empty($from) && !empty($to)) {
-			$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+			$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
 				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>, %s)', $from, $to, $type, $branch) :
 				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>)', $from, $to, $type);
 		}
 		else {
-			$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+			$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
 				$this->__('Repository status (<span id="scmtype">%s</span>, %s)', $type, $branch) :
 				$this->__('Repository status (<span id="scmtype">%s</span>)', $type);
 		}

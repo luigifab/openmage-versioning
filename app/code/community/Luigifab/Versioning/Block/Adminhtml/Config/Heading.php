@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated J/29/03/2018
+ * Updated M/01/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -27,7 +27,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		// exemple d'une adresse de base : https://mario/sites/14/web/(xyz/)(index.php/)
 		// exemple d'une adresse finale  : https://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
-		$url = preg_replace('#/[^/]+\.php[0-9]*/#', '/', $url);
+		$url = preg_replace('#/[^/]+\.php\d*/#', '/', $url);
 
 		if (Mage::getStoreConfigFlag('web/url/use_store'))
 			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getData('code').'/', '/', $url);

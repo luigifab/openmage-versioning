@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated S/22/09/2018
+ * Updated V/11/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -22,11 +22,6 @@ var versioning = {
 	width: 197,
 
 	// initialisation
-	// et prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
-	decode: function (data) {
-		return decodeURIComponent(escape(self.atob(data)));
-	},
-
 	start: function () {
 
 		if (document.querySelector('body[class*="adminhtml-versioning-repository-"]')) {
@@ -49,9 +44,14 @@ var versioning = {
 		document.querySelector('div.content-header-floating td.form-buttons').setAttribute('style', 'visibility:hidden;');
 	},
 
+	decode: function (data) {
+		// prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
+		return decodeURIComponent(escape(self.atob(data)));
+	},
+
 
 	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 24
+	// = révision : 25
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
 	confirmFlag: function (url, title, content) {
@@ -62,7 +62,7 @@ var versioning = {
 			if (apijs.version < 530)
 				throw new Error('Invalid apijs version');
 
-			url.match(/revision\/([0-9a-z]+)\//);
+			url.match(/revision\/(\w+)\//);
 			apijs.dialog.dialogConfirmation(
 				title, // title
 				this.decode(content), // text
@@ -82,7 +82,7 @@ var versioning = {
 			try {
 				// sans l'apijs
 				// demande de confirmation
-				if (confirm(this.decode(content).replace(/\[[^\]]+\]/g, ''))) {
+				if (confirm(this.decode(content).replace(/\[[^\]]+]/g, ''))) {
 					this.enableLoader();
 					location.href = url;
 				}
@@ -113,7 +113,7 @@ var versioning = {
 
 
 	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 44
+	// = révision : 45
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
 	confirmUpgrade: function (url, title) {
@@ -126,7 +126,7 @@ var versioning = {
 			if (apijs.version < 530)
 				throw new Error('Invalid apijs version');
 
-			url.match(/revision\/([0-9a-z]+)\//);
+			url.match(/revision\/(\w+)\//);
 			apijs.dialog.dialogFormOptions(
 				title.replace('§', RegExp.$1), // title
 				this.decode(content), // text
@@ -151,10 +151,10 @@ var versioning = {
 				// sans l'apijs
 				// simule la boîte de dialogue de l'apijs
 				var data = document.createElement('div'),
-				    text = this.decode(content).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/\]/g, '>'),
+				    text = this.decode(content).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/]/g, '>'),
 				    icon = document.getElementById('scmtype').textContent;
 
-				url.match(/revision\/([0-9a-z]+)\//);
+				url.match(/revision\/(\w+)\//);
 				data.innerHTML =
 					'<div class="fake options versioning ' + icon + ' ready" id="apijsDialog">' +
 						'<form method="get" action="' + url + '" class="fake options versioning ' + icon + ' ready" onsubmit="return versioning.actionConfirmUpgrade(true);" id="apijsBox">' +
@@ -205,7 +205,7 @@ var versioning = {
 		// avec l'apijs, en deux temps
 		else {
 			apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
-			location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/=|&/g, '/');
+			location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
 		}
 
 		return true;
@@ -412,7 +412,7 @@ var versioning = {
 							dMiHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
 						else
 							dMiHeight = tableRows[rows - parent.row].getDimensions().height / 2;
-						dMiHeight = dMiHeight + miHeight;
+						dMiHeight += miHeight;
 
 						if ((parent.revision === tops[parent.col]) && (y + dMiHeight < pY)) {
 							// dessine une ligne en travers
@@ -512,8 +512,8 @@ var versioning = {
 
 		var d1 = document.querySelector('table.data input[name="d1"]:checked'),
 		    d2 = document.querySelector('table.data input[name="d2"]:checked'),
-		    pos1 = parseInt(d1.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
-		    pos2 = parseInt(d2.getAttribute('onchange').replace(/[^0-9]/g, ''), 10),
+		    pos1 = parseInt(d1.getAttribute('onchange').replace(/\D/g, ''), 10),
+		    pos2 = parseInt(d2.getAttribute('onchange').replace(/\D/g, ''), 10),
 		    onclick;
 
 		if (typeof url === 'string') {

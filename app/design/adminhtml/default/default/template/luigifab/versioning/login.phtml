@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/20/02/2016
- * Updated S/03/03/2018
+ * Updated S/22/12/2018
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -18,7 +18,7 @@
  */
 
 $cssjs = $this->helper('versioning')->getCssJsHtml();
-$lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
+$lang = mb_substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>" style="height:100%;">

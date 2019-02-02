@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/27/02/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -142,7 +142,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	public function decorateStatus($value, $row, $column, $isExport) {
 
-		$status = (in_array($row->getData('status'), array('Update completed', 'Upgrade completed'))) ? 'success' : 'error';
+		$status = in_array($row->getData('status'), array('Update completed', 'Upgrade completed')) ? 'success' : 'error';
 		$text   = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->helper('versioning')->_('Error');
 
 		return sprintf('<span class="versioning-status grid-%s">%s</span>', $status, $text);

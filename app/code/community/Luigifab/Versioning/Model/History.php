@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated D/20/05/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -33,7 +33,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			// recherche des données
 			// construction d'un premier tableau
-			$ressource = fopen($file, 'r');
+			$ressource = fopen($file, 'rb');
 
 			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
 
@@ -49,10 +49,10 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 					// modifié en version 1.1.0
 					// la 7ème case contient désormais le statut suivi d'un saut de ligne suivi des détails de la mise à jour
-					if (strpos($line[6], "\n") !== false) {
-						$pos = strpos($line[6], "\n");
-						$item->setData('status', substr($line[6], 0, $pos));
-						$item->setData('details', substr($line[6], $pos + 1));
+					if (mb_strpos($line[6], "\n") !== false) {
+						$pos = mb_strpos($line[6], "\n");
+						$item->setData('status', mb_substr($line[6], 0, $pos));
+						$item->setData('details', mb_substr($line[6], $pos + 1));
 					}
 					else {
 						$item->setData('status', $line[6]);
@@ -61,15 +61,15 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 					// ajouté en version 1.1.0
 					// la 8ème case contient l'éventuel nom de la branche
-					$item->setData('branch', (!empty($line[7])) ? $line[7] : '');
+					$item->setData('branch', !empty($line[7]) ? $line[7] : '');
 
 					// an upgrade is already...
 					// remplace le texte par sa version traduite
-					if ((strpos($item->getData('details'), 'An upgrade is already underway') === 0) ||
-					    (strpos($item->getData('details'), 'An update is in progress') === 0))
+					if ((mb_strpos($item->getData('details'), 'An upgrade is already underway') === 0) ||
+					    (mb_strpos($item->getData('details'), 'An update is in progress') === 0))
 						$item->setData('details', $help->__('Stop! Stop! Stop! An update is in progress.'));
 
-					array_push($this->_items, $item);
+					$this->_items[] = $item;
 				}
 			}
 
@@ -88,7 +88,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			foreach ($this->_items as $item) {
 				if (($current >= $from) && ($current < $to))
-					array_push($items,  $item);
+					$items[] = $item;
 				$current++;
 			}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated M/27/02/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -27,10 +27,11 @@ class Luigifab_Versioning_Model_Source_Type {
 
 		foreach ($models as $model) {
 			$model = Mage::getSingleton($model);
-			$label = ($model->isSoftwareInstalled()) ?
-				$help->__('%s (%s)', strtoupper($model->getType()), $model->getSoftwareVersion()) :
-				$help->__('%s (not available)', strtoupper($model->getType()));
-			$options[strtolower($model->getType())] = array('value' => strtolower($model->getType()), 'label' => $label);
+			$type  = mb_strtolower($model->getType());
+			$label = $model->isSoftwareInstalled() ?
+				$help->__('%s (%s)', mb_strtoupper($model->getType()), $model->getSoftwareVersion()) :
+				$help->__('%s (not available)', mb_strtoupper($model->getType()));
+			$options[$type] = array('value' => $type, 'label' => $label);
 		}
 
 		ksort($options);
@@ -43,9 +44,8 @@ class Luigifab_Versioning_Model_Source_Type {
 		$ressource = opendir($source);
 
 		while (($file = readdir($ressource)) !== false) {
-
-			if ((strpos($file, '.') !== 0) && is_file($source.'/'.$file))
-				array_push($files, 'versioning/scm_'.strtolower(substr($file, 0, -4)));
+			if ((mb_strpos($file, '.') !== 0) && is_file($source.'/'.$file))
+				$files[] = 'versioning/scm_'.mb_strtolower(mb_substr($file, 0, -4));
 		}
 
 		closedir($ressource);

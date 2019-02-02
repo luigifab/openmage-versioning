@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated D/26/08/2018
+ * Updated J/10/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -38,7 +38,7 @@ class Luigifab_Versioning_Model_Observer {
 
 		if (!is_dir($dir))
 			@mkdir($dir, 0755);
-		if (!is_dir($dir) || !is_writeable($dir))
+		if (!is_dir($dir) || !is_writable($dir))
 			Mage::throwException('Directory <em>errors/config</em> does not exist or is not writable.');
 
 		// récupération de toute la configuration utile
@@ -82,23 +82,23 @@ class Luigifab_Versioning_Model_Observer {
 				$value = str_replace('"', '""', trim($value));
 
 				// versioning/downtime/*title
-				if (strpos($key, 'title') !== false) {
+				if (mb_strpos($key, 'title') !== false) {
 
 					if (!empty($value))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 				}
 				// versioning/downtime/*content
-				else if (strpos($key, 'content') !== false) {
+				else if (mb_strpos($key, 'content') !== false) {
 
-					if (!empty($value) && (strpos($value, '<') === 0))
+					if (!empty($value) && (mb_strpos($value, '<') === 0))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 					else if (!empty($value))
 						$translations[$locale][] =  '"'.$key.'","<p>'.str_replace("\n", '<br />', $value).'</p>"';
 				}
 				// versioning/downtime/*autoreload
-				else if (strpos($key, 'autoreload') !== false) {
+				else if (mb_strpos($key, 'autoreload') !== false) {
 
-					if (!empty($value) && (strpos($value, '[') !== false) && (strpos($value, ']') !== false))
+					if (!empty($value) && (mb_strpos($value, '[') !== false) && (mb_strpos($value, ']') !== false))
 						$translations[$locale][] = '"'.$key.'","'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'"';
 				}
 			}
@@ -124,7 +124,7 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (strpos($key, '_email') !== false)
+			if (mb_strpos($key, '_email') !== false)
 				$config[] = $key.'='.str_replace('=', '', $value);
 		}
 
@@ -146,9 +146,9 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (strpos($key, '_byip') !== false) {
+			if (mb_strpos($key, '_byip') !== false) {
 				$value = array_filter(preg_split('#\s+#', $value));
-				$config[substr($key, 0, strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
+				$config[mb_substr($key, 0, mb_strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated L/16/07/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -24,7 +24,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	public function _($data, $a = null, $b = null) {
-		return (strpos($txt = $this->__(' '.$data, $a, $b), ' ') === 0) ? $this->__($data, $a, $b) : $txt;
+		return (mb_strpos($txt = $this->__(' '.$data, $a, $b), ' ') === 0) ? $this->__($data, $a, $b) : $txt;
 	}
 
 	public function getHumanDuration($row) {
@@ -62,7 +62,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getMaintenanceInfo() {
 
 		$file   = BP.'/errors/config/error503.ip';
-		$byip   = (is_file($file) && (strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
+		$byip   = (is_file($file) && (mb_strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
 		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/error503_byip')));
 
 		$html   = array();
@@ -84,7 +84,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getUpgradeInfo() {
 
 		$file   = BP.'/errors/config/upgrade.ip';
-		$byip   = (is_file($file) && (strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
+		$byip   = (is_file($file) && (mb_strpos(file_get_contents($file), '-'.$this->getIpAddr().'-') !== false));
 		$nobody = (!is_file($file) || empty(Mage::getStoreConfig('versioning/downtime/upgrade_byip')));
 
 		$html   = array();
@@ -127,9 +127,9 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 	public function getIpAddr() {
 
-		$ip = (!empty(getenv('HTTP_X_FORWARDED_FOR'))) ? explode(',', getenv('HTTP_X_FORWARDED_FOR')) : false;
-		$ip = (!empty($ip)) ? trim(array_pop($ip)) : trim(getenv('REMOTE_ADDR'));
-		$ip = (preg_match('#^::ffff:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
+		$ip = !empty(getenv('HTTP_X_FORWARDED_FOR')) ? explode(',', getenv('HTTP_X_FORWARDED_FOR')) : false;
+		$ip = !empty($ip) ? trim(array_pop($ip)) : trim(getenv('REMOTE_ADDR'));
+		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? mb_substr($ip, 7) : $ip;
 
 		return $ip;
 	}
@@ -140,6 +140,6 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		$head->addItem('skin_css', 'css/luigifab/versioning/styles.min.css');    // évite que _data['items'] soit inexistant
 		$head->removeItem('skin_css', 'css/luigifab/versioning/styles.min.css'); // sur le foreach du getCssJsHtml
 
-		return (strlen($data = trim($head->getCssJsHtml())) > 10) ? $data : null;
+		return (mb_strlen($data = trim($head->getCssJsHtml())) > 10) ? $data : null;
 	}
 }

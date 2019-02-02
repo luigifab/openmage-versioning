@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated J/26/07/2018
+ * Updated J/17/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -37,11 +37,11 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 	private function checkChanges() {
 
 		$index = file_get_contents(BP.'/index.php');
-		if (strpos($index, 'trim(array_pop($ip))') === false)
+		if (mb_strpos($index, '::f{4}:\\d{1,3}') === false)
 			return 'index.php';
-		if (strpos($index, 'trim(getenv(\'REMOTE_ADDR\'))') === false)
+		if (mb_strpos($index, 'trim(getenv(\'REMOTE_ADDR\'))') === false)
 			return 'index.php';
-		if (strpos($index, 'config/upgrade.ip') === false)
+		if (mb_strpos($index, 'config/upgrade.ip') === false)
 			return 'index.php';
 
 		return true;

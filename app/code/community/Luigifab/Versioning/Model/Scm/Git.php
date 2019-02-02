@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/26/08/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -19,22 +19,22 @@
 
 class Luigifab_Versioning_Model_Scm_Git {
 
-	private $version  = null;
-	private $revision = null;
-	private $items    = null;
+	private $version;
+	private $revision;
+	private $items;
 
 
 	// indique si le gestionnaire de version est installé
 	// le tout à partir de la réponse de la commande 'git'
 	public function isSoftwareInstalled() {
 		exec('git --version', $data);
-		return (preg_match('#([0-9]+\.[0-9]+\.[0-9]+)#', trim(implode($data)), $this->version) !== 0);
+		return (preg_match('#(\d+\.\d+\.\d+)#', trim(implode($data)), $this->version) !== 0);
 	}
 
 	public function getSoftwareVersion() {
 		if (empty($this->version))
 			$this->isSoftwareInstalled();
-		return (!empty($this->version)) ? trim($this->version[0]) : null;
+		return !empty($this->version) ? trim($this->version[0]) : null;
 	}
 
 	public function getType() {
@@ -58,7 +58,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 		if (!is_string($configsh))
 			$configsh = realpath('../.git/ssh/config.sh');
 
-		$desc = (version_compare($this->getSoftwareVersion(), '1.7.2', '>=')) ? '%B' : '%s%n%b';
+		$desc = version_compare($this->getSoftwareVersion(), '1.7.2', '>=') ? '%B' : '%s%n%b';
 		$nb   = intval(Mage::getStoreConfig('versioning/scm/number'));
 
 		if (is_string($configsh) && is_executable($configsh)) {
@@ -83,10 +83,10 @@ class Luigifab_Versioning_Model_Scm_Git {
 		$data = str_replace("\n\n", "\n", $data);
 
 		// traitement de la réponse
-		if (($val !== 0) || (strpos($data, '</log>') === false) || (strpos($data, 'error: ') !== false) || (strpos($data, 'fatal: ') !== false)) {
+		if (($val !== 0) || (mb_strpos($data, '</log>') === false) || (mb_strpos($data, 'error: ') !== false) || (mb_strpos($data, 'fatal: ') !== false)) {
 
-			$data = (is_array($data)) ? implode("\n", $data) : $data;
-			$data = (strpos($data, '<log') !== false) ? substr($data, 0, strpos($data, '<log')) : $data;
+			$data = is_array($data) ? implode("\n", $data) : $data;
+			$data = (mb_strpos($data, '<log') !== false) ? mb_substr($data, 0, mb_strpos($data, '<log')) : $data;
 			$data = '<u>Response:</u>'."\n".$data;
 
 			$config = '<u>The git/config file:</u>'."\n".
@@ -95,7 +95,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 			Mage::throwException('Can not get commit history, invalid response!'."\n\n".trim($data)."\n\n".trim($config));
 		}
 		else {
-			$data    = (strpos($data, '<') !== 0) ? substr($data, strpos($data, '<')) : $data;
+			$data    = (mb_strpos($data, '<') !== 0) ? mb_substr($data, mb_strpos($data, '<')) : $data;
 			$branchs = array($this->getCurrentBranch());
 
 			$xml = new DOMDocument();
@@ -123,7 +123,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 				}
 
 				if (!in_array($branch, $branchs))
-					array_push($branchs, $branch);
+					$branchs[] = $branch;
 
 				$item = new Varien_Object();
 				$item->setData('current_revision', $this->getCurrentRevision());
@@ -158,7 +158,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		exec('git branch | grep "*" | cut -c3-', $data);
 		$data = trim(implode($data));
-		$data = (!empty($data)) ? $data : null;
+		$data = !empty($data) ? $data : null;
 
 		$this->branch = $data;
 		return $this->branch;
@@ -171,7 +171,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		exec('git rev-parse --short HEAD', $data);
 		$data = trim(implode($data));
-		$data = (!empty($data)) ? $data : null;
+		$data = !empty($data) ? $data : null;
 
 		$this->revision = $data;
 		return $this->revision;
@@ -199,14 +199,14 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 			if (empty($line))
 				unset($lines[$i]);
-			else if (strpos($line, '--- a/') === 0)
+			else if (mb_strpos($line, '--- a/') === 0)
 				unset($lines[$i]);
-			else if (strpos($line, '+++ b/') === 0)
+			else if (mb_strpos($line, '+++ b/') === 0)
 				unset($lines[$i]);
 			else if ($line == '\\ No newline at end of file')
 				unset($lines[$i]);
-			else if (strpos($line ,'diff --git a') === 0)                 // 13 = strlen('diff --git a/')
-				$line = "\n".'<strong>=== '.substr(htmlspecialchars($line), 13, strpos($line, ' b/') - 13).'</strong>';
+			else if (mb_strpos($line ,'diff --git a') === 0)                 // 13 = mb_strlen('diff --git a/')
+				$line = "\n".'<strong>=== '.mb_substr(htmlspecialchars($line), 13, mb_strpos($line, ' b/') - 13).'</strong>';
 			else if ($line[0] == '+')
 				$line = '<ins>'.htmlspecialchars($line).' </ins>';
 			else if ($line[0] == '-')
@@ -241,23 +241,23 @@ class Luigifab_Versioning_Model_Scm_Git {
 		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
 		foreach ($lines as &$line) {
 
-			if (strpos($line, 'A') === 0)
+			if (mb_strpos($line, 'A') === 0)
 				$line = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $help->__('new file:-------')), $line);
-			else if (strpos($line, 'C') === 0)
-				$line = preg_replace("#C[0-9]*\t#", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
-			else if (strpos($line, 'D') === 0)
+			else if (mb_strpos($line, 'C') === 0)
+				$line = preg_replace("#C\d*\t#", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
+			else if (mb_strpos($line, 'D') === 0)
 				$line = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $help->__('deleted:--------')), $line);
-			else if (strpos($line, 'M') === 0)
+			else if (mb_strpos($line, 'M') === 0)
 				$line = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
-			else if (strpos($line, 'R') === 0)
-				$line = preg_replace("#R[0-9]*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
-			else if (strpos($line, 'T') === 0)
+			else if (mb_strpos($line, 'R') === 0)
+				$line = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
+			else if (mb_strpos($line, 'T') === 0)
 				$line = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $help->__('type changed:---')), $line);
-			else if (strpos($line, 'U') === 0)
+			else if (mb_strpos($line, 'U') === 0)
 				$line = str_replace('U'."\t", "\t\t".str_replace('-', ' ', $help->__('unmerged:-------')), $line);
-			else if (strpos($line, 'X') === 0)
+			else if (mb_strpos($line, 'X') === 0)
 				$line = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $help->__('unknown:--------')), $line);
-			else if (strpos($line, 'B') === 0)
+			else if (mb_strpos($line, 'B') === 0)
 				$line = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
 		}
 
@@ -303,7 +303,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 		$obj->writeCommand($data);
 
 		foreach ($lines as $line) {
-			if (strpos($line, 'fatal: ') === 0)
+			if (mb_strpos($line, 'fatal: ') === 0)
 				Mage::throwException(str_replace('fatal: ', '', $line));
 		}
 

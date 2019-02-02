@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/16/10/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -131,7 +131,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			$this->_redirect('adminhtml/system_config/edit', array('section' => 'versioning'));
 			return;
 		}
-		else if (Mage::getSingleton('admin/session')->isFirstPageAfterLogin() || empty($revision)) {
+		else if (empty($revision) || Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
 			$this->_redirect('*/versioning_repository/index');
 			return;
 		}
@@ -139,7 +139,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$upgrade = Mage::getSingleton('versioning/upgrade');
 		$upgrade->disableAllBuffer();
 
-		$lang = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
+		$lang = mb_substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 		echo "\n",'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="',$lang,'" lang="',$lang,'">';
 		echo "\n",'<head>';
@@ -225,12 +225,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", '// svg animation colors';
 		echo "\n", 'try {';
 		echo "\n",  'var svg = document.getElementById("state").getSVGDocument();';
-		echo "\n",  'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
+		echo "\n",  'svg.getElementById("color").setAttribute("class", "'.($result['error'] ? 'error' : 'success').'");';
 		echo "\n", '}';
 		echo "\n", 'catch (ee) {';
 		echo "\n",  'document.getElementById("state").onload = function () {';
 		echo "\n",   'var svg = document.getElementById("state").getSVGDocument();';
-		echo "\n",   'svg.getElementById("color").setAttribute("class", "'.(($result['error']) ? 'error' : 'success').'");';
+		echo "\n",   'svg.getElementById("color").setAttribute("class", "'.($result['error'] ? 'error' : 'success').'");';
 		echo "\n",  '};';
 		echo "\n", '}';
 		echo "\n",'</script>';

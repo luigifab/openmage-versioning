@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated D/20/05/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -25,7 +25,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 		$this->_controller = 'adminhtml_history';
 		$this->_blockGroup = 'versioning';
-		$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+		$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
 			$this->__('Updates history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
 			$this->__('Updates history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
@@ -46,7 +46,7 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 
 	public function getGridHtml() {
 		$file = $this->helper('versioning')->getLastLog();
-		return '<pre lang="mul">'.((is_file($file)) ? file_get_contents($file) : '').'</pre> '.$this->getChildHtml('grid');
+		return '<pre lang="mul">'.(is_file($file) ? file_get_contents($file) : '').'</pre> '.$this->getChildHtml('grid');
 	}
 
 	public function getHeaderCssClass() {

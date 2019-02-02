@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/17/05/2018
+ * Updated J/27/12/2018
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -17,7 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-$lang = substr($this->getData('locale'), 0, 2);
+$lang = mb_substr($this->getData('locale'), 0, 2);
 $code = (string) $code;
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -48,11 +48,11 @@ div.box { margin:0 1em 1em; width:auto; }
 }
 </style>
 <script type="text/javascript">
-var count = 0, timer;
+var count = 0;
 self.addEventListener('load', function () {
 	if (document.getElementById('reload')) {
 		count = parseInt(document.getElementById('reload').querySelector('span').innerHTML, 10) - 1;
-		timer = self.setInterval(function () {
+		self.setInterval(function () {
 			if (count > 1)
 				document.getElementById('reload').querySelector('span').innerHTML = count--;
 		}, 1000);
@@ -61,7 +61,6 @@ self.addEventListener('load', function () {
 }, false);
 </script>
 </head>
-
 <body>
 	<div class="box">
 		<div class="number">

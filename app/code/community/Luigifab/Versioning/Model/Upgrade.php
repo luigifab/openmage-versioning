@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated D/26/08/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -24,8 +24,8 @@ class Luigifab_Versioning_Model_Upgrade {
 	// n'utilise surtout pas le fichier versioning.log pour Mage::log
 	public function disableAllBuffer() {
 
-		header('Content-Encoding: chunked', true);
-		header('Connection: Keep-Alive', true);
+		header('Content-Encoding: chunked');
+		header('Connection: Keep-Alive');
 
 		ini_set('max_execution_time', 600);
 		ini_set('output_buffering', false);
@@ -90,7 +90,7 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			file_put_contents($lock, $H['current_rev'].'/'.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
 			if ($useFlag)
-				file_put_contents($help->getUpgradeFlag(), file_get_contents($lock));
+				copy($lock, $help->getUpgradeFlag());
 
 			// ÉTAPE 2 et 3
 			// avec les événements before et after
@@ -113,7 +113,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			unlink($lock);
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
-			$H['status']   = (is_file($log)) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
+			$H['status']   = is_file($log) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
 
 			$result = array(
 				'url'   => '*/versioning_repository/index',
@@ -127,7 +127,7 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
 				$H['duration'] = ceil(microtime(true) - $H['duration']);
-				$H['status']   = (is_file($log)) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
+				$H['status']   = is_file($log) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
 			}
 			else {
 				$H['duration'] = ceil(microtime(true) - $H['duration']);
@@ -179,7 +179,7 @@ class Luigifab_Versioning_Model_Upgrade {
 	// affiche une commande ou une information pour savoir ce qu'il se passe
 	// ajoute un peu de code HTML pour faire plus jolie
 	private function writeTitle($data, $endEvent = false) {
-		echo ($endEvent) ? '</span>'."\n".$data."\n" : "\n".$data."\n";
+		echo $endEvent ? '</span>'."\n".$data."\n" : "\n".$data."\n";
 	}
 
 	private function writeEvent($data) {

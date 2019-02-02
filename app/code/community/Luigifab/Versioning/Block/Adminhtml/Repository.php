@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/17/05/2018
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -25,7 +25,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
-		$this->_headerText = (!empty($branch = Mage::registry('versioning')->getCurrentBranch())) ?
+		$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
 			$this->__('Revisions history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
 			$this->__('Revisions history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
 
@@ -104,7 +104,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		return $this->getChildHtml('grid')."\n".
 			'<script type="text/javascript">'."\n".
-			'self.versioningIds = {'.substr($hash, 0, -1).'};'."\n".
+			'self.versioningIds = {'.mb_substr($hash, 0, -1).'};'."\n".
 			'self.versioningCols = '.array_pop($columns).';'."\n".
 			'self.versioningConfirm = ['."\n".
 				'"'.$this->helper('versioning')->getFields().'", '."\n".

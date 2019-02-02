@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated M/28/02/2017
+ * Updated M/15/01/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -19,7 +19,7 @@
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-define('ROOT', ((is_dir('./errors')) ? realpath('.') : realpath('..')));
+define('ROOT', is_dir('./errors') ? realpath('.') : realpath('..'));
 
 if (is_file(ROOT.'/errors/config/processor.php')) {
 	require_once(ROOT.'/errors/config/processor.php');
