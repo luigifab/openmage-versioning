@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/02/11/2012
- * Updated M/27/02/2018
+ * Updated S/16/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -37,9 +37,9 @@ class Luigifab_Versioning_Model_Demo {
 		$observer->getData('controller')->writeCommand('before event example');
 		Mage::log('Luigifab_Versioning_Model_Demo::beforeUpgradeEvent, revision: '.$observer->getData('revision'));
 
-		//Mage::app()->getRequest()->getParam('revision', '') => string (xyzxyzxyz) = $observer->getData('revision')
-		//Mage::app()->getRequest()->getParam('use_flag', '') => string = '1' or ''
-		//Mage::app()->getRequest()->getParam('test', '')     => string = '1' or '' (addFieldsEvent())
+		//$_GET['revision'] => string (xyzxyzxyz) = $observer->getData('revision')
+		//$_GET['use_flag'] => string = '1' or ''
+		//$_GET['test']     => string = '1' or '' (addFieldsEvent())
 	}
 
 	// example for EVENT admin_versioning_upgrade_after
@@ -60,8 +60,8 @@ class Luigifab_Versioning_Model_Demo {
 			Mage::log('Luigifab_Versioning_Model_Demo::afterUpgradeEvent, revision: '.$observer->getData('revision'));
 		}
 
-		//Mage::app()->getRequest()->getParam('revision', '') => string = xyzxyzxyz = $observer->getData('revision')
-		//Mage::app()->getRequest()->getParam('use_flag', '') => string = '1' or ''
-		//Mage::app()->getRequest()->getParam('test', '')     => string = '1' or '' (addFieldsEvent())
+		//$_GET['revision'] => string = xyzxyzxyz = $observer->getData('revision')
+		//$_GET['use_flag'] => string = '1' or ''
+		//$_GET['test']     => string = '1' or '' (addFieldsEvent())
 	}
 }

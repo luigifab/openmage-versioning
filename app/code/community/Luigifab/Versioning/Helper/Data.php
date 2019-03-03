@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/15/01/2019
+ * Updated V/01/03/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -40,7 +40,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		else if ($data > 1)
 			$data = ($seconds > 9) ? '00:'.$data : '00:0'.$data;
 		else
-			$data = '⩽ 1';
+			$data = '⩽&nbsp;1';
 
 		return $data;
 	}
@@ -68,7 +68,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		$html   = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the maintenance page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr());
+		$html[] = '<p>'.str_replace('<strong>', '<strong class="ip">', $this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr()));
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';
@@ -90,7 +90,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		$html   = array();
 		$html[] = '<p>'.$this->__('Are you sure you want to enable the update page?').'</p>';
 		$html[] = ''; // pour un saut de ligne supplémentaire sans apijs
-		$html[] = '<p>'.$this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr());
+		$html[] = '<p>'.str_replace('<strong>', '<strong class="ip">', $this->__('Your IP address: <strong>%s</strong>', $this->getIpAddr()));
 
 		if ($nobody)
 			$html[] = '<br />'.$this->__('<strong>Nobody</strong> will have access to the frontend.').'</p>';

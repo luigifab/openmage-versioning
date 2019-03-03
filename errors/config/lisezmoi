@@ -39,4 +39,4 @@ if (is_file('./upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === f
 
 Vous pouvez surcharger les fichiers suivants :
  - errors/processor.php » errors/config/processor.php  (utilisez UserProcessor comme nom de classe, votre classe doit étendre Processor)
- - errors/page.phtml    » errors/config/page.phtml
+ - errors/page.php      » errors/config/page.php

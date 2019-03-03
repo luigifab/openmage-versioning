@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/15/01/2019
+ * Updated J/28/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -177,7 +177,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 		return $this->revision;
 	}
 
-	public function getCurrentDiff($from = null, $to = null) {
+	public function getCurrentDiff($from = null, $to = null, $dir = null) {
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
@@ -191,6 +191,11 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		if (!empty($from) && !empty($to))
 			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
+		else if (!empty($from))
+			$command .= ' '.escapeshellarg($from).'..';
+
+		if (!empty($dir))
+			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 
 		$i = 0;
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
@@ -223,7 +228,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 			str_replace("\t", '    ', implode("\n", $lines));
 	}
 
-	public function getCurrentDiffStatus($from, $to) {
+	public function getCurrentDiffStatus($from, $to, $dir = null) {
 
 		$help = Mage::helper('versioning');
 
@@ -234,7 +239,14 @@ class Luigifab_Versioning_Model_Scm_Git {
 		else
 			$command = 'git diff --name-status';
 
-		$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
+		if (!empty($from) && !empty($to))
+			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
+		else if (!empty($from))
+			$command .= ' '.escapeshellarg($from).'..';
+
+		if (!empty($dir))
+			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
+
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)

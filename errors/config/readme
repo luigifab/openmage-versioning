@@ -39,4 +39,4 @@ if (is_file('./upgrade.flag') && (strpos(getenv('REQUEST_URI'), '/admin/') === f
 
 You can rewrite the following files:
  - errors/processor.php » errors/config/processor.php  (use UserProcessor as class name, your class must extends Processor)
- - errors/page.phtml    » errors/config/page.phtml
+ - errors/page.php      » errors/config/page.php

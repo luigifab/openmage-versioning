@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated V/11/01/2019
+ * Updated V/01/03/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -31,10 +31,8 @@ var versioning = {
 			if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
 				document.querySelector('table.data tbody button').click();
 
-			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds === 'object')) {
-				versioning.drawGraph(self.versioningIds, self.versioningCols);
-				versioning.initDiff();
-			}
+			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds === 'object'))
+				versioning.drawGraph(self.versioningIds, self.versioningCols).initDiff();
 		}
 	},
 
@@ -62,7 +60,6 @@ var versioning = {
 			if (apijs.version < 530)
 				throw new Error('Invalid apijs version');
 
-			url.match(/revision\/(\w+)\//);
 			apijs.dialog.dialogConfirmation(
 				title, // title
 				this.decode(content), // text
@@ -213,15 +210,16 @@ var versioning = {
 
 
 	// #### Affichage de l'historique ########################################### //
-	// = révision : 10
+	// = révision : 11
 	// » Affiche les détails d'une mise à jour dans la balise pre
 	// » Marque la ligne active du tableau avec la classe current
 	history: function (link, content) {
 
-		var elems = document.querySelectorAll('table.data tbody tr'), elem;
+		var elem, elems = document.querySelectorAll('table.data tbody tr');
 		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
-			if (elems[elem].hasAttribute('class'))
-				elems[elem].setAttribute('class', elems[elem].getAttribute('class').replace(/ ?current/, ''));
+			elem = elems[elem];
+			if (elem.hasAttribute('class'))
+				elem.setAttribute('class', elem.getAttribute('class').replace(/ ?current/, ''));
 		}
 
 		elem = link.parentNode.parentNode;
@@ -233,17 +231,18 @@ var versioning = {
 
 
 	// #### Représentation des branches ######################################### //
-	// = révision : 132
+	// = révision : 134
 	// » Utilise Raphael.js 2.2.7 (93,5 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
-	// » Utilise la fonction innerSVG (1,8 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
+	// » Utilise la fonction innerSVG (1,4 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
 	// » Crée ensuite les lignes entres les points sans utiliser les trucs dépréciés de prototype
 	drawGraph: function (data, cols) {
 
-		var elem, x, y, pX, pY, colors = [], styles = [], names = [], tops = [], bottoms = [], innerSvg = '', that = versioning,
+		var elem, x, y, pX, pY, gradients = '', that = versioning,
 			commitsHash  = new Hash(data),
 			commitsArray = commitsHash.values(),
-			tableRows    = $$('table.data tbody tr'), rows = tableRows.length - 1,   // les lignes du tableau
+			tableRows    = $$('table.data tbody tr'), rows = tableRows.length - 1, // les lignes du tableau
+			colors = [], styles = [], names = [], tops = [], bottoms = [],
 			grad = 0, offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0, dMiHeight = 0;
 
 		// https://stackoverflow.com/a/1129270
@@ -270,13 +269,13 @@ var versioning = {
 
 		// initialisation du graphique
 		// canvas = l'élément svg
-		this.svg = new Raphael(document.getElementById('versioning_grid_table').parentNode);
-		this.svg.setSize(this.width, graphHeight);
-		this.svg.canvas.setAttribute('style', 'top:' + offsetTop + 'px;');
-		this.svg.canvas.setAttribute('class', 'k k0');
-		this.svg.canvas.setAttribute('id', 'versioning_graph');
-		this.svg.canvas.setAttribute('onmouseover', 'versioning.mouseOver(true);');
-		this.svg.canvas.parentNode.setAttribute('onmouseleave', 'versioning.mouseOver(false);');
+		that.svg = new Raphael(document.getElementById('versioning_grid_table').parentNode);
+		that.svg.setSize(that.width, graphHeight);
+		that.svg.canvas.setAttribute('style', 'top:' + offsetTop + 'px;');
+		that.svg.canvas.setAttribute('class', 'k k0');
+		that.svg.canvas.setAttribute('id', 'versioning_graph');
+		that.svg.canvas.setAttribute('onmouseover', 'versioning.mouseOver(true);');
+		that.svg.canvas.parentNode.setAttribute('onmouseleave', 'versioning.mouseOver(false);');
 
 		// génération des couleurs
 		// mémorise en même temps le point le plus haut/bas de chaque branche
@@ -402,7 +401,7 @@ var versioning = {
 						// dégradé manuel car Raphael.js ne permet pas de définir un dégradé sur un path sur stroke
 						// dans un sens ou dans l'autre, bref on veut pas savoir
 						// attention pour les lignes en travers pas de kX
-						innerSvg += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0">' +
+						gradients += '<linearGradient id="manGrad' + grad + '" x1="0" y1="0" x2="100%" y2="0">' +
 							'<stop offset="0" stop-color="' + ((x > pX) ? parent.color : commit.color) + '"></stop>' +
 							'<stop offset="100%" stop-color="' + ((x > pX) ? commit.color : parent.color) + '"></stop>' +
 						'</linearGradient>';
@@ -465,8 +464,8 @@ var versioning = {
 		});
 
 		// une seule fois sinon ok que pour le dernier ajout avec Edge 14
-		if (innerSvg.length > 0)
-			document.querySelector('svg defs').innerSVG = innerSvg;
+		if (gradients.length > 0)
+			document.querySelector('svg defs').innerSVG = gradients;
 
 		// ajoute les styles pour les animations
 		elem = document.createElement('style');
@@ -474,6 +473,8 @@ var versioning = {
 		elem.setAttribute('id', 'versioning_styles');
 		elem.appendChild(document.createTextNode(styles.join("\n")));
 		document.querySelector('head').appendChild(elem);
+
+		return that;
 	},
 
 	mouseOver: function (yes) {
@@ -488,12 +489,12 @@ var versioning = {
 
 
 	// #### Gestion des cases du diff ########################################### //
-	// = révision : 13
+	// = révision : 14
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
 	initDiff: function () {
 
-		var elems = document.querySelectorAll('table.data input[type="radio"]'), elem, d1 = 1, d2 = 1, bis = true;
+		var elem, elems = document.querySelectorAll('table.data input[type="radio"]'), d1 = 1, d2 = 1, bis = true;
 		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
 			elems[elem].setAttribute('onchange', 'versioning.goDiff(' + (bis ? (d1++) : (d2++)) + ', ' + (bis ? 'false' : 'true') + ');');
 			elems[elem].removeAttribute('disabled'); // lors d'un F5 c'est utile
@@ -506,6 +507,7 @@ var versioning = {
 		document.querySelector('table.data input[name="d2"]:not([disabled])').checked = true;
 
 		this.goDiff();
+		return this;
 	},
 
 	goDiff: function (url, two) {

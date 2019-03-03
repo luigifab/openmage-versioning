@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/01/01/2019
+ * Updated M/05/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -162,7 +162,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 
-	public function _toHtml() {
+	protected function _toHtml() {
 		return str_replace('class="data', 'class="data k k0', parent::_toHtml());
 	}
 }

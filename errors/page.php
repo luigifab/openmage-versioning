@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/27/12/2018
+ * Updated J/28/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -16,6 +16,9 @@
  * merchantability or fitness for a particular purpose. See the
  * GNU General Public License (GPL) for more details.
  */
+
+if (!is_object($this))
+	exit(0);
 
 $lang = mb_substr($this->getData('locale'), 0, 2);
 $code = (string) $code;

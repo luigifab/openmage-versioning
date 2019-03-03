@@ -1,7 +1,7 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated M/15/01/2019
+ * Updated J/28/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -30,7 +30,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$from = $this->getRequest()->getParam('from');
 		$to   = $this->getRequest()->getParam('to');
 
-		if (!empty($from) && !empty($to)) {
+		if (!empty($from)) {
 			$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
 				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>, %s)', $from, $to, $type, $branch) :
 				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>)', $from, $to, $type);
@@ -55,7 +55,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 			'class'   => 'go'
 		));
 
-		if (!empty($from) && !empty($to)) {
+		if (!empty($from)) {
 			$this->_addButton('status', array(
 				'label'   => $this->__('Repository status'),
 				'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
@@ -69,10 +69,14 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$model = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
 		$from  = $this->getRequest()->getParam('from');
 		$to    = $this->getRequest()->getParam('to');
+		$dir   = $this->getRequest()->getParam('dir');
 
-		if (!empty($from) && !empty($to))
-			return '<pre lang="mul">'.$model->getCurrentDiffStatus($from, $to).'</pre>'.
-			       '<pre lang="mul">'.$model->getCurrentDiff($from, $to).'</pre>';
+		if (!empty($dir))
+			$dir = str_replace(array('"','\'','|','\\'), '', $dir);
+
+		if (!empty($from))
+			return '<pre lang="mul">'.$model->getCurrentDiffStatus($from, $to, $dir).'</pre>'.
+			       '<pre lang="mul">'.$model->getCurrentDiff($from, $to, $dir).'</pre>';
 		else
 			return '<pre lang="mul">'.$model->getCurrentStatus().'</pre><pre lang="mul">'.$model->getCurrentDiff().'</pre>';
 	}

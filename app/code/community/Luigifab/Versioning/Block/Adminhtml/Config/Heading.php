@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated M/01/01/2019
+ * Updated M/05/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -17,8 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-use Varien_Data_Form_Element_Renderer_Interface as Varien_DFER_Interface;
-class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_Abstract implements Varien_DFER_Interface {
+class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_Block_System_Config_Form_Field_Heading {
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 

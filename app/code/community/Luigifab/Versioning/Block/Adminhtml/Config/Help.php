@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated J/17/01/2019
+ * Updated J/14/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -22,13 +22,12 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
 		if (($msg = $this->checkChanges()) === true) {
-			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>',
-				$this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning');
+			return sprintf('<p class="box">Luigifab/%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
+				'Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning');
 		}
 		else {
-			return sprintf('<p class="box">Luigifab/Versioning %s <a href="https://www.%s" style="float:right;">%2$s</a></p>'.
-				'<p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
-				$this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning',
+			return sprintf('<p class="box">Luigifab/%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
+				'Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning',
 				$this->__('INCOMPLETE MODULE INSTALLATION'),
 				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
 		}

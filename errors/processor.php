@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/17/01/2019
+ * Updated J/28/02/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -37,7 +37,7 @@ class Processor {
 
 		// gestion des langues
 		$files  = array_merge(scandir(ROOT.'/errors/config/', SCANDIR_SORT_NONE), glob(ROOT.'/app/locale/*/Luigifab_Versioning.csv'));
-		$result = $this->searchLang($files);
+		$result = $this->initLocale($files);
 
 		setlocale(LC_ALL, $result.'utf8');
 		$this->setData('locale', $result);
@@ -83,13 +83,13 @@ class Processor {
 		return $this->getData('report');
 	}
 
+	public function getHtmlContent() {
+		return $this->__($this->getData('type').'_content');
+	}
+
 	public function getHtmlReload() {
 		$text = $this->__($this->getData('type').'_autoreload');
 		return (mb_strpos($text, '_autoreload') === false) ? '<p id="reload">'.$text.'</p>' : '';
-	}
-
-	public function getHtmlContent() {
-		return $this->__($this->getData('type').'_content');
 	}
 
 
@@ -118,7 +118,7 @@ class Processor {
 		header('X-Frame-Options: DENY');
 
 		ob_start();
-		require_once(is_file(ROOT.'/errors/config/page.phtml') ? ROOT.'/errors/config/page.phtml' : ROOT.'/errors/page.phtml');
+		require_once(is_file(ROOT.'/errors/config/page.php') ? ROOT.'/errors/config/page.php' : ROOT.'/errors/page.php');
 		$html = ob_get_contents();
 		ob_end_clean();
 
@@ -155,6 +155,7 @@ class Processor {
 	}
 
 
+	// configuration et données
 	public function getConfig($key) {
 		return !empty($this->config[$this->type.'_'.$key]) ? $this->config[$this->type.'_'.$key] : false;
 	}
@@ -169,7 +170,8 @@ class Processor {
 	}
 
 
-	private function searchLang($files, $result = 'en_US', $filter = array()) {
+	// language et traduction
+	private function initLocale($files, $result = 'en_US', $filter = array()) {
 
 		foreach ($files as $file) {
 			// app/locale/en_US/Luigifab_Versioning.csv
@@ -272,6 +274,7 @@ class Processor {
 		else {
 			$final = ($index !== false) ? $this->dataTranslated[$index] : $words;
 		}
+
 
 
 
