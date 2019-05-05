@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated V/01/03/2019
+ * Updated D/28/04/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -47,7 +47,6 @@ var versioning = {
 		return decodeURIComponent(escape(self.atob(data)));
 	},
 
-
 	// #### Confirmation des pages de maintenance ############################### //
 	// = révision : 25
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
@@ -81,7 +80,7 @@ var versioning = {
 				// demande de confirmation
 				if (confirm(this.decode(content).replace(/\[[^\]]+]/g, ''))) {
 					this.enableLoader();
-					location.href = url;
+					self.location.href = url;
 				}
 			}
 			catch (ee) {
@@ -91,7 +90,7 @@ var versioning = {
 				// demande de confirmation
 				if (confirm(Translator.translate('Are you sure?'))) {
 					this.enableLoader();
-					location.href = url;
+					self.location.href = url;
 				}
 			}
 		}
@@ -100,14 +99,13 @@ var versioning = {
 	actionConfirmFlag: function (url) {
 		versioning.enableLoader();
 		apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
-		location.href = url;
+		self.location.href = url;
 	},
 
 	cancelFlag: function (url) {
 		this.enableLoader();
-		location.href = url;
+		self.location.href = url;
 	},
-
 
 	// #### Confirmation de mise à jour ######################################### //
 	// = révision : 45
@@ -202,36 +200,30 @@ var versioning = {
 		// avec l'apijs, en deux temps
 		else {
 			apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
-			location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
+			self.location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
 		}
 
 		return true;
 	},
 
-
 	// #### Affichage de l'historique ########################################### //
-	// = révision : 11
+	// = révision : 12
 	// » Affiche les détails d'une mise à jour dans la balise pre
 	// » Marque la ligne active du tableau avec la classe current
 	history: function (link, content) {
 
-		var elem, elems = document.querySelectorAll('table.data tbody tr');
-		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
-			elem = elems[elem];
-			if (elem.hasAttribute('class'))
-				elem.setAttribute('class', elem.getAttribute('class').replace(/ ?current/, ''));
-		}
+		var elem, elems = document.querySelectorAll('table.data tbody tr[class]');
+		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem))
+			elems[elem].classList.remove('current');
 
-		elem = link.parentNode.parentNode;
-		elem.setAttribute('class', ((elem.hasAttribute('class')) ? elem.getAttribute('class') : '') + ' current');
-
+		link.parentNode.parentNode.classList.add('current');
 		document.querySelector('pre').innerHTML = this.decode(content) + "\n\n";
+
 		return false;
 	},
 
-
 	// #### Représentation des branches ######################################### //
-	// = révision : 134
+	// = révision : 137
 	// » Utilise Raphael.js 2.2.7 (93,5 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,4 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
@@ -487,7 +479,6 @@ var versioning = {
 		document.getElementById('versioning_grid_table').setAttribute('class', 'data ' + klass);
 	},
 
-
 	// #### Gestion des cases du diff ########################################### //
 	// = révision : 14
 	// » Gère l'activation du lien vers la page du diff
@@ -520,7 +511,7 @@ var versioning = {
 
 		if (typeof url === 'string') {
 			this.enableLoader();
-			location.href = url;
+			self.location.href = url;
 		}
 		else {
 			if (two === true) {

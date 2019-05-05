@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/15/01/2019
+ * Updated D/28/04/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -245,7 +245,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", '// register disableClose delayed to prevent close warning in Chrome browser';
 		echo "\n", 'self.setTimeout(function () {';
 		echo "\n",  'self.onbeforeunload = null;';
-		echo "\n",  'location.href = "',$this->getUrl($result['url']),'";';
+		echo "\n",  'self.location.href = "',$this->getUrl($result['url']),'";';
 		echo "\n",  'self.setTimeout(function () {';
 		echo "\n",   'self.onbeforeunload = disableClose;';
 		echo "\n",  '}, 1);';

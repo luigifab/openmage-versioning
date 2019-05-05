@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/28/02/2019
+ * Updated D/28/04/2019
  *
  * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -59,7 +59,7 @@ self.addEventListener('load', function () {
 			if (count > 1)
 				document.getElementById('reload').querySelector('span').innerHTML = count--;
 		}, 1000);
-		self.setTimeout(function () { location.reload(); }, count * 1000);
+		self.setTimeout(function () { self.location.reload(); }, count * 1000);
 	}
 }, false);
 </script>

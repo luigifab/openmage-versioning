@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.7.3</version>
+			<version>3.7.4</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
