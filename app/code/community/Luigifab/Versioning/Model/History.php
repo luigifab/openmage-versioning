@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated M/15/01/2019
+ * Updated L/04/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,9 +22,9 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 	protected $_pageSize = true;
 	protected $_isCollectionLoaded = true;
 
-	// collection spécifique (ou pas...) avec un simple array()
+	// collection spécifique (ou pas...) avec un simple array
 	// avec un jolie bricolage mais c'est pas très important
-	public function init($page, $size) {
+	public function init(int $page, int $size) {
 
 		$help = Mage::helper('versioning');
 		$file = $help->getHistoryLog();
@@ -33,9 +33,9 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			// recherche des données
 			// construction d'un premier tableau
-			$ressource = fopen($file, 'rb');
+			$resource = fopen($file, 'rb');
 
-			while (($line = fgetcsv($ressource, 50000, ',', '`')) !== false) {
+			while (($line = fgetcsv($resource, 50000, ',', '`')) !== false) {
 
 				if (!empty($line[0])) {
 
@@ -49,8 +49,8 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 					// modifié en version 1.1.0
 					// la 7ème case contient désormais le statut suivi d'un saut de ligne suivi des détails de la mise à jour
-					if (mb_strpos($line[6], "\n") !== false) {
-						$pos = mb_strpos($line[6], "\n");
+					if (mb_stripos($line[6], "\n") !== false) {
+						$pos = mb_stripos($line[6], "\n");
 						$item->setData('status', mb_substr($line[6], 0, $pos));
 						$item->setData('details', mb_substr($line[6], $pos + 1));
 					}
@@ -65,15 +65,15 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 					// an upgrade is already...
 					// remplace le texte par sa version traduite
-					if ((mb_strpos($item->getData('details'), 'An upgrade is already underway') === 0) ||
-					    (mb_strpos($item->getData('details'), 'An update is in progress') === 0))
+					if ((mb_stripos($item->getData('details'), 'An upgrade is already underway') === 0) ||
+					    (mb_stripos($item->getData('details'), 'An update is in progress') === 0))
 						$item->setData('details', $help->__('Stop! Stop! Stop! An update is in progress.'));
 
 					$this->_items[] = $item;
 				}
 			}
 
-			fclose($ressource);
+			fclose($resource);
 
 			// première sauvegarde
 			$this->_items = array_reverse($this->_items);
@@ -81,7 +81,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			// collection finale
 			// construction de second tableau
-			$items   = array();
+			$items   = [];
 			$current = 0;
 			$from    = ($page - 1) * $size;
 			$to      = ($page - 1) * $size + $size;

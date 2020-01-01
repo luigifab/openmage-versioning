@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/03/2012
- * Updated M/28/02/2017
+ * Updated M/20/08/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,12 +21,12 @@ class Luigifab_Versioning_Model_Source_Number {
 
 	public function toOptionArray() {
 
-		return array(
-			array('value' => 20,  'label' => 20),
-			array('value' => 30,  'label' => 30),
-			array('value' => 50,  'label' => 50),
-			array('value' => 100, 'label' => 100),
-			array('value' => 200, 'label' => 200)
-		);
+		return [
+			['value' => 20,  'label' => 20],
+			['value' => 30,  'label' => 30],
+			['value' => 50,  'label' => 50],
+			['value' => 100, 'label' => 100],
+			['value' => 200, 'label' => 200]
+		];
 	}
 }

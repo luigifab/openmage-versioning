@@ -1,9 +1,9 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated J/28/02/2019
+ * Updated D/10/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,67 +22,70 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 	public function __construct() {
 
 		parent::__construct();
+		$system = $this->helper('versioning')->getSystem();
 
-		$this->_controller = 'adminhtml_status';
-		$this->_blockGroup = 'versioning';
-
-		$type = Mage::getStoreConfig('versioning/scm/type');
+		$type = $system->getType();
 		$from = $this->getRequest()->getParam('from');
 		$to   = $this->getRequest()->getParam('to');
 
 		if (!empty($from)) {
-			$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
-				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>, %s)', $from, $to, $type, $branch) :
-				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>)', $from, $to, $type);
+			$this->_controller = 'adminhtml_status';
+			$this->_blockGroup = 'versioning';
+			$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
+				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>)', $from, $to, $type) :
+				$this->__('Differences between revisions %s and %s (<span id="scmtype">%s</span>, %s)', $from, $to, $type, $branch);
 		}
 		else {
-			$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
-				$this->__('Repository status (<span id="scmtype">%s</span>, %s)', $type, $branch) :
-				$this->__('Repository status (<span id="scmtype">%s</span>)', $type);
+			$this->_controller = 'adminhtml_status';
+			$this->_blockGroup = 'versioning';
+			$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
+				$this->__('Repository status (<span id="scmtype">%s</span>)', $type) :
+				$this->__('Repository status (<span id="scmtype">%s</span>, %s)', $type, $branch);
 		}
 
 		$this->_removeButton('add');
 
-		$this->_addButton('back', array(
+		$this->_addButton('back', [
 			'label'   => $this->__('Back'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
 			'class'   => 'back'
-		));
+		]);
 
-		$this->_addButton('history', array(
+		$this->_addButton('log', [
 			'label'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
-		));
+		]);
 
 		if (!empty($from)) {
-			$this->_addButton('status', array(
+			$this->_addButton('status', [
 				'label'   => $this->__('Repository status'),
 				'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
 				'class'   => 'go'
-			));
+			]);
 		}
 	}
 
 	public function getGridHtml() {
 
-		$model = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
-		$from  = $this->getRequest()->getParam('from');
-		$to    = $this->getRequest()->getParam('to');
-		$dir   = $this->getRequest()->getParam('dir');
+		$system = $this->helper('versioning')->getSystem();
+		$from = $this->getRequest()->getParam('from');
+		$to   = $this->getRequest()->getParam('to');
+		$dir  = $this->getRequest()->getParam('dir');
+		$excl = $this->getRequest()->getParam('excl');
 
 		if (!empty($dir))
-			$dir = str_replace(array('"','\'','|','\\'), '', $dir);
+			$dir = str_replace(['"','\'','|','\\'], '', $dir);
 
 		if (!empty($from))
-			return '<pre lang="mul">'.$model->getCurrentDiffStatus($from, $to, $dir).'</pre>'.
-			       '<pre lang="mul">'.$model->getCurrentDiff($from, $to, $dir).'</pre>';
+			return '<pre lang="mul">'.$system->getCurrentDiffStatus($from, $to, $dir).'</pre>'.
+			       '<pre lang="mul">'.$system->getCurrentDiff($from, $to, $dir, $excl).'</pre>';
 		else
-			return '<pre lang="mul">'.$model->getCurrentStatus().'</pre><pre lang="mul">'.$model->getCurrentDiff().'</pre>';
+			return '<pre lang="mul">'.$system->getCurrentStatus().'</pre><pre lang="mul">'.$system->getCurrentDiff().'</pre>';
 	}
 
 	public function getHeaderCssClass() {
-		return 'icon-head '.parent::getHeaderCssClass().' '.Mage::getStoreConfig('versioning/scm/type');
+		return 'icon-head '.parent::getHeaderCssClass().' '.$this->helper('versioning')->getSystem()->getType();
 	}
 
 	protected function _prepareLayout() {

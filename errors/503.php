@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated M/15/01/2019
+ * Updated S/09/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -17,17 +17,17 @@
  * GNU General Public License (GPL) for more details.
  */
 
+chdir(__DIR__);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-define('ROOT', is_dir('./errors') ? realpath('.') : realpath('..'));
 
-if (is_file(ROOT.'/errors/config/processor.php')) {
-	require_once(ROOT.'/errors/config/processor.php');
-	require_once(ROOT.'/errors/processor.php');
+if (is_file('config/processor.php')) {
+	require_once('config/processor.php');
+	require_once('processor.php');
 	$processor = new UserProcessor();
 }
 else {
-	require_once(ROOT.'/errors/processor.php');
+	require_once('processor.php');
 	$processor = new Processor();
 }
 

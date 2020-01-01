@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated J/14/02/2019
+ * Updated D/06/10/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,26 +21,28 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-		if (($msg = $this->checkChanges()) === true) {
-			return sprintf('<p class="box">Luigifab/%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
-				'Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning');
-		}
-		else {
-			return sprintf('<p class="box">Luigifab/%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
-				'Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning',
+		$msg = $this->checkChanges();
+		if ($msg !== true)
+			return sprintf('<p class="box">%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>'.
+				'<p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
+				'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning',
 				$this->__('INCOMPLETE MODULE INSTALLATION'),
 				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
-		}
+
+		return sprintf('<p class="box">%s %s <span style="float:right;"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
+			'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/magento/versioning');
 	}
 
 	private function checkChanges() {
 
 		$index = file_get_contents(BP.'/index.php');
-		if (mb_strpos($index, '::f{4}:\\d{1,3}') === false)
+		if (mb_stripos($index, '::f{4}:\\d{1,3}') === false)
 			return 'index.php';
-		if (mb_strpos($index, 'trim(getenv(\'REMOTE_ADDR\'))') === false)
+		if (mb_stripos($index, 'mb_substr($ip, 7)') === false)
 			return 'index.php';
-		if (mb_strpos($index, 'config/upgrade.ip') === false)
+		if (mb_stripos($index, '$ip = empty($ip) ? getenv(\'REMOTE_ADDR\')') === false)
+			return 'index.php';
+		if (mb_stripos($index, 'config/upgrade.ip') === false)
 			return 'index.php';
 
 		return true;

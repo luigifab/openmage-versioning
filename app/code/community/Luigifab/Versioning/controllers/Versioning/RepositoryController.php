@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/28/04/2019
+ * Updated D/06/10/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -23,18 +23,16 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		return Mage::getSingleton('admin/session')->isAllowed('tools/versioning');
 	}
 
-	// pages
 	public function indexAction() {
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
-			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
-			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
+			$this->_redirect('*/system_config/edit', ['section' => 'versioning']);
 		}
 	}
 
@@ -43,12 +41,11 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
-			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
 			$this->loadLayout()->_setActiveMenu('tools/versioning')->renderLayout();
 		}
 		else {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
-			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
+			$this->_redirect('*/system_config/edit', ['section' => 'versioning']);
 		}
 	}
 
@@ -57,9 +54,6 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->setUsedModuleName('Luigifab_Versioning');
 
 		if (Mage::getStoreConfigFlag('versioning/scm/enabled')) {
-
-			Mage::register('versioning', Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type')));
-
 			if ($this->getRequest()->isXmlHttpRequest() || !empty($this->getRequest()->getParam('isAjax')))
 				$this->getResponse()->setBody($this->getLayout()->createBlock('versioning/adminhtml_history_grid')->toHtml());
 			else
@@ -67,11 +61,10 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		}
 		else {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
-			$this->_redirect('*/system_config/edit', array('section' => 'versioning'));
+			$this->_redirect('*/system_config/edit', ['section' => 'versioning']);
 		}
 	}
 
-	// drapeaux
 	public function addUpgradeFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
@@ -118,36 +111,32 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		$this->_redirect('*/*/index');
 	}
 
-	// mise à jour
 	public function upgradeAction() {
 
 		$this->setUsedModuleName('Luigifab_Versioning');
 
-		$revision = $this->getRequest()->getParam('revision', ''); // string
-		$useflag = ($this->getRequest()->getParam('use_flag', '') == '1'); // boolean
+		$revision =  $this->getRequest()->getParam('revision', ''); // string
+		$useflag  = ($this->getRequest()->getParam('use_flag', '') == '1'); // boolean
 
 		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
-			$this->_redirect('adminhtml/system_config/edit', array('section' => 'versioning'));
-			return;
+			return $this->_redirect('*/system_config/edit', ['section' => 'versioning']);
 		}
-		else if (empty($revision) || Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-			$this->_redirect('*/versioning_repository/index');
-			return;
+		if (empty($revision) || Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
+			return $this->_redirect('*/versioning_repository/index');
 		}
 
-		$upgrade = Mage::getSingleton('versioning/upgrade');
-		$upgrade->disableAllBuffer();
+		$upgrade = Mage::getSingleton('versioning/upgrade')->disableAllBuffer();
+		$locale  = mb_substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 
-		$lang = mb_substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-		echo "\n",'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="',$lang,'" lang="',$lang,'">';
+		echo "\n",'<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="',$locale,'" lang="',$locale,'">';
 		echo "\n",'<head>';
 		echo "\n",'<title>',$this->__('Updating'),' - ',Mage::getStoreConfig('design/head/default_title'),'</title>';
 		echo "\n",'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
 		echo "\n",'<meta http-equiv="Content-Script-Type" content="text/javascript" />';
 		echo "\n",'<meta http-equiv="Content-Style-Type" content="text/css" />';
-		echo "\n",'<meta http-equiv="Content-Language" content="',$lang,'" />';
+		echo "\n",'<meta http-equiv="Content-Language" content="',$locale,'" />';
 		echo "\n",'<link rel="icon" type="image/x-icon" href="',Mage::getDesign()->getSkinUrl('favicon.ico'),'" />';
 		// styles
 		echo "\n",'<style type="text/css">';
@@ -187,12 +176,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'<script type="text/javascript">';
 		echo "\n", '// disable keys of keyboard';
 		echo "\n", 'function disableKeyboard(ev) {';
-		echo "\n",  'if (typeof ev !== "undefined") { ev.preventDefault(); ev.stopPropagation(); }';
+		echo "\n",  'if (typeof ev != "undefined") { ev.preventDefault(); ev.stopPropagation(); }';
 		echo "\n",  'else { event.cancelBubble = true; event.returnValue = false; }';
 		echo "\n", '}';
 		echo "\n", '// prevents window or tab closing';
 		echo "\n", 'function disableClose(ev) {';
-		echo "\n",  'if (typeof ev !== "undefined") { ev.preventDefault(); ev.stopPropagation(); return ""; }';
+		echo "\n",  'if (typeof ev != "undefined") { ev.preventDefault(); ev.stopPropagation(); return ""; }';
 		echo "\n",  'else { event.cancelBubble = true; event.returnValue = ""; return ""; }';
 		echo "\n", '}';
 		echo "\n", '// register events';

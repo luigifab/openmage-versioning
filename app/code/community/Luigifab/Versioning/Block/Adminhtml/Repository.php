@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/15/01/2019
+ * Updated D/10/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,98 +22,96 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 	public function __construct() {
 
 		parent::__construct();
+		$system = $this->helper('versioning')->getSystem();
 
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
-		$this->_headerText = !empty($branch = Mage::registry('versioning')->getCurrentBranch()) ?
-			$this->__('Revisions history (<span id="scmtype">%s</span>, %s)', Mage::getStoreConfig('versioning/scm/type'), $branch) :
-			$this->__('Revisions history (<span id="scmtype">%s</span>)', Mage::getStoreConfig('versioning/scm/type'));
+		$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
+			$this->__('Revisions history (<span id="scmtype">%s</span>)', $system->getType()) :
+			$this->__('Revisions history (<span id="scmtype">%s</span>, %s)', $system->getType(), $branch);
 
 		$this->_removeButton('add');
 
-		$this->_addButton('diff', array(
+		$this->_addButton('diff', [
 			'label'   => 'diff',
 			'title'   => $this->__('Show diff'),
-			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', array('from' => 'abc', 'to' => 'abc'))."');",
+			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', ['from' => 'abc', 'to' => 'abc'])."');",
 			'class'   => 'go'
-		));
+		]);
 
-		$this->_addButton('history', array(
+		$this->_addButton('log', [
 			'label'   => 'log',
 			'title'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
 			'class'   => 'go'
-		));
+		]);
 
-		$this->_addButton('status', array(
+		$this->_addButton('status', [
 			'label'   => 'status',
 			'title'   => $this->__('Repository status'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
 			'class'   => 'go'
-		));
+		]);
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
-			$this->_addButton('maintenance_flag', array(
+			$this->_addButton('maintenance_flag', [
 				'label'   => $this->__('Remove the maintenance page'),
 				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delMaintenanceFlag')."');",
 				'class'   => 'delpage delete'
-			));
+			]);
 		}
 		else {
-			$this->_addButton('maintenance_flag', array(
+			$this->_addButton('maintenance_flag', [
 				'label'   => $this->__('Enable the maintenance page'),
 				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo()."');"
-			));
+			]);
 		}
 
 		if (is_file($this->helper('versioning')->getUpgradeFlag())) {
-			$this->_addButton('upgrade_flag', array(
+			$this->_addButton('upgrade_flag', [
 				'label'   => $this->__('Remove the update page'),
 				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delUpgradeFlag')."');",
 				'class'   => 'delpage delete'
-			));
+			]);
 		}
 		else {
-			$this->_addButton('upgrade_flag', array(
+			$this->_addButton('upgrade_flag', [
 				'label'   => $this->__('Enable the update page'),
 				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo()."');"
-			));
+			]);
 		}
 	}
 
 	public function getGridHtml() {
 
-		$commits = Mage::registry('versioning')->getCommitsCollection();
+		$commits = $this->helper('versioning')->getSystem()->getCommitsCollection();
 		$columns = $commits->getColumnValues('column'); sort($columns);
-		$total   = count($commits) - 1;
-		$hash    = '';
+		$json = [];
+		$cnt  = count($commits) - 1;
 
 		// comptage dans l'ordre inverse
 		// le commit le plus récent = count($commits) - 1
 		// le commit le plus ancien = 0
 		foreach ($commits as $commit) {
-			$hash .= "\n";
-			$hash .= '"'.$commit->getData('revision').'": {';
-			$hash .=  '"revision": "'.$commit->getData('revision').'",';
-			$hash .=  '"parents": ["'.implode('","', $commit->getData('parents')).'"],';
-			$hash .=  '"branch": "'.$commit->getData('branch').'",';
-			$hash .=  '"col": '.$commit->getData('column').',';
-			$hash .=  '"row": '.$total--;
-			$hash .= '},';
+			$revision = $commit->getData('revision');
+			$json[$revision] = [
+				'revision' => $revision,
+				'parents'  => $commit->getData('parents'),
+				'branch'   => $commit->getData('branch'),
+				'col'      => $commit->getData('column'),
+				'row'      => $cnt--
+			];
 		}
 
 		return $this->getChildHtml('grid')."\n".
 			'<script type="text/javascript">'."\n".
-			'self.versioningIds = {'.mb_substr($hash, 0, -1).'};'."\n".
-			'self.versioningCols = '.array_pop($columns).';'."\n".
-			'self.versioningConfirm = ['."\n".
-				'"'.$this->helper('versioning')->getFields().'", '."\n".
-				'"'.$this->__('Martian sunset seen by Spirit.').'" '."\n".
-			'];'."\n".
+			'self.versioningIds = '.json_encode($json).";\n".
+			'self.versioningCols = '.array_pop($columns).";\n".
+			'self.versioningText = '.json_encode([$this->helper('versioning')->getFields(), $this->__('Martian sunset seen by Spirit.')]).";\n".
 			'</script>';
 	}
 
 	public function getHeaderCssClass() {
-		return 'icon-head '.parent::getHeaderCssClass().' '.Mage::getStoreConfig('versioning/scm/type');
+		return 'icon-head '.parent::getHeaderCssClass().' '.$this->helper('versioning')->getSystem()->getType();
 	}
 }

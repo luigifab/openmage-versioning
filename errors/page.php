@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated D/28/04/2019
+ * Updated J/07/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,17 +20,17 @@
 if (!is_object($this))
 	exit(0);
 
-$lang = mb_substr($this->getData('locale'), 0, 2);
-$code = (string) $code;
+$locale = mb_substr($this->getData('locale'), 0, 2);
+$code   = (string) $code;
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $locale ?>" lang="<?php echo $locale ?>">
 <head>
 	<title><?php echo $this->getPageTitle() ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<meta http-equiv="Content-Language" content="<?php echo $lang ?>" />
+	<meta http-equiv="Content-Language" content="<?php echo $locale ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo $this->getUrl('favicon.ico') ?>" />
 	<?php /* <link rel="stylesheet" type="text/css" media="screen" href="<?php echo $this->getUrl('config/my.css') ?>" /> */ ?>
 	<?php /* <script type="text/javascript" src="<?php echo $this->getUrl('config/my.js') ?>"></script> */ ?>
@@ -46,22 +46,24 @@ border-radius:50%; border-bottom:1px solid #CACACA; background-color:#EEE;
 }
 h1 { margin-bottom:1em; font-size:1.3em; font-weight:400; }
 p { margin:1em 0; font-size:0.85em; line-height:140%; }
+pre { margin-top:3em; padding:2em; white-space:pre-wrap; word-break:break-all; background-color:#D0D0D0; }
 @media screen and (max-width:33rem),(max-device-width:33rem) {
 div.box { margin:0 1em 1em; width:auto; }
+pre { display:none; }
 }
 </style>
 <script type="text/javascript">
-var count = 0;
+self.cnt = 0;
 self.addEventListener('load', function () {
 	if (document.getElementById('reload')) {
-		count = parseInt(document.getElementById('reload').querySelector('span').innerHTML, 10) - 1;
+		self.cnt = parseInt(document.getElementById('reload').querySelector('span').innerHTML, 10);
 		self.setInterval(function () {
-			if (count > 1)
-				document.getElementById('reload').querySelector('span').innerHTML = count--;
+			if (--self.cnt > 1)
+				document.getElementById('reload').querySelector('span').innerHTML = self.cnt;
 		}, 1000);
-		self.setTimeout(function () { self.location.reload(); }, count * 1000);
+		self.setTimeout(function () { self.location.reload(); }, (self.cnt - 1) * 1000);
 	}
-}, false);
+});
 </script>
 </head>
 <body>
@@ -72,9 +74,12 @@ self.addEventListener('load', function () {
 		<h1><?php echo $this->getTitle() ?></h1>
 		<?php echo $this->getHtmlContent() ?>
 		<?php echo $this->getHtmlReload() ?>
-		<?php if (!empty($this->getReportId())): ?>
-			<p><?php echo $this->__('Error number: §', $this->getReportId()) ?></p>
+		<?php if (!empty($id = $this->getData('report'))): ?>
+			<p><?php echo $this->__('Error number: §', $id) ?></p>
 		<?php endif ?>
 	</div>
+	<?php if (!empty($txt = $this->canShowReport())): ?>
+		<pre><?php echo $txt ?></pre>
+	<?php endif ?>
 </body>
 </html>

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated J/10/01/2019
+ * Updated M/24/09/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -28,6 +28,7 @@ class Luigifab_Versioning_Model_Observer {
 	// = (upgrade.ip)  Désactiver la page à partir des adresses IP suivantes
 	// Rapport d'erreur
 	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html
+	// = (report.ip)   Afficher le rapport à partir des adresses IP suivantes
 	// = (config.dat)  Envoyer le rapport par email à
 	// Erreur 404 système
 	// = (*.csv)       Titre de la page / Titre / Contenu texte ou html
@@ -43,7 +44,7 @@ class Luigifab_Versioning_Model_Observer {
 
 		// récupération de toute la configuration utile
 		// enregistre le tout dans un tableau avant d'enregistrer le tout dans les fichiers *.csv, config.ip et config.dat
-		$global = array();
+		$global = [];
 
 		foreach (Mage::app()->getWebsites() as $website) {
 			foreach ($website->getGroups() as $group) {
@@ -64,13 +65,13 @@ class Luigifab_Versioning_Model_Observer {
 	// fr_FR => Array
 	//  [error503_pagetitle] [error503_title] [error503_content] [error503_autoreload] [error503_byip]
 	//  [upgrade_pagetitle]  [upgrade_title]  [upgrade_content]  [upgrade_autoreload]  [upgrade_byip]
-	//  [report_pagetitle]   [report_title]   [report_content]                         [report_email]
+	//  [report_pagetitle]   [report_title]   [report_content]                         [report_byip]   [report_email]
 	//  [report_pagetitle]   [report_title]   [error404_content]
 
 	// pagetitle/title, content, autoreload (*.csv)
-	private function updateTranslations($global) {
+	private function updateTranslations(array $global) {
 
-		$translations = array();
+		$translations = [];
 
 		// extraction des traductions locale par locale
 		// il se peut aussi qu'il n'y en ait qu'une seule
@@ -82,24 +83,24 @@ class Luigifab_Versioning_Model_Observer {
 				$value = str_replace('"', '""', trim($value));
 
 				// versioning/downtime/*title
-				if (mb_strpos($key, 'title') !== false) {
+				if (mb_stripos($key, 'title') !== false) {
 
 					if (!empty($value))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 				}
 				// versioning/downtime/*content
-				else if (mb_strpos($key, 'content') !== false) {
+				else if (mb_stripos($key, 'content') !== false) {
 
-					if (!empty($value) && (mb_strpos($value, '<') === 0))
+					if (!empty($value) && (mb_stripos($value, '<') === 0))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 					else if (!empty($value))
 						$translations[$locale][] =  '"'.$key.'","<p>'.str_replace("\n", '<br />', $value).'</p>"';
 				}
 				// versioning/downtime/*autoreload
-				else if (mb_strpos($key, 'autoreload') !== false) {
+				else if (mb_stripos($key, 'autoreload') !== false) {
 
-					if (!empty($value) && (mb_strpos($value, '[') !== false) && (mb_strpos($value, ']') !== false))
-						$translations[$locale][] = '"'.$key.'","'.str_replace(array('[', ']'), array('<span>', '</span>'), $value).'"';
+					if (!empty($value) && (mb_stripos($value, '[') !== false) && (mb_stripos($value, ']') !== false))
+						$translations[$locale][] = '"'.$key.'","'.str_replace(['[', ']'], ['<span>', '</span>'], $value).'"';
 				}
 			}
 		}
@@ -112,10 +113,10 @@ class Luigifab_Versioning_Model_Observer {
 		}
 	}
 
-	// email (config.dat)
-	private function updateDataConfig($global) {
+	// email, custom (config.dat)
+	private function updateDataConfig(array $global) {
 
-		$config = array();
+		$config = [];
 
 		// extraction de la configuration
 		foreach (reset($global) as $key => $value) {
@@ -124,7 +125,7 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (mb_strpos($key, '_email') !== false)
+			if ((mb_stripos($key, '_email') !== false) || (mb_stripos($key, '_custom') !== false))
 				$config[] = $key.'='.str_replace('=', '', $value);
 		}
 
@@ -134,10 +135,10 @@ class Luigifab_Versioning_Model_Observer {
 			file_put_contents(BP.'/errors/config/config.dat', implode("\n", $config));
 	}
 
-	// byip (upgrade.ip error503.ip)
-	private function updateIpConfig($global) {
+	// byip (error503.ip upgrade.ip report.ip)
+	private function updateIpConfig(array $global) {
 
-		$config = array();
+		$config = [];
 
 		// extraction de la configuration
 		foreach (reset($global) as $key => $value) {
@@ -146,9 +147,9 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (mb_strpos($key, '_byip') !== false) {
+			if (mb_stripos($key, '_byip') !== false) {
 				$value = array_filter(preg_split('#\s+#', $value));
-				$config[mb_substr($key, 0, mb_strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
+				$config[mb_substr($key, 0, mb_strripos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
 			}
 		}
 

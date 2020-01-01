@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/15/01/2019
+ * Updated M/26/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -44,50 +44,50 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	protected function _prepareColumns() {
 
-		$this->addColumn('from', array(
+		$this->addColumn('from', [
 			'header'   => $this->__('Current revision'),
 			'index'    => 'from',
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('to', array(
+		$this->addColumn('to', [
 			'header'   => $this->__('Requested revision'),
 			'index'    => 'to',
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('branch', array(
+		$this->addColumn('branch', [
 			'header'   => $this->__('Branch'),
 			'index'    => 'branch',
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('remote_addr', array(
+		$this->addColumn('remote_addr', [
 			'header'   => $this->__('IP address'),
 			'index'    => 'remote_addr',
 			'align'    => 'center',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('user', array(
+		$this->addColumn('user', [
 			'header'   => $this->__('User'),
 			'index'    => 'user',
 			'align'    => 'center',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('date', array(
+		$this->addColumn('date', [
 			'header'   => $this->__('Date'),
 			'index'    => 'date',
 			'type'     => 'datetime',
@@ -96,36 +96,36 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'width'    => '150px',
 			'sortable' => false,
 			'filter'   => false
-		));
+		]);
 
-		$this->addColumn('duration', array(
+		$this->addColumn('duration', [
 			'header'   => $this->__('Duration'),
 			'index'    => 'duration',
 			'align'    => 'center',
 			'width'    => '60px',
 			'sortable' => false,
 			'filter'   => false,
-			'frame_callback' => array($this, 'decorateDuration')
-		));
+			'frame_callback' => [$this, 'decorateDuration']
+		]);
 
-		$this->addColumn('status', array(
+		$this->addColumn('status', [
 			'header'    => $this->__('Status'),
 			'index'     => 'status',
 			'width'     => '125px',
 			'filter'    => false,
 			'sortable'  => false,
-			'frame_callback' => array($this, 'decorateStatus')
-		));
+			'frame_callback' => [$this, 'decorateStatus']
+		]);
 
-		$this->addColumn('action', array(
+		$this->addColumn('action', [
 			'type'      => 'action',
 			'align'     => 'center',
 			'width'     => '55px',
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => array($this, 'decorateLink')
-		));
+			'frame_callback' => [$this, 'decorateLink']
+		]);
 
 		return parent::_prepareColumns();
 	}
@@ -142,18 +142,18 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	public function decorateStatus($value, $row, $column, $isExport) {
 
-		$status = in_array($row->getData('status'), array('Update completed', 'Upgrade completed')) ? 'success' : 'error';
+		$status = in_array($row->getData('status'), ['Update completed', 'Upgrade completed']) ? 'success' : 'error';
 		$text   = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->helper('versioning')->_('Error');
 
 		return sprintf('<span class="versioning-status grid-%s">%s</span>', $status, $text);
 	}
 
 	public function decorateDuration($value, $row, $column, $isExport) {
-		return $this->helper('versioning')->getHumanDuration($row);
+		return $this->helper('versioning')->getHumanDuration($row->getData('duration'));
 	}
 
 	public function decorateLink($value, $row, $column, $isExport) {
-		return sprintf('<button type="button" onclick="versioning.history(this, \'%s\');">%s</button>',
-			addslashes(base64_encode($row->getData('details'))), $this->__('View'));
+		return sprintf('<button type="button" class="slink" onclick="versioning.history(this, \'%s\');">%s</button>',
+			base64_encode($row->getData('details')), $this->__('View'));
 	}
 }

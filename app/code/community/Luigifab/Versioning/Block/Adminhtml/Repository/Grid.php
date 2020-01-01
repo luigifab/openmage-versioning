@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/05/02/2019
+ * Updated M/26/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -34,13 +34,13 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	protected function _prepareCollection() {
-		$this->setCollection(Mage::registry('versioning')->getCommitsCollection());
+		$this->setCollection($this->helper('versioning')->getSystem()->getCommitsCollection());
 		return parent::_prepareCollection();
 	}
 
 	protected function _prepareColumns() {
 
-		$this->addColumn('revision', array(
+		$this->addColumn('revision', [
 			'header'    => $this->__('Revision'),
 			'index'     => 'revision',
 			'align'     => 'center',
@@ -48,46 +48,44 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'filter'    => false,
 			'sortable'  => false,
 			'column_css_class' => 'revision',
-			'frame_callback'   => array($this, 'decorateRevision')
-		));
+			'frame_callback'   => [$this, 'decorateRevision']
+		]);
 
-		$this->addColumn('diff', array(
+		$this->addColumn('diff', [
 			'header'    => $this->__('Diff'),
 			'align'     => 'center',
 			'width'     => '55px',
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => array($this, 'decorateDiff')
-		));
+			'frame_callback' => [$this, 'decorateDiff']
+		]);
 
-		$this->addColumn('graph', array(
+		$this->addColumn('graph', [
 			'header'    => $this->__('Graph'),
 			'width'     => '200px',
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true
-		));
+		]);
 
-		$this->addColumn('author', array(
+		$this->addColumn('author', [
 			'header'    => $this->__('Author'),
-			'width'     => '200px',
 			'index'     => 'author',
 			'align'     => 'center',
 			'filter'    => false,
 			'sortable'  => false
-		));
+		]);
 
-		$this->addColumn('description', array(
+		$this->addColumn('description', [
 			'header'    => $this->__('Description'),
 			'index'     => 'description',
-			'align'     => 'left',
 			'filter'    => false,
 			'sortable'  => false,
-			'frame_callback' => array($this, 'decorateDescription')
-		));
+			'frame_callback' => [$this, 'decorateDescription']
+		]);
 
-		$this->addColumn('date', array(
+		$this->addColumn('date', [
 			'header'    => $this->__('Date'),
 			'index'     => 'date',
 			'type'      => 'datetime',
@@ -96,17 +94,17 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'width'     => '150px',
 			'filter'    => false,
 			'sortable'  => false
-		));
+		]);
 
-		$this->addColumn('action', array(
+		$this->addColumn('action', [
 			'type'      => 'action',
 			'align'     => 'center',
 			'width'     => '85px',
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => array($this, 'decorateLink')
-		));
+			'frame_callback' => [$this, 'decorateLink']
+		]);
 
 		return parent::_prepareColumns();
 	}
@@ -125,7 +123,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	public function getMessagesBlock() {
-		return Mage::getBlockSingleton('core/template');
+		return Mage::getBlockSingleton('adminhtml/template');
 	}
 
 
@@ -143,21 +141,19 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 		$description = nl2br($row->getData('description'));
 
 		if (!empty($bugtracker)) {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[\+~%\/.\w\-_]*)?\??(?:[\-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=+$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=+$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[+~%\/.\w\-_]*)?\??(?:[\-+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
 			$description = preg_replace('#\#(\d+)#', '<a href="'.$bugtracker.'$1" class="issue">$1</a>', $description);
 		}
 		else {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[\+~%\/.\w\-_]*)?\??(?:[\-\+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
+			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=+$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=+$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[+~%\/.\w\-_]*)?\??(?:[\-+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
 		}
 
 		return $description;
 	}
 
 	public function decorateLink($value, $row, $column, $isExport) {
-
-		$url = $this->getUrl('*/*/upgrade', array('revision' => $row->getData('revision')));
-
-		return sprintf('<button type="button" onclick="versioning.confirmUpgrade(\'%s\', \'%s\');">%s</button>',
+		$url = $this->getUrl('*/*/upgrade', ['revision' => $row->getData('revision')]);
+		return sprintf('<button type="button" class="slink" onclick="versioning.confirmUpgrade(\'%s\', \'%s\');">%s</button>',
 			$url, $this->__('Update to revision %s', '§'), $this->__('Deliver'));
 	}
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated M/05/02/2019
+ * Updated V/12/07/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.7.4</version>
+			<version>3.8.0</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -37,6 +37,9 @@
 		<models>
 			<versioning>
 				<class>Luigifab_Versioning_Model</class>
+				<adaptators>
+					<git>versioning/scm_git</git>
+				</adaptators>
 			</versioning>
 		</models>
 	</global>

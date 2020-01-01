@@ -1,8 +1,8 @@
 /**
  * Created J/22/12/2011
- * Updated D/28/04/2019
+ * Updated J/05/12/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -16,6 +16,14 @@
  * GNU General Public License (GPL) for more details.
  */
 
+if (window.NodeList && !NodeList.prototype.forEach) {
+	NodeList.prototype.forEach = function (callback, that, i) {
+		that = that || window;
+		for (i = 0; i < this.length; i++)
+			callback.call(that, this[i], i, this);
+	};
+}
+
 var versioning = {
 
 	svg: null,
@@ -28,18 +36,15 @@ var versioning = {
 
 			console.info('versioning.app - hello');
 
-			if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
+			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds == 'object'))
+				this.drawGraph(self.versioningIds, self.versioningCols).startDiff();
+			else if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
 				document.querySelector('table.data tbody button').click();
-
-			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds === 'object'))
-				versioning.drawGraph(self.versioningIds, self.versioningCols).initDiff();
 		}
 	},
 
-	enableLoader: function () {
-		document.body.style.cursor = 'progress';
-		document.querySelector('div.content-header td.form-buttons').setAttribute('style', 'visibility:hidden;');
-		document.querySelector('div.content-header-floating td.form-buttons').setAttribute('style', 'visibility:hidden;');
+	loader: function () {
+		document.body.classList.add('progress');
 	},
 
 	decode: function (data) {
@@ -47,8 +52,7 @@ var versioning = {
 		return decodeURIComponent(escape(self.atob(data)));
 	},
 
-	// #### Confirmation des pages de maintenance ############################### //
-	// = révision : 25
+	// Confirmation des pages de maintenance
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
 	confirmFlag: function (url, title, content) {
@@ -69,18 +73,25 @@ var versioning = {
 
 			var elem = document.createElement('p');
 			elem.setAttribute('class', 'credits');
-			elem.appendChild(document.createTextNode(self.versioningConfirm[1]));
+			elem.appendChild(document.createTextNode(self.versioningText[1]));
 			apijs.dialog.t1.appendChild(elem);
+
+			return false;
 		}
 		catch (e) {
 			console.log(e);
+			try { apijs.dialog.actionClose(); } catch (ee) { }
 
 			try {
 				// sans l'apijs
 				// demande de confirmation
 				if (confirm(this.decode(content).replace(/\[[^\]]+]/g, ''))) {
-					this.enableLoader();
+					this.loader();
 					self.location.href = url;
+					return true;
+				}
+				else {
+					return false;
 				}
 			}
 			catch (ee) {
@@ -89,31 +100,34 @@ var versioning = {
 				// en dernier recours
 				// demande de confirmation
 				if (confirm(Translator.translate('Are you sure?'))) {
-					this.enableLoader();
+					this.loader();
 					self.location.href = url;
+					return true;
+				}
+				else {
+					return false;
 				}
 			}
 		}
 	},
 
 	actionConfirmFlag: function (url) {
-		versioning.enableLoader();
-		apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
+		versioning.loader();
+		apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
 		self.location.href = url;
 	},
 
 	cancelFlag: function (url) {
-		this.enableLoader();
+		this.loader();
 		self.location.href = url;
 	},
 
-	// #### Confirmation de mise à jour ######################################### //
-	// = révision : 45
+	// Confirmation de mise à jour
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
 	confirmUpgrade: function (url, title) {
 
-		var content = self.versioningConfirm[0], credits = self.versioningConfirm[1];
+		var content = self.versioningText[0], credits = self.versioningText[1];
 
 		try {
 			// avec l'apijs
@@ -173,7 +187,13 @@ var versioning = {
 
 				// en dernier recours
 				// demande de confirmation
-				return confirm(Translator.translate('Are you sure?'));
+				if (confirm(Translator.translate('Are you sure?'))) {
+					this.loader();
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 		}
 	},
@@ -190,7 +210,7 @@ var versioning = {
 		if (action === false)
 			return true;
 
-		versioning.enableLoader();
+		versioning.loader();
 
 		// sans l'apijs
 		if (action === true) {
@@ -199,47 +219,41 @@ var versioning = {
 		}
 		// avec l'apijs, en deux temps
 		else {
-			apijs.dialog.styles.remove('waiting', 'lock'); // obligatoire sinon il y a une demande de confirmation de quitter la page
+			apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
 			self.location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
 		}
 
 		return true;
 	},
 
-	// #### Affichage de l'historique ########################################### //
-	// = révision : 12
+	// Affichage de l'historique
 	// » Affiche les détails d'une mise à jour dans la balise pre
 	// » Marque la ligne active du tableau avec la classe current
-	history: function (link, content) {
+	history: function (elem, content) {
 
-		var elem, elems = document.querySelectorAll('table.data tbody tr[class]');
-		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem))
-			elems[elem].classList.remove('current');
-
-		link.parentNode.parentNode.classList.add('current');
+		document.querySelectorAll('table.data tbody tr[class]').forEach(function (elem) { elem.classList.remove('current'); });
 		document.querySelector('pre').innerHTML = this.decode(content) + "\n\n";
 
+		elem.parentNode.parentNode.classList.add('current');
 		return false;
 	},
 
-	// #### Représentation des branches ######################################### //
-	// = révision : 137
-	// » Utilise Raphael.js 2.2.7 (93,5 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
+	// Représentation des branches
+	// » Utilise Raphael.js 2.3.0 (93,4 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,4 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
 	// » Crée ensuite les lignes entres les points sans utiliser les trucs dépréciés de prototype
 	drawGraph: function (data, cols) {
 
-		var elem, x, y, pX, pY, gradients = '', that = versioning,
-			commitsHash  = new Hash(data),
-			commitsArray = commitsHash.values(),
-			tableRows    = $$('table.data tbody tr'), rows = tableRows.length - 1, // les lignes du tableau
+		var x, y, pX, pY, elem, gradients = '',
+			commits   = Object.keys(data).map(function (key) { return data[key]; }), // les commits sous forme d'un array
+			tableRows = $$('table.data tbody tr'), rows = tableRows.length - 1,      // les lignes du tableau html
 			colors = [], styles = [], names = [], tops = [], bottoms = [],
 			grad = 0, offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0, dMiHeight = 0;
 
 		// https://stackoverflow.com/a/1129270
 		// inverse l'ordre du tableau
-		commitsArray.sort(function (a, b) {
+		commits.sort(function (a, b) {
 			if (a.row > b.row)
 				return -1;
 			if (a.row < b.row)
@@ -250,7 +264,7 @@ var versioning = {
 		// recheche de la hauteur et de la position du graphique (avec Prototype > 1.7 ou non)
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
 		//  topPoint = la position du haut de la première ligne dans le tableau (à partir du haut du document)
-		if (typeof Element.Layout === 'function') {
+		if (typeof Element.Layout == 'function') {
 			offsetTop   = tableRows.first().getLayout().get('top') - 1;
 			graphHeight = tableRows.last().getLayout().get('top') + tableRows.last().getLayout().get('height') - offsetTop - 1;
 		}
@@ -261,13 +275,13 @@ var versioning = {
 
 		// initialisation du graphique
 		// canvas = l'élément svg
-		that.svg = new Raphael(document.getElementById('versioning_grid_table').parentNode);
-		that.svg.setSize(that.width, graphHeight);
-		that.svg.canvas.setAttribute('style', 'top:' + offsetTop + 'px;');
-		that.svg.canvas.setAttribute('class', 'k k0');
-		that.svg.canvas.setAttribute('id', 'versioning_graph');
-		that.svg.canvas.setAttribute('onmouseover', 'versioning.mouseOver(true);');
-		that.svg.canvas.parentNode.setAttribute('onmouseleave', 'versioning.mouseOver(false);');
+		this.svg = new Raphael(document.getElementById('versioning_grid_table').parentNode);
+		this.svg.setSize(this.width, graphHeight);
+		this.svg.canvas.setAttribute('style', 'top:' + offsetTop + 'px;');
+		this.svg.canvas.setAttribute('class', 'k k0');
+		this.svg.canvas.setAttribute('id', 'versioning_graph');
+		this.svg.canvas.setAttribute('onmouseover', 'versioning.mouseOver(true);');
+		this.svg.canvas.parentNode.setAttribute('onmouseleave', 'versioning.mouseOver(false);');
 
 		// génération des couleurs
 		// mémorise en même temps le point le plus haut/bas de chaque branche
@@ -286,7 +300,7 @@ var versioning = {
 			styles.push('table.k' + x + ' .k:not(.k' + x + ') button { opacity:0; visibility:hidden; }');
 		}
 
-		commitsArray.each(function (commit) {
+		commits.forEach(function (commit) {
 
 			commit.color = colors[commit.col];
 			commit.klass = 'k k' + commit.col;
@@ -302,11 +316,11 @@ var versioning = {
 		//  miHeight = le milieu de la ligne dans le tableau
 		//      rows = le nombre de ligne dans le tableau (de 0 à tableRows-1)
 		//       row = le numéro de la ligne dans le tableau (max = la première ligne, 0 = la dernière ligne)
-		commitsArray.each(function (commit) {
+		commits.forEach(function (commit) {
 
 			// recherche de la position du point
 			// avec Prototype > 1.7 ou non
-			if (typeof Element.Layout === 'function') {
+			if (typeof Element.Layout == 'function') {
 				topPoint = tableRows[rows - commit.row].getLayout().get('top') - offsetTop;
 				miHeight = tableRows[rows - commit.row].getLayout().get('height') / 2;
 			}
@@ -321,7 +335,7 @@ var versioning = {
 			x = 25 * commit.col + 20;
 
 			// dessine un point
-			that.svg.circle(x, y, 3.5)
+			this.svg.circle(x, y, 3.5)
 				.attr('fill', commit.color)
 				.attr('stroke', 'none')
 				.attr('class', commit.klass);
@@ -332,13 +346,13 @@ var versioning = {
 
 				names.push(commit.branch);
 
-				elem = that.svg.text(x + 13, y - 0.3, commit.branch)
+				elem = this.svg.text(x + 13, y - 0.3, commit.branch)
 					.attr('fill', commit.color)
 					.attr('text-anchor', 'start')
 					.attr('class', commit.klass);
 
 				pX = x + 3.2 + 8 + elem.getBBox().width + 7;       // variable temporaire
-				that.svg.path(
+				this.svg.path(
 					'M ' + (x + 3.2) + ',' + (y - 0.4) +          // point de départ au niveau du point
 					' L ' + (x + 3.2 + 8) + ',' + (y - 0.4 - 8) + // en haut à gauche
 					' L ' + (pX) + ',' + (y - 0.4 - 8) +          // en haut à droite
@@ -353,21 +367,21 @@ var versioning = {
 					.toFront();
 				elem.toFront(); // repasse le texte au dessus de l'étiquette
 
-				if (pX > versioning.width)
-					versioning.width = pX;
+				if (pX > this.width)
+					this.width = pX;
 			}
 
 			// ligne vers le parent (donc un peu plus bas)
 			// s'il existe, sinon vers le bas du graphique
-			commit.parents.each(function (ref, parent) {
+			commit.parents.forEach(function (ref, parent) {
 
-				parent = (ref.length > 0) ? commitsHash.get(ref) : undefined;
+				parent = (ref.length > 0) ? data[ref] : undefined;
 
-				if (typeof parent === 'object') {
+				if (typeof parent == 'object') {
 
 					// recherche de la position du point
 					// avec Prototype > 1.7 ou non
-					if (typeof Element.Layout === 'function') {
+					if (typeof Element.Layout == 'function') {
 						topPoint = tableRows[rows - parent.row].getLayout().get('top') - offsetTop;
 						miHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
 					}
@@ -383,7 +397,7 @@ var versioning = {
 
 					if (parent.col === commit.col) {
 						// dessine une ligne verticale
-						that.svg.path(['M', x, y, 'V', pY])
+						this.svg.path(['M', x, y, 'V', pY])
 							.attr('stroke', commit.color)
 							.attr('stroke-width', 1.7)
 							.attr('class', commit.klass)
@@ -399,7 +413,7 @@ var versioning = {
 						'</linearGradient>';
 
 						// avec Prototype > 1.7 ou non
-						if (typeof Element.Layout === 'function')
+						if (typeof Element.Layout == 'function')
 							dMiHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
 						else
 							dMiHeight = tableRows[rows - parent.row].getDimensions().height / 2;
@@ -407,11 +421,11 @@ var versioning = {
 
 						if ((parent.revision === tops[parent.col]) && (y + dMiHeight < pY)) {
 							// dessine une ligne en travers
-							elem = that.svg.path(['M', x, y, 'T', pX, y + dMiHeight]);
+							elem = this.svg.path(['M', x, y, 'T', pX, y + dMiHeight]);
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
 							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
 							// dessise une ligne verticale
-							that.svg.path(['M', pX, y + dMiHeight, 'V', pY])
+							this.svg.path(['M', pX, y + dMiHeight, 'V', pY])
 								.attr('stroke', parent.color)
 								.attr('stroke-width', 1.7)
 								.attr('class', 'k')
@@ -419,19 +433,19 @@ var versioning = {
 						}
 						else if ((commit.revision === bottoms[commit.col]) && (pY > y + dMiHeight) && (commit.parents.length === 1)) {
 							// dessise une ligne verticale
-							that.svg.path(['M', x, y, 'V', pY - dMiHeight])
+							this.svg.path(['M', x, y, 'V', pY - dMiHeight])
 								.attr('stroke', commit.color)
 								.attr('stroke-width', 1.7)
 								.attr('class', 'k')
 								.toBack();
 							// dessine une ligne en travers
-							elem = that.svg.path(['M', x, pY - dMiHeight, 'T', pX, pY]);
+							elem = this.svg.path(['M', x, pY - dMiHeight, 'T', pX, pY]);
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
 							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
 						}
 						else {
 							// dessine une ligne en travers
-							elem = that.svg.path(['M', x, y, 'T', pX, pY]);
+							elem = this.svg.path(['M', x, y, 'T', pX, pY]);
 							elem.node.setAttribute('stroke', 'url(#manGrad' + grad + ')');
 							elem.attr('stroke-width', 1.6).attr('class', 'k').toBack();
 						}
@@ -441,19 +455,21 @@ var versioning = {
 				}
 				else if (ref.length > 0) {
 					// dessine une ligne verticale vers le bas du graphique
-					that.svg.path(['M', x, y, 'V', graphHeight])
+					this.svg.path(['M', x, y, 'V', graphHeight])
 						.attr('stroke', commit.color)
 						.attr('stroke-width', 1.7)
 						.attr('class', commit.klass)
 						.toBack();
 				}
-			});
+
+			}, this); // pour que ci-dessus this = this
 
 			elem = tableRows[rows - commit.row];
 			elem.setAttribute('onclick', "versioning.updateClass(this.getAttribute('class'));");
 			elem.setAttribute('class', ((commit.row % 2) < 1) ? commit.klass : 'even ' + commit.klass);
 			elem.removeAttribute('title');
-		});
+
+		}, this); // pour que ci-dessus this = this
 
 		// une seule fois sinon ok que pour le dernier ajout avec Edge 14
 		if (gradients.length > 0)
@@ -466,12 +482,12 @@ var versioning = {
 		elem.appendChild(document.createTextNode(styles.join("\n")));
 		document.querySelector('head').appendChild(elem);
 
-		return that;
+		return this;
 	},
 
-	mouseOver: function (yes) {
-		this.svg.canvas.style.width = (yes) ? versioning.width + 'px' : '197px';
-		this.svg.canvas.style.pointerEvents = (yes) ? 'none' : 'inherit';
+	mouseOver: function (show) {
+		this.svg.canvas.style.width = show ? this.width + 'px' : '197px';
+		this.svg.canvas.style.pointerEvents = show ? 'none' : 'inherit';
 	},
 
 	updateClass: function (klass) {
@@ -479,63 +495,63 @@ var versioning = {
 		document.getElementById('versioning_grid_table').setAttribute('class', 'data ' + klass);
 	},
 
-	// #### Gestion des cases du diff ########################################### //
-	// = révision : 14
+	// Gestion des cases du diff
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
-	initDiff: function () {
+	startDiff: function () {
 
-		var elem, elems = document.querySelectorAll('table.data input[type="radio"]'), d1 = 1, d2 = 1, bis = true;
-		for (elem in elems) if (elems.hasOwnProperty(elem) && !isNaN(elem)) {
-			elems[elem].setAttribute('onchange', 'versioning.goDiff(' + (bis ? (d1++) : (d2++)) + ', ' + (bis ? 'false' : 'true') + ');');
-			elems[elem].removeAttribute('disabled'); // lors d'un F5 c'est utile
-			bis = !bis;
-		}
+		var a = 1, b = 1, c = true;
+		document.querySelectorAll('table.data input[type="radio"]').forEach(function (elem) {
+			elem.setAttribute('onchange', 'versioning.goDiff(' + (c ? a++ : b++) + ', ' + (c ? 'false' : 'true') + ');');
+			elem.removeAttribute('disabled'); // lors d'un F5 c'est utile
+			c = !c;
+		});
 
 		document.querySelector('table.data tr:last-child input[name="d1"]').setAttribute('disabled', 'disabled');
 		document.querySelector('table.data tr:first-child input[name="d2"]').setAttribute('disabled', 'disabled');
 		document.querySelector('table.data input[name="d1"]:not([disabled])').checked = true;
 		document.querySelector('table.data input[name="d2"]:not([disabled])').checked = true;
 
-		this.goDiff();
-		return this;
+		return this.goDiff();
 	},
 
-	goDiff: function (url, two) {
+	goDiff: function (url, second) {
 
-		var d1 = document.querySelector('table.data input[name="d1"]:checked'),
-		    d2 = document.querySelector('table.data input[name="d2"]:checked'),
-		    pos1 = parseInt(d1.getAttribute('onchange').replace(/\D/g, ''), 10),
-		    pos2 = parseInt(d2.getAttribute('onchange').replace(/\D/g, ''), 10),
+		var ia = document.querySelector('table.data input[name="d1"]:checked'),
+		    ib = document.querySelector('table.data input[name="d2"]:checked'),
+		    pa = parseInt(ia.getAttribute('onchange').replace(/\D/g, ''), 10),
+		    pb = parseInt(ib.getAttribute('onchange').replace(/\D/g, ''), 10),
 		    onclick;
 
-		if (typeof url === 'string') {
-			this.enableLoader();
+		if (typeof url == 'string') {
+			this.loader();
 			self.location.href = url;
 		}
 		else {
-			if (two === true) {
-				if (pos1 >= pos2) {
-					d1 = d2.parentNode.parentNode.previousElementSibling.querySelector('input[name="d1"]');
-					d1.checked = true;
+			if (second === true) {
+				if (pa >= pb) {
+					ia = ib.parentNode.parentNode.previousElementSibling.querySelector('input[name="d1"]');
+					ia.checked = true;
 				}
 			}
 			else {
-				if (pos1 >= pos2) {
-					d2 = d1.parentNode.parentNode.nextElementSibling.querySelector('input[name="d2"]');
-					d2.checked = true;
+				if (pa >= pb) {
+					ib = ia.parentNode.parentNode.nextElementSibling.querySelector('input[name="d2"]');
+					ib.checked = true;
 				}
 			}
 
 			onclick = document.querySelector('div.content-header td.form-buttons button').getAttribute('onclick');
-			onclick = onclick.replace(/\/from\/[^\/]+/, '/from/' + d2.value);
-			onclick = onclick.replace(/\/to\/[^\/]+/, '/to/' + d1.value);
+			onclick = onclick.replace(/\/from\/[^\/]+/, '/from/' + ib.value);
+			onclick = onclick.replace(/\/to\/[^\/]+/, '/to/' + ia.value);
 
 			document.querySelector('div.content-header td.form-buttons button').setAttribute('onclick', onclick);
 			document.querySelector('div.content-header-floating td.form-buttons button').setAttribute('onclick', onclick);
 		}
+
+		return this;
 	}
 };
 
-if (typeof self.addEventListener === 'function')
-	self.addEventListener('load', versioning.start, false);
+if (typeof self.addEventListener == 'function')
+	self.addEventListener('load', versioning.start.bind(versioning));

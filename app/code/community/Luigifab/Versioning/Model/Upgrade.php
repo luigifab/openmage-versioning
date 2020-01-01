@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated M/15/01/2019
+ * Updated M/24/09/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -19,18 +19,20 @@
 
 class Luigifab_Versioning_Model_Upgrade {
 
-	// met fin aux temporisations de sortie activés par Magento
+	// désactivation des tampons
+	// cela permet d'afficher la page au fur et à mesure de l'avancement
 	// est incapable de mettre fin à la temporisation de zlib.output_compression
 	// n'utilise surtout pas le fichier versioning.log pour Mage::log
+	// https://stackoverflow.com/a/25835968
 	public function disableAllBuffer() {
 
 		header('Content-Encoding: chunked');
 		header('Connection: Keep-Alive');
 
-		ini_set('max_execution_time', 600);
-		ini_set('output_buffering', false);
-		ini_set('implicit_flush', true);
-		ini_set('display_errors', true);
+		ini_set('max_execution_time', 900);
+		ini_set('output_buffering', 0);
+		ini_set('implicit_flush', 1);
+		ini_set('display_errors', 1);
 		ob_implicit_flush(true);
 		ignore_user_abort(true);
 
@@ -45,29 +47,28 @@ class Luigifab_Versioning_Model_Upgrade {
 		return $this;
 	}
 
+	// exécute le processus de mise à jour
+	// log les informations de la mise à jour
+	public function process($targetRevision, $useflag) {
 
-	// log toutes les informations de la mise à jour (enfin presque)
-	// déroule le processus de mise à jour
-	public function process($targetRevision, $useFlag) {
-
-		$repository = Mage::getSingleton('versioning/scm_'.Mage::getStoreConfig('versioning/scm/type'));
-		$help = Mage::helper('versioning');
-		$lock = $help->getLock();
-		$log  = $help->getLastLog();
+		$help   = Mage::helper('versioning');
+		$system = $help->getSystem();
+		$lock   = $help->getLock();
+		$log    = $help->getLastLog();
 
 		try {
 			// données de l'historique
 			// l'ordre à une importance capitale (voir Luigifab_Versioning_Model_History)
-			$H = array(
+			$H = [
 				'date'        => date('c'), // 0
-				'current_rev' => $repository->getCurrentRevision(), // 1
+				'current_rev' => $system->getCurrentRevision(), // 1
 				'target_rev'  => $targetRevision, // 2
 				'remote_addr' => $help->getIpAddr(), // 3
 				'user'        => Mage::getSingleton('admin/session')->getData('user')->getData('username'), // 4
 				'duration'    => microtime(true), // 5
 				'status'      => 'Upgrade in progress', // 6
-				'branch'      => $repository->getCurrentBranch(), // 7
-			);
+				'branch'      => $system->getCurrentBranch(), // 7
+			];
 
 			// ÉTAPE 1
 			$this->writeTitle($help->__('1) Locking and configuration check'));
@@ -83,27 +84,27 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			if (!empty($H['branch']))
 				$this->writeNotice($help->__('Repository: %s / Branch: %s / Current revision: %s / Requested revision: %s',
-					$repository->getType(), $H['branch'], $H['current_rev'], $targetRevision));
+					$system->getType(), $H['branch'], $H['current_rev'], $targetRevision));
 			else
 				$this->writeNotice($help->__('Repository: %s / Current revision: %s / Requested revision: %s',
-					$repository->getType(), $H['current_rev'], $targetRevision));
+					$system->getType(), $H['current_rev'], $targetRevision));
 
 			file_put_contents($lock, $H['current_rev'].'/'.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
-			if ($useFlag)
+			if ($useflag)
 				copy($lock, $help->getUpgradeFlag());
 
 			// ÉTAPE 2 et 3
 			// avec les événements before et after
 			$this->writeEvent('admin_versioning_upgrade_before...');
 			Mage::dispatchEvent('admin_versioning_upgrade_before',
-				array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
+				['repository' => $system, 'revision' => $targetRevision, 'controller' => $this]);
 
 			$this->writeTitle($help->__('2) Updating'), true);
-			$repository->upgradeToRevision($this, $log, $targetRevision);
+			$system->upgradeToRevision($this, $log, $targetRevision);
 
 			$this->writeEvent('admin_versioning_upgrade_after...');
 			Mage::dispatchEvent('admin_versioning_upgrade_after',
-				array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this));
+				['repository' => $system, 'revision' => $targetRevision, 'controller' => $this]);
 
 			$this->writeTitle($help->__('3) Cache'), true);
 			$this->clearAllCache();
@@ -115,46 +116,22 @@ class Luigifab_Versioning_Model_Upgrade {
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
 			$H['status']   = is_file($log) ? 'Update completed'."\n".trim(file_get_contents($log)) : 'Update completed';
 
-			$result = array(
+			$result = [
 				'url'   => '*/versioning_repository/index',
 				'title' => $help->__('Update completed (revision %s)', $targetRevision),
 				'error' => false
-			);
+			];
 
 			Mage::getSingleton('adminhtml/session')->addSuccess($help->__('Update to revision %s completed.', $targetRevision));
 		}
 		catch (Exception $e) {
 
-			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
-				$H['duration'] = ceil(microtime(true) - $H['duration']);
-				$H['status']   = is_file($log) ? $e->getMessage()."\n".trim(file_get_contents($log)) : $e->getMessage();
-			}
-			else {
-				$H['duration'] = ceil(microtime(true) - $H['duration']);
-				$H['status']   = $e->getMessage();
-			}
+			$H['duration'] = ceil(microtime(true) - $H['duration']);
+			$H['status']   = $e->getMessage();
 
-			if (!in_array($e->getMessage(), array('Not authorized', 'An update is in progress'))) {
+			if (in_array($e->getMessage(), ['Not authorized', 'An update is in progress'])) {
 
-				$this->writeError($e->getMessage());
-				Mage::getSingleton('adminhtml/session')->addError(nl2br($e->getMessage()));
-
-				$this->writeEvent('admin_versioning_upgrade_after...');
-				Mage::dispatchEvent('admin_versioning_upgrade_after',
-					array('repository' => $repository, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e));
-
-				$this->writeTitle($help->__('4) Unlocking'), true);
-				if (is_file($lock))
-					unlink($lock);
-
-				$result = array(
-					'url'   => '*/versioning_repository/history',
-					'title' => $help->__('Update error (revision %s)', $targetRevision),
-					'error' => true
-				);
-			}
-			else {
-				if (in_array($e->getMessage(), array('An update is in progress'))) {
+				if ($e->getMessage() == 'An update is in progress') {
 					$this->writeError($help->__('Stop! Stop! Stop! An update is in progress.'));
 					Mage::getSingleton('adminhtml/session')->addError($help->__('Please wait, an update is in progress.'));
 				}
@@ -163,18 +140,38 @@ class Luigifab_Versioning_Model_Upgrade {
 					Mage::getSingleton('adminhtml/session')->addError($help->__('You are not authorized to perform this operation.'));
 				}
 
-				$result = array(
+				$result = [
 					'url'   => '*/versioning_repository/index',
 					'title' => $help->__('Update error (revision %s)', $targetRevision),
 					'error' => true
-				);
+				];
+			}
+			else {
+				if (is_file($log))
+					$H['status'] = $e->getMessage()."\n".trim(file_get_contents($log));
+
+				$this->writeError($e->getMessage());
+				Mage::getSingleton('adminhtml/session')->addError(nl2br($e->getMessage()));
+
+				$this->writeEvent('admin_versioning_upgrade_after...');
+				Mage::dispatchEvent('admin_versioning_upgrade_after',
+					['repository' => $system, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e]);
+
+				$this->writeTitle($help->__('4) Unlocking'), true);
+				if (is_file($lock))
+					unlink($lock);
+
+				$result = [
+					'url'   => '*/versioning_repository/history',
+					'title' => $help->__('Update error (revision %s)', $targetRevision),
+					'error' => true
+				];
 			}
 		}
 
 		file_put_contents($help->getHistoryLog(), '`'.implode('`,`', $H).'`'."\n", FILE_APPEND | LOCK_EX);
 		return $result;
 	}
-
 
 	// affiche une commande ou une information pour savoir ce qu'il se passe
 	// ajoute un peu de code HTML pour faire plus jolie
@@ -197,7 +194,6 @@ class Luigifab_Versioning_Model_Upgrade {
 	public function writeCommand($data) {
 		echo '<code>',$data,'</code>',"\n";
 	}
-
 
 	// tente de vider totalement le cache de Magento (du moins essaye)
 	// utilise les méthodes et événements de Magento puis supprime tous les répertoires
@@ -229,7 +225,7 @@ class Luigifab_Versioning_Model_Upgrade {
 		}
 
 		// suppression des répertoires
-		$dirs = array(
+		$dirs = [
 			Mage::getBaseDir('var').'/cache/',
 			Mage::getBaseDir('var').'/full_page_cache/',
 			Mage::getBaseDir('media').'/css/',
@@ -237,7 +233,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::getBaseDir('media').'/js_secure/',
 			Mage::getBaseDir('media').'/js/',
 			BP.'/includes/src/'
-		);
+		];
 
 		exec('rm -rf '.implode(' ', $dirs));
 	}

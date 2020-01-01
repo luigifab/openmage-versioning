@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/28/02/2019
+ * Updated J/07/11/2019
  *
- * Copyright 2011-2019 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -17,26 +17,31 @@
  * GNU General Public License (GPL) for more details.
  */
 
-array_walk_recursive($_GET, function (&$val) { $val = trim($val); });
-array_walk_recursive($_POST, function (&$val) { $val = trim($val); });
+array_walk_recursive($_GET, static function (&$val) { $val = trim($val); });
+array_walk_recursive($_POST, static function (&$val) { $val = trim($val); });
 
 class Processor {
 
 	private $type;
-	private $config = array();
-	private $dataSource = array();
-	private $dataTranslated = array();
+	private $config = [];
+	private $dataSource = [];
+	private $dataTranslated = [];
 
 
-	public function init($type) {
+	public function init(string $type) {
 
+		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
+		$ip = empty($ip) ? getenv('REMOTE_ADDR') : array_pop($ip);
+		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? mb_substr($ip, 7) : $ip;
+
+		$this->setData('ip', $ip);
 		$this->setData('type', $type);
 
-		if (!is_dir(ROOT.'/errors/config/'))
-			@mkdir(ROOT.'/errors/config/', 0755);
+		if (!is_dir('./config/'))
+			@mkdir('./config/', 0755);
 
 		// gestion des langues
-		$files  = array_merge(scandir(ROOT.'/errors/config/', SCANDIR_SORT_NONE), glob(ROOT.'/app/locale/*/Luigifab_Versioning.csv'));
+		$files  = array_merge(scandir('./config/', SCANDIR_SORT_NONE), glob('../app/locale/*/Luigifab_Versioning.csv'));
 		$result = $this->initLocale($files);
 
 		setlocale(LC_ALL, $result.'utf8');
@@ -45,29 +50,31 @@ class Processor {
 		// le premier fichier contient les traductions configurées dans le back-office
 		// le second fichier contient les traductions par défaut (n'écrase pas les valeurs du back-office)
 		// le troisième fichier sert si les fichiers précédents sont incomplets
-		$this->loadCSV(ROOT.'/errors/config/'.$this->getData('locale').'.csv');
-		$this->loadCSV(ROOT.'/app/locale/'.$this->getData('locale').'/Luigifab_Versioning.csv');
-		$this->loadCSV(ROOT.'/app/locale/en_US/Luigifab_Versioning.csv');
+		$this->loadCSV('./config/'.$this->getData('locale').'.csv');
+		$this->loadCSV('../app/locale/'.$this->getData('locale').'/Luigifab_Versioning.csv');
+		$this->loadCSV('../app/locale/en_US/Luigifab_Versioning.csv');
 
 		// chargement de la configuration
 		// remplace 0 et 1 par false et true
-		$file = ROOT.'/errors/config/config.dat';
+		$file = './config/config.dat';
 		if (is_file($file)) {
 
 			$data = trim(file_get_contents($file));
 			$data = explode("\n", $data);
 
 			foreach ($data as $config) {
-				if ((mb_strlen($config) > 3) && (mb_strpos($config, '#') !== 0)) {
-					list($key, $value) = explode('=', $config);
-					$this->config[$key] = in_array($value, array(0, 1, '0', '1'), true) ? ($value != 0) : $value;
+				if ((mb_strlen($config) > 3) && (mb_stripos($config, '#') !== 0)) {
+					[$key, $value] = explode('=', $config);
+					$this->config[$key] = in_array($value, [0, 1, '0', '1'], true) ? ($value != 0) : $value;
 				}
 			}
 		}
 
 		// rapport de démo
-		if (!empty($_GET['demo']))
+		if (!empty($_GET['demo'])) {
 			$this->setData('report', 123456789);
+			$this->setData('report_content', 'Maecenas turpis ex fermentum vel condimentum a pulvinar sit amet enim. Vivamus tristique dolor odio ut scelerisque velit faucibus ac.');
+		}
 	}
 
 
@@ -79,109 +86,135 @@ class Processor {
 		return $this->__($this->getData('type').'_title');
 	}
 
-	public function getReportId() {
-		return $this->getData('report');
-	}
-
 	public function getHtmlContent() {
 		return $this->__($this->getData('type').'_content');
 	}
 
 	public function getHtmlReload() {
 		$text = $this->__($this->getData('type').'_autoreload');
-		return (mb_strpos($text, '_autoreload') === false) ? '<p id="reload">'.$text.'</p>' : '';
+		return (mb_stripos($text, '_autoreload') === false) ? '<p id="reload">'.$text.'</p>' : '';
 	}
 
 
-	public function getUrl($file) {
+	public function getUrl(string $file) {
 
-		$base = getenv('SCRIPT_NAME');                                            // /sites/14/web/errors[/503.php] /sites/14/web[/index.php]
-		$base = mb_substr($base, 0, mb_strrpos($base, '/'));                      // /sites/14/web/errors           /sites/14/web
-		$base = (mb_strpos($base, 'errors') === false) ? $base.'/errors' : $base; // /sites/14/web/errors           /sites/14/web/errors
+		$base = getenv('SCRIPT_NAME');                                             // /sites/14/web/errors[/503.php] /sites/14/web[/index.php]
+		$base = mb_substr($base, 0, mb_strripos($base, '/'));                      // /sites/14/web/errors           /sites/14/web
+		$base = (mb_stripos($base, 'errors') === false) ? $base.'/errors' : $base; // /sites/14/web/errors           /sites/14/web/errors
 
 		if ($file == 'favicon.ico')
-			return mb_substr($base, 0, mb_strrpos($base, '/')).'/favicon.ico';
-		else if (mb_strpos($file, '/config/') === false)
-			return is_file(ROOT.'/errors/config/'.$file) ? $base.'/config/'.$file : $base.'/'.$file;
+			return mb_substr($base, 0, mb_strripos($base, '/')).'/favicon.ico';
+		else if (mb_stripos($file, '/config/') === false)
+			return is_file('./config/'.$file) ? $base.'/config/'.$file : $base.'/'.$file;
 		else
 			return $base.'/'.$file;
 	}
 
-	public function renderPage($code) {
+	public function renderPage(int $code) {
 
 		header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
+		header('Content-Type: text/html; charset=utf-8');
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Expires: Tue, 07 Nov 1989 20:30:00 GMT');
-		header('X-UA-Compatible: IE=edge');
 		header('X-XSS-Protection: 1; mode=block');
 		header('X-Content-Type-Options: nosniff');
 		header('X-Frame-Options: DENY');
+		header_remove('Pragma');
+		header_remove('Set-Cookie');
 
 		ob_start();
-		require_once(is_file(ROOT.'/errors/config/page.php') ? ROOT.'/errors/config/page.php' : ROOT.'/errors/page.php');
-		$html = ob_get_contents();
-		ob_end_clean();
-
-		echo str_replace(array("\n\n","\t",'  ',"\n\n",'  '), array("\n",'',' ',"\n",' '), $html);
+		require_once(is_file('./config/page.php') ? './config/page.php' : './page.php');
+		echo str_replace(["\n\n", "\t", '  ', "\n\n", '  '], ["\n", '', ' ', "\n", ' '], ob_get_clean());
 	}
 
-	public function saveReport($data) {
+	public function saveReport(array $data) {
 
-		$id = abs(intval(microtime(true) * mt_rand(100, 1000)));
-		$this->setData('report', $id);
-
-		$directory = str_replace('/errors', '', __DIR__).'/var/report/';
-		if (!is_dir($directory))
-			@mkdir($directory, 0755, true);
+		$id  = ceil(microtime(true) * random_int(100, 999));
+		$dir = str_replace('/errors', '', __DIR__).'/var/report/';
+		if (!is_dir($dir))
+			@mkdir($dir, 0755, true);
 
 		// data[0] = $e->getMessage()
 		// data[1] = $e->getTraceAsString()
-		// data['url']  = 'REQUEST_URI'
+		// data['url'] = 'REQUEST_URI'
 		// data['skin'] = app()->getStore()->getData('code');
-		$data['url'] = !empty($data['url']) ? $data['url'] : 'url not available';
-		@file_put_contents($directory.$id, $data[0]."\n".$data['url']."\n\n".$data[1]);
+		// data['script_name'] = 'SCRIPT_NAME'
+		$text = [
+			'- - - -',
+			'REMOTE_ADDR '.$this->getData('ip'),
+			empty(getenv('HTTP_USER_AGENT')) ? 'HTTP_USER_AGENT not available' : 'HTTP_USER_AGENT '.getenv('HTTP_USER_AGENT'),
+			empty(getenv('HTTP_REFERER')) ? 'HTTP_REFERER not available' : 'HTTP_REFERER '.getenv('HTTP_REFERER'),
+			empty($data['url']) ? 'REQUEST_URI not available' : 'REQUEST_URI '.$data['url'],
+			'- - - -',
+			$data[1],
+			'- - - -',
+			'GET '.(empty($_GET) ? 'empty' : implode(' ', array_keys($_GET))),
+			'POST '.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
+			'FILES '.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
+			'COOKIE '.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
+
+		//array_unshift($text, str_repeat("\n%s", count($text)));
+		//$text = call_user_func_array('sprintf', $text);
+		$text = sprintf(str_repeat("\n%s", count($text)), ...$text);
+		$data = $data[0];
+
+		@file_put_contents($dir.$id, $data.$text);
+
+		$this->setData('report', $id);
+		$this->setData('report_content', '<strong>'.$data.'</strong>'.htmlspecialchars($text, ENT_NOQUOTES | ENT_SUBSTITUTE));
 
 		$email = explode(' ', $this->getConfig('email'));
 		if (!empty($email)) {
-
-			$to = implode(', ', $email);
 			$subject = 'Fatal error #'.$id;
-			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
-			$message = '<pre style="font-size:0.85em; white-space:pre-wrap;"><strong>'.$data[0]."</strong>\n".
-				$data['url']."\n\n".$data[1].'</pre>';
-
-			mail($to, $subject, $message, $headers);
+			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strripos($email[0], '@'));
+			$message = '<pre><strong>'.$data.'</strong>'.$text.'</pre>';
+			mail(implode(', ', $email), $subject, $message, $headers);
 		}
+	}
+
+	public function canShowReport() {
+
+		if (!empty($txt = $this->getData('report_content'))) {
+
+			if (isset($_SERVER['MAGE_IS_DEVELOPER_MODE']))
+				return $txt;
+
+			$ips = './config/report.ip';
+			if (is_file($ips) && (mb_stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false))
+				return $txt;
+		}
+
+		return false;
 	}
 
 
 	// configuration et données
-	public function getConfig($key) {
-		return !empty($this->config[$this->type.'_'.$key]) ? $this->config[$this->type.'_'.$key] : false;
+	public function getConfig(string $key) {
+		return empty($this->config[$this->type.'_'.$key]) ? false : $this->config[$this->type.'_'.$key];
 	}
 
-	public function getData($key) {
-		return !empty($this->{$key}) ? $this->{$key} : null;
+	public function getData(string $key) {
+		return empty($this->{$key}) ? null : $this->{$key};
 	}
 
-	public function setData($key, $value) {
+	public function setData(string $key, $value) {
 		$this->{$key} = $value;
 		return $this;
 	}
 
 
 	// language et traduction
-	private function initLocale($files, $result = 'en_US', $filter = array()) {
+	private function initLocale(array $files, string $result = 'en_US', array $filter = []) {
 
 		foreach ($files as $file) {
 			// app/locale/en_US/Luigifab_Versioning.csv
-			if (mb_strpos($file, 'Luigifab_Versioning.csv') !== false) {
-				$code = mb_substr($file, mb_strpos($file, 'locale/') + 7);
-				$code = mb_substr($code, 0, mb_strpos($code, '/'));
+			if (mb_stripos($file, 'Luigifab_Versioning.csv') !== false) {
+				$code = mb_substr($file, mb_stripos($file, 'locale/') + 7);
+				$code = mb_substr($code, 0, mb_stripos($code, '/'));
 				$filter[$code] = $code;
 			}
 			// en-US.csv
-			else if ((mb_strpos($file, '.csv') !== false) && (mb_strpos($file, '.') !== 0)) {
+			else if ((mb_stripos($file, '.csv') !== false) && (mb_stripos($file, '.') !== 0)) {
 				$code = str_replace('-', '_', mb_substr($file, 0, -4));
 				$filter[$code] = $code;
 			}
@@ -190,13 +223,13 @@ class Processor {
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
 		$preferredLocales = array_reduce(
-			(getenv('HTTP_ACCEPT_LANGUAGE') !== false) ? explode(',', getenv('HTTP_ACCEPT_LANGUAGE')) : array(),
-			function ($res, $item) {
-				list($code, $q) = array_merge(explode(';q=', $item), array(1));
-				$res[str_replace('-', '_', $code)] = floatval($q);
+			(getenv('HTTP_ACCEPT_LANGUAGE') !== false) ? explode(',', getenv('HTTP_ACCEPT_LANGUAGE')) : [],
+			static function ($res, $item) {
+				[$code, $q] = array_merge(explode(';q=', $item), [1]);
+				$res[str_replace('-', '_', $code)] = (float) $q;
 				return $res;
 			},
-			array()
+			[]
 		);
 
 		arsort($preferredLocales);
@@ -206,22 +239,21 @@ class Processor {
 		// ajoute la langue présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
-			if (mb_strpos($code, '_') !== false)
-				array_unshift($preferredLocales, mb_substr($code, 0, mb_strpos($code, '_')));
+			if (mb_stripos($code, '_') !== false)
+				array_unshift($preferredLocales, mb_substr($code, 0, mb_stripos($code, '_')));
 			array_unshift($preferredLocales, $code);
 		}
 
 		// la bonne trouvaille
 		foreach ($preferredLocales as $code) {
 
-			if ((mb_strlen($code) >= 2) && (mb_strpos($code, '_') === false)) {
-				// par exemple es devient es_ES
-				// de manière à prioriser es_ES au lieu d'utiliser es_AR
+			if ((mb_strlen($code) >= 2) && (mb_stripos($code, '_') === false)) {
+				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
 				if (in_array($code.'_'.mb_strtoupper($code), $availableLocales)) {
 					$result = $code.'_'.mb_strtoupper($code);
 					break;
 				}
-				// par exemple es
+				// es
 				foreach ($availableLocales as $locale) {
 					if (mb_stripos($locale, $code) === 0) {
 						$result = $locale;
@@ -229,7 +261,7 @@ class Processor {
 					}
 				}
 			}
-			// par exemple es_ES ou fil_PH
+			// es_ES ou fil_PH
 			else if (in_array($code, $availableLocales)) {
 				$result = $code;
 				break;
@@ -239,45 +271,41 @@ class Processor {
 		return $result;
 	}
 
-	private function loadCSV($file) {
+	private function loadCSV(string $file) {
 
 		if (is_file($file)) {
 
-			$ressource = fopen($file, 'rb');
+			$resource = fopen($file, 'rb');
 
-			while (($line = fgetcsv($ressource, 5000)) !== false) {
+			while (($line = fgetcsv($resource, 5000)) !== false) {
 				if (!empty($line[0]) && !empty($line[1])) {
 					$this->dataSource[] = $line[0];
 					$this->dataTranslated[] = $line[1];
 				}
 			}
 
-			fclose($ressource);
+			fclose($resource);
 		}
 	}
 
-	public function __($words) {
+	public function __(string $text, ...$values) {
 
-		if (empty($words))
+		if (empty($text))
 			return '';
 
-		$words = stripslashes($words);
-		$index = array_search($words, $this->dataSource);
-		$args  = func_num_args();
+		$text  = stripslashes($text);
+		$index = array_search($text, $this->dataSource);
 
-		if ($args > 1) {
-			$final = ''; $i = 1;
-			$parts = ($index !== false) ? explode('§', $this->dataTranslated[$index]) : explode('§', $words);
-			foreach ($parts as $part)
-				$final .= ($i < $args) ? $part.func_get_arg($i++) : $part;
+		if (!empty($values)) {
+			$final = '';
+			$parts = ($index !== false) ? explode('§', $this->dataTranslated[$index]) : explode('§', $text);
+			foreach ($parts as $i => $part)
+				$final .= empty($values[$i]) ? $part : $part.$values[$i];
 		}
 		else {
-			$final = ($index !== false) ? $this->dataTranslated[$index] : $words;
+			$final = ($index !== false) ? $this->dataTranslated[$index] : $text;
 		}
 
-
-
-
-		return str_replace(array(' ?',' !',' ;',' :','« ',' »'), array('&nbsp;?','&nbsp;!','&nbsp;;','&nbsp;:','«&nbsp;','&nbsp;»'), $final);
+		return str_replace([' ?', ' !', ' ;', ' :'], ['&nbsp;?', '&nbsp;!', '&nbsp;;', '&nbsp;:'], $final);
 	}
 }
