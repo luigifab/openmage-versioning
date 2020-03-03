@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated J/05/12/2019
+ * Updated S/01/02/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -24,38 +24,37 @@ if (window.NodeList && !NodeList.prototype.forEach) {
 	};
 }
 
-var versioning = {
+var versioning = new (function () {
 
-	svg: null,
-	width: 197,
+	"use strict";
+	this.svg   = null;
+	this.width = 197;
 
-	// initialisation
-	start: function () {
+	this.start = function () {
 
-		if (document.querySelector('body[class*="adminhtml-versioning-repository-"]')) {
-
+		if (document.getElementById('versioning_grid_table')) {
 			console.info('versioning.app - hello');
-
-			if (document.getElementById('versioning_grid_table') && (typeof self.versioningIds == 'object'))
-				this.drawGraph(self.versioningIds, self.versioningCols).startDiff();
-			else if (document.getElementById('versioning_history_grid') && document.querySelector('table.data tbody button'))
-				document.querySelector('table.data tbody button').click();
+			this.drawGraph(self.versioningIds, self.versioningCols).startDiff();
 		}
-	},
+		else if (document.getElementById('versioning_history_grid_table') && document.querySelector('table.data tbody button')) {
+			console.info('versioning.app - hello');
+			document.querySelector('table.data tbody button').click();
+		}
+	};
 
-	loader: function () {
+	this.loader = function () {
 		document.body.classList.add('progress');
-	},
+	};
 
-	decode: function (data) {
+	this.decode = function (data) {
 		// prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
 		return decodeURIComponent(escape(self.atob(data)));
-	},
+	};
 
 	// Confirmation des pages de maintenance
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Pour la désactivation redirige simplement sur l'action
-	confirmFlag: function (url, title, content) {
+	this.confirmFlag = function (url, title, content) {
 
 		try {
 			// avec l'apijs
@@ -79,7 +78,7 @@ var versioning = {
 			return false;
 		}
 		catch (e) {
-			console.log(e);
+			console.error(e);
 			try { apijs.dialog.actionClose(); } catch (ee) { }
 
 			try {
@@ -95,7 +94,7 @@ var versioning = {
 				}
 			}
 			catch (ee) {
-				console.log(ee);
+				console.error(ee);
 
 				// en dernier recours
 				// demande de confirmation
@@ -109,23 +108,24 @@ var versioning = {
 				}
 			}
 		}
-	},
+	};
 
-	actionConfirmFlag: function (url) {
+	this.actionConfirmFlag = function (url) {
 		versioning.loader();
-		apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
+		if (apijs.version < 600) apijs.dialog.styles.remove('waiting', 'lock');
+		else                     apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
 		self.location.href = url;
-	},
+	};
 
-	cancelFlag: function (url) {
+	this.cancelFlag = function (url) {
 		this.loader();
 		self.location.href = url;
-	},
+	};
 
 	// Confirmation de mise à jour
 	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
-	confirmUpgrade: function (url, title) {
+	this.confirmUpgrade = function (url, title) {
 
 		var content = self.versioningText[0], credits = self.versioningText[1];
 
@@ -153,7 +153,7 @@ var versioning = {
 			return false;
 		}
 		catch (e) {
-			console.log(e);
+			console.error(e);
 			try { apijs.dialog.actionClose(); } catch (ee) { }
 
 			try {
@@ -183,7 +183,7 @@ var versioning = {
 				return false;
 			}
 			catch (ee) {
-				console.log(ee);
+				console.error(ee);
 
 				// en dernier recours
 				// demande de confirmation
@@ -196,13 +196,13 @@ var versioning = {
 				}
 			}
 		}
-	},
+	};
 
-	closeConfirmUpgrade: function () {
+	this.closeConfirmUpgrade = function () {
 		document.getElementById('apijsDialog').parentNode.removeChild(document.getElementById('apijsDialog'));
-	},
+	};
 
-	actionConfirmUpgrade: function (action) {
+	this.actionConfirmUpgrade = function (action) {
 
 		// avec l'apijs, en deux temps
 		// validation du formulaire si la fonction callback avec son paramètre args renvoie true, callback(false, args)
@@ -219,31 +219,32 @@ var versioning = {
 		}
 		// avec l'apijs, en deux temps
 		else {
-			apijs.dialog.styles.remove('lock'); // obligatoire sinon demande de confirmation de quitter la page
+			if (apijs.version < 600) apijs.dialog.styles.remove('waiting', 'lock');
+			else                     apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
 			self.location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
 		}
 
 		return true;
-	},
+	};
 
 	// Affichage de l'historique
 	// » Affiche les détails d'une mise à jour dans la balise pre
 	// » Marque la ligne active du tableau avec la classe current
-	history: function (elem, content) {
+	this.history = function (elem, content) {
 
 		document.querySelectorAll('table.data tbody tr[class]').forEach(function (elem) { elem.classList.remove('current'); });
 		document.querySelector('pre').innerHTML = this.decode(content) + "\n\n";
 
 		elem.parentNode.parentNode.classList.add('current');
 		return false;
-	},
+	};
 
 	// Représentation des branches
 	// » Utilise Raphael.js 2.3.0 (93,4 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,4 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
 	// » Crée ensuite les lignes entres les points sans utiliser les trucs dépréciés de prototype
-	drawGraph: function (data, cols) {
+	this.drawGraph = function (data, cols) {
 
 		var x, y, pX, pY, elem, gradients = '',
 			commits   = Object.keys(data).map(function (key) { return data[key]; }), // les commits sous forme d'un array
@@ -483,22 +484,22 @@ var versioning = {
 		document.querySelector('head').appendChild(elem);
 
 		return this;
-	},
+	};
 
-	mouseOver: function (show) {
+	this.mouseOver = function (show) {
 		this.svg.canvas.style.width = show ? this.width + 'px' : '197px';
 		this.svg.canvas.style.pointerEvents = show ? 'none' : 'inherit';
-	},
+	};
 
-	updateClass: function (klass) {
+	this.updateClass = function (klass) {
 		this.svg.canvas.setAttribute('class', klass);
 		document.getElementById('versioning_grid_table').setAttribute('class', 'data ' + klass);
-	},
+	};
 
 	// Gestion des cases du diff
 	// » Gère l'activation du lien vers la page du diff
 	// » Active automatiquement les premières cases
-	startDiff: function () {
+	this.startDiff = function () {
 
 		var a = 1, b = 1, c = true;
 		document.querySelectorAll('table.data input[type="radio"]').forEach(function (elem) {
@@ -513,9 +514,9 @@ var versioning = {
 		document.querySelector('table.data input[name="d2"]:not([disabled])').checked = true;
 
 		return this.goDiff();
-	},
+	};
 
-	goDiff: function (url, second) {
+	this.goDiff = function (url, second) {
 
 		var ia = document.querySelector('table.data input[name="d1"]:checked'),
 		    ib = document.querySelector('table.data input[name="d2"]:checked'),
@@ -550,8 +551,9 @@ var versioning = {
 		}
 
 		return this;
-	}
-};
+	};
+
+})();
 
 if (typeof self.addEventListener == 'function')
 	self.addEventListener('load', versioning.start.bind(versioning));

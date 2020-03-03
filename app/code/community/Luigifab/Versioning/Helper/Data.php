@@ -37,8 +37,8 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return (string) Mage::getConfig()->getModuleConfig('Luigifab_Versioning')->version;
 	}
 
-	public function _(string $data, $a = null, $b = null) {
-		return (mb_stripos($txt = $this->__(' '.$data, $a, $b), ' ') === 0) ? $this->__($data, $a, $b) : $txt;
+	public function _(string $data, ...$values) {
+		return (mb_stripos($txt = $this->__(' '.$data, ...$values), ' ') === 0) ? $this->__($data, ...$values) : $txt;
 	}
 
 	public function escapeEntities($data, bool $quotes = false) {

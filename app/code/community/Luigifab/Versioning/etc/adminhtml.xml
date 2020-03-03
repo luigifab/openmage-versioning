@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created J/22/12/2011
- * Updated V/23/02/2018
+ * Updated D/09/02/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -64,16 +64,10 @@
 						<children>
 							<config>
 								<children>
-									<!--luigifab translate="title">
-										<title>Tools</title>
-										<sort_order>103</sort_order>
-										<children-->
-											<versioning translate="title">
-												<title>Version control</title>
-												<sort_order>103085</sort_order>
-											</versioning>
-										<!--/children>
-									</luigifab-->
+									<versioning translate="title">
+										<title>Version control</title>
+										<sort_order>103085</sort_order>
+									</versioning>
 								</children>
 							</config>
 						</children>

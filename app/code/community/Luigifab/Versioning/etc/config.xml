@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated V/12/07/2019
+ * Updated J/16/01/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>3.8.0</version>
+			<version>3.8.1</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -64,28 +64,28 @@
 					</versioning>
 				</observers>
 			</admin_system_config_changed_section_versioning>
-			<!--admin_versioning_add_fields>      ADD FIELDS EVENT EXAMPLE
+			<!--admin_versioning_add_fields>
 				<observers>
-					<versioning_demo_addfields>
+					<demo>
 						<class>versioning/demo</class>
 						<method>addFieldsEvent</method>
-					</versioning_demo_addfields>
+					</demo>
 				</observers>
-			</admin_versioning_add_fields-->
-			<!--admin_versioning_upgrade_before>  BEFORE UPGRADE EVENT EXAMPLE
+			</admin_versioning_add_fields>
+			<admin_versioning_upgrade_before>
 				<observers>
-					<versioning_demo_before>
+					<demo>
 						<class>versioning/demo</class>
 						<method>beforeUpgradeEvent</method>
-					</versioning_demo_before>
+					</demo>
 				</observers>
-			</admin_versioning_upgrade_before-->
-			<!--admin_versioning_upgrade_after>   AFTER UPGRADE EVENT EXAMPLE
+			</admin_versioning_upgrade_before>
+			<admin_versioning_upgrade_after>
 				<observers>
-					<versioning_demo_after>
+					<demo>
 						<class>versioning/demo</class>
 						<method>afterUpgradeEvent</method>
-					</versioning_demo_after>
+					</demo>
 				</observers>
 			</admin_versioning_upgrade_after-->
 		</events>
@@ -106,4 +106,12 @@
 			</modules>
 		</translate>
 	</adminhtml>
+	<default>
+		<versioning>
+			<general>
+				<diff_limit>1</diff_limit>
+				<diff_filter>MRTUXB</diff_filter>
+			</general>
+		</versioning>
+	</default>
 </config>

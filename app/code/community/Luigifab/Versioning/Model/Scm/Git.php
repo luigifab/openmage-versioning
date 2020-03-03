@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/10/11/2019
+ * Updated J/16/01/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -17,30 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-class Luigifab_Versioning_Model_Scm_Git {
-
-	private $version;
-	private $revision;
-	private $items;
-
-
-	// indique si le gestionnaire de version est installé
-	// le tout à partir de la réponse de la commande 'git'
-	public function isSoftwareInstalled() {
-		exec('git --version', $data);
-		return (preg_match('#(\d+\.\d+\.\d+)#', trim(implode($data)), $this->version) !== 0);
-	}
-
-	public function getSoftwareVersion() {
-		if (empty($this->version))
-			$this->isSoftwareInstalled();
-		return empty($this->version) ? null : trim($this->version[0]);
-	}
-
-	public function getType() {
-		return 'git';
-	}
-
+class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
@@ -149,7 +126,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 
 	// renvoi la branche actuelle à partir de la réponse de la commande 'git branch'
-	// renvoi le numéro de la révision actuelle de la copie locale (à partir de la réponse de la commande 'git log')
+	// renvoi le numéro de la révision actuelle de la copie locale à partir de la réponse de la commande 'git log'
 	// renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
 	public function getCurrentBranch() {
 
@@ -179,17 +156,19 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null) {
 
-		$help = Mage::helper('versioning');
+		$help   = Mage::helper('versioning');
+		$limit  = Mage::getStoreConfig('versioning/general/diff_limit');
+		$filter = Mage::getStoreConfig('versioning/general/diff_filter');
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
 		// have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
-			$command = 'git diff -U1 --diff-filter=MRTUXB --ignore-all-space --ignore-blank-lines';
+			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
-			$command = 'git diff -U1 --diff-filter=MRTUXB --ignore-all-space';
+			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space';
 		else
-			$command = 'git diff -U1 --diff-filter=MRTUXB';
+			$command = 'git diff -U'.$limit.' --diff-filter='.$filter;
 
 		if (!empty($from) && !empty($to))
 			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
@@ -203,8 +182,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
-		$cut = false;
-		$ignore = false;
+		$cut = $ignore = false;
 		foreach ($lines as $i => $line) {
 
 			if (empty($line))
@@ -216,12 +194,23 @@ class Luigifab_Versioning_Model_Scm_Git {
 			else if ($line == '\\ No newline at end of file')
 				unset($lines[$i]);
 			else if (mb_stripos($line, 'diff --git a') === 0) {
-				$cut = mb_stripos($line, '.min.') !== false;
+				$cut = mb_stripos($line, '.min.') !== false; // 13 = mb_strlen('diff --git a/')
 				$lines[$i] = "\n".'<strong>=== '.mb_substr($help->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
 				if (is_array($excl)) {
-					$ignore = in_array(mb_substr($line, mb_strripos($line, '.') + 1), $excl);
-					$ignore = $ignore || ($cut && in_array('min', $excl));
-					if ($ignore)                                                               // 13 = mb_strlen('diff --git a/')
+					$ignore = $cut && in_array('min', $excl);
+					// par extension
+					if (!$ignore) {
+						$ignore = mb_strripos($line, '.');
+						$ignore = mb_substr($line, ($ignore > 0) ? $ignore + 1 : mb_strripos($line, '/') + 1);
+						$ignore = in_array($ignore, $excl);
+					}
+					// par nom de fichier
+					if (!$ignore) {
+						$ignore = mb_substr($line, ($ignore > 0) ? $ignore + 1 : mb_strripos($line, '/') + 1);
+						$ignore = in_array($ignore, $excl);
+					}
+					// ignore la ligne
+					if ($ignore)
 						unset($lines[$i]);
 				}
 			}
@@ -249,7 +238,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 			str_replace("\t", '    ', implode("\n", $lines));
 	}
 
-	public function getCurrentDiffStatus($from, $to, $dir = null) {
+	public function getCurrentDiffStatus($from = null, $to = null, $dir = null) {
 
 		$help = Mage::helper('versioning');
 
@@ -303,6 +292,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 	}
 
 	public function getCurrentStatus() {
+
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 git status', $data);
 		return '<span>git status</span>'."\n".Mage::helper('versioning')->escapeEntities(implode("\n", $data));
 	}
@@ -311,7 +301,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 	// met à jour la copie locale avec 'git reset' (après avoir annulé les éventuelles modifications avec 'git clean')
 	// prend soin de vérifier le code de retour de la commande 'git reset' et d'enregistrer les détails de la mise à jour
 	// n'utilise pas GIT_SSH étant donnée que tout est disponible sur le dépôt local
-	public function upgradeToRevision($obj, $log, $revision) {
+	public function upgradeToRevision($object, $log, $revision) {
 
 		$revision = escapeshellarg($revision);
 
@@ -337,7 +327,7 @@ class Luigifab_Versioning_Model_Scm_Git {
 		$data  = trim(file_get_contents($log));
 		$lines = explode("\n", $data);
 
-		$obj->writeCommand($data);
+		$object->writeCommand($data);
 
 		foreach ($lines as $line) {
 			if (mb_stripos($line, 'fatal: ') === 0)

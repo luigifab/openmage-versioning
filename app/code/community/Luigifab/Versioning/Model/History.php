@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated L/04/11/2019
+ * Updated J/23/01/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -61,7 +61,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 					// ajouté en version 1.1.0
 					// la 8ème case contient l'éventuel nom de la branche
-					$item->setData('branch', !empty($line[7]) ? $line[7] : '');
+					$item->setData('branch', empty($line[7]) ? '' : $line[7]);
 
 					// an upgrade is already...
 					// remplace le texte par sa version traduite
@@ -81,15 +81,13 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			// collection finale
 			// construction de second tableau
-			$items   = [];
-			$current = 0;
-			$from    = ($page - 1) * $size;
-			$to      = ($page - 1) * $size + $size;
+			$items = [];
+			$from  = ($page - 1) * $size;
+			$to    = ($page - 1) * $size + $size;
 
-			foreach ($this->_items as $item) {
-				if (($current >= $from) && ($current < $to))
+			foreach ($this->_items as $idx => $item) {
+				if (($idx >= $from) && ($idx < $to))
 					$items[] = $item;
-				$current++;
 			}
 
 			// seconde sauvegarde

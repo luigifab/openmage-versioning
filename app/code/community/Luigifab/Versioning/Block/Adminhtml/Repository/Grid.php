@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated M/26/11/2019
+ * Updated V/14/02/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -74,7 +74,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'index'     => 'author',
 			'align'     => 'center',
 			'filter'    => false,
-			'sortable'  => false
+			'sortable'  => false,
+			'frame_callback' => [$this, 'decorateAuthor']
 		]);
 
 		$this->addColumn('description', [
@@ -134,6 +135,11 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	public function decorateDiff($value, $row, $column, $isExport) {
 		return sprintf('<input type="radio" name="d1" value="%s" /> <input type="radio" name="d2" value="%1$s" />', $row->getData('revision'));
 	}
+
+	public function decorateAuthor($value, $row, $column, $isExport) {
+		return str_replace(' ', '&nbsp;', trim($value));
+	}
+
 
 	public function decorateDescription($value, $row, $column, $isExport) {
 

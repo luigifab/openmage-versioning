@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/07/11/2019
+ * Updated L/20/01/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -40,9 +40,9 @@ class Processor {
 		if (!is_dir('./config/'))
 			@mkdir('./config/', 0755);
 
-		// gestion des langues
+		// gestion des locales
 		$files  = array_merge(scandir('./config/', SCANDIR_SORT_NONE), glob('../app/locale/*/Luigifab_Versioning.csv'));
-		$result = $this->initLocale($files);
+		$result = $this->searchLocale($files);
 
 		setlocale(LC_ALL, $result.'utf8');
 		$this->setData('locale', $result);
@@ -204,57 +204,58 @@ class Processor {
 
 
 	// language et traduction
-	private function initLocale(array $files, string $result = 'en_US', array $filter = []) {
+	private function searchLocale(array $files, string $result = 'en_US', array &$available = []) {
 
 		foreach ($files as $file) {
 			// app/locale/en_US/Luigifab_Versioning.csv
 			if (mb_stripos($file, 'Luigifab_Versioning.csv') !== false) {
-				$code = mb_substr($file, mb_stripos($file, 'locale/') + 7);
-				$code = mb_substr($code, 0, mb_stripos($code, '/'));
-				$filter[$code] = $code;
+				$locale = mb_substr($file, mb_stripos($file, 'locale/') + 7);
+				$locale = (string) mb_substr($locale, 0, mb_stripos($locale, '/'));
+				$available[$locale] = $locale;
 			}
-			// en-US.csv
+			// en-US.csv ou en_US.csv
 			else if ((mb_stripos($file, '.csv') !== false) && (mb_stripos($file, '.') !== 0)) {
-				$code = str_replace('-', '_', mb_substr($file, 0, -4));
-				$filter[$code] = $code;
+				$locale = (string) str_replace('-', '_', mb_substr($file, 0, -4));
+				$available[$locale] = $locale;
 			}
 		}
 
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
-		$preferredLocales = array_reduce(
-			(getenv('HTTP_ACCEPT_LANGUAGE') !== false) ? explode(',', getenv('HTTP_ACCEPT_LANGUAGE')) : [],
-			static function ($res, $item) {
+		$preferred = array_reduce(
+			empty(getenv('HTTP_ACCEPT_LANGUAGE')) ? [] : explode(',', getenv('HTTP_ACCEPT_LANGUAGE')),
+			static function ($result, $item) {
 				[$code, $q] = array_merge(explode(';q=', $item), [1]);
-				$res[str_replace('-', '_', $code)] = (float) $q;
-				return $res;
+				$result[str_replace('-', '_', $code)] = (float) $q;
+				return $result;
 			},
 			[]
 		);
 
-		arsort($preferredLocales);
-		$preferredLocales = array_keys($preferredLocales); // la liste triée de HTTP_ACCEPT_LANGUAGE : fr_FR, fr, en_GB, en...
-		$availableLocales = array_keys($filter);           // la liste des langues possibles : fr_FR, pt_PT, pt_BR...
+		arsort($preferred);
+		$preferred = array_keys($preferred); // la liste triée des locales de HTTP_ACCEPT_LANGUAGE
+		$available = array_keys($available); // la liste des locales possibles
 
-		// ajoute la langue présente dans l'url en premier car elle est prioritaire
+		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
 			if (mb_stripos($code, '_') !== false)
-				array_unshift($preferredLocales, mb_substr($code, 0, mb_stripos($code, '_')));
-			array_unshift($preferredLocales, $code);
+				array_unshift($preferred, mb_substr($code, 0, mb_stripos($code, '_')));
+			array_unshift($preferred, $code);
 		}
 
-		// la bonne trouvaille
-		foreach ($preferredLocales as $code) {
+		// cherche la locale à utiliser
+		foreach ($preferred as $code) {
 
+			// es ou fil
 			if ((mb_strlen($code) >= 2) && (mb_stripos($code, '_') === false)) {
 				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
-				if (in_array($code.'_'.mb_strtoupper($code), $availableLocales)) {
+				if (in_array($code.'_'.mb_strtoupper($code), $available)) {
 					$result = $code.'_'.mb_strtoupper($code);
 					break;
 				}
 				// es
-				foreach ($availableLocales as $locale) {
+				foreach ($available as $locale) {
 					if (mb_stripos($locale, $code) === 0) {
 						$result = $locale;
 						break 2; // car il y a bien 2 foreach
@@ -262,7 +263,7 @@ class Processor {
 				}
 			}
 			// es_ES ou fil_PH
-			else if (in_array($code, $availableLocales)) {
+			else if (in_array($code, $available)) {
 				$result = $code;
 				break;
 			}
@@ -298,12 +299,12 @@ class Processor {
 
 		if (!empty($values)) {
 			$final = '';
-			$parts = ($index !== false) ? explode('§', $this->dataTranslated[$index]) : explode('§', $text);
+			$parts = is_numeric($index) ? explode('§', $this->dataTranslated[$index]) : explode('§', $text);
 			foreach ($parts as $i => $part)
 				$final .= empty($values[$i]) ? $part : $part.$values[$i];
 		}
 		else {
-			$final = ($index !== false) ? $this->dataTranslated[$index] : $text;
+			$final = is_numeric($index) ? $this->dataTranslated[$index] : $text;
 		}
 
 		return str_replace([' ?', ' !', ' ;', ' :'], ['&nbsp;?', '&nbsp;!', '&nbsp;;', '&nbsp;:'], $final);

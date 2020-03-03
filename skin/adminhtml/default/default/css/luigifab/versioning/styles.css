@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated M/26/11/2019
+ * Updated S/01/02/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -68,7 +68,10 @@ body.adminhtml-versioning-repository-history table.data tr.headings th.no-link {
 body.adminhtml-versioning-repository-history table.data tr.current { font-weight:700; }
 body.adminhtml-versioning-repository-history table.data tr.current button { display:none; }
 
-button.slink { display:inline; margin:0; padding:0; font-weight:400; text-decoration:underline; color:#EA7601; border:0; background:none; }
+button.slink {
+	display:inline; margin:0; padding:0; line-height:1;
+	font-weight:400; text-decoration:underline; color:#EA7601; border:0; background:none;
+}
 
 /* &&&&&&&&&&&&&&&&&&&&&& versioning/repository/index &&& */
 body.adminhtml-versioning-repository-index button.delpage.delete span { padding-left:0; background-image:none; }

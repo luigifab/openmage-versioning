@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/08/07/2017
+ * Updated M/07/01/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -96,6 +96,7 @@
 		<reference name="content">
 			<action method="setTemplate" ifconfig="versioning/scm/login">
 				<template>luigifab/versioning/login.phtml</template>
+				<old>login.phtml</old>
 			</action>
 		</reference>
 	</adminhtml_index_login>
@@ -104,6 +105,7 @@
 		<reference name="content">
 			<action method="setTemplate" ifconfig="versioning/scm/login">
 				<template>luigifab/versioning/forgotpassword.phtml</template>
+				<old>forgotpassword.phtml</old>
 			</action>
 		</reference>
 	</adminhtml_index_forgotpassword>
