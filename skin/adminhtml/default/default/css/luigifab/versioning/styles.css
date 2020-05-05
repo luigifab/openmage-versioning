@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated S/01/02/2020
+ * Updated J/20/02/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -133,7 +133,7 @@ body.adminhtml-versioning-repository-index #anchor-content { margin-top:1px; pad
 	font-size:0.85em; font-family:sans-serif; font-weight:400; text-decoration:none; cursor:pointer; background-image:none;
 }
 
-#apijsBox.fake div.control button::-moz-focus-inner { margin:-1px; padding:0; border:0; outline:0; }
+#apijsBox.fake div.control button::-moz-focus-inner { padding:0; border:0; outline:0; }
 #apijsBox.fake div.control button:hover, #apijsBox.fake div.control button:active,
 #apijsBox.fake div.control button:focus { outline:0; border-color:#555; background-color:#F4F4F4; }
 

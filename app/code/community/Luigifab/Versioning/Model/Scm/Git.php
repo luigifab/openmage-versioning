@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/16/01/2020
+ * Updated J/23/04/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/magento/versioning
@@ -91,9 +91,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
 				preg_match('#\s*{([^}]+)}\s*$#', $description, $branch);
-				if (count($branch) >= 1) {
+				if (!empty($branch)) {
 					$description = preg_replace('#\s*{[^}]+}\s*$#', '', $description);
-					$branch = trim(array_pop($branch));
+					$branch = trim(is_array($branch) ? array_pop($branch) : $branch);
 				}
 				else {
 					$branch = 'unknown';
