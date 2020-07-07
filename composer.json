@@ -1,0 +1,64 @@
+{
+    "type": "magento-module",
+    "name": "luigifab/openmage-versioning",
+    "description": "A module to automatize the updates using GIT for OpenMage and Magento.",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Fabrice Creuzot (luigifab)",
+            "email": "code@luigifab.fr"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "openmage/magento-lts": ">=19.4.0",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-dom": "*"
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "map": [
+            ["src/app/locale/cs_CZ/Luigifab_Versioning.csv", "app/locale/cs_CZ/Luigifab_Versioning.csv"],
+            ["src/app/locale/de_AT/Luigifab_Versioning.csv", "app/locale/de_AT/Luigifab_Versioning.csv"],
+            ["src/app/locale/de_CH/Luigifab_Versioning.csv", "app/locale/de_CH/Luigifab_Versioning.csv"],
+            ["src/app/locale/de_DE/Luigifab_Versioning.csv", "app/locale/de_DE/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_AU/Luigifab_Versioning.csv", "app/locale/en_AU/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_CA/Luigifab_Versioning.csv", "app/locale/en_CA/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_GB/Luigifab_Versioning.csv", "app/locale/en_GB/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_IE/Luigifab_Versioning.csv", "app/locale/en_IE/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_NZ/Luigifab_Versioning.csv", "app/locale/en_NZ/Luigifab_Versioning.csv"],
+            ["src/app/locale/en_US/Luigifab_Versioning.csv", "app/locale/en_US/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_AR/Luigifab_Versioning.csv", "app/locale/es_AR/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_CL/Luigifab_Versioning.csv", "app/locale/es_CL/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_CO/Luigifab_Versioning.csv", "app/locale/es_CO/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_CR/Luigifab_Versioning.csv", "app/locale/es_CR/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_ES/Luigifab_Versioning.csv", "app/locale/es_ES/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_MX/Luigifab_Versioning.csv", "app/locale/es_MX/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_PA/Luigifab_Versioning.csv", "app/locale/es_PA/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_PE/Luigifab_Versioning.csv", "app/locale/es_PE/Luigifab_Versioning.csv"],
+            ["src/app/locale/es_VE/Luigifab_Versioning.csv", "app/locale/es_VE/Luigifab_Versioning.csv"],
+            ["src/app/locale/fr_CA/Luigifab_Versioning.csv", "app/locale/fr_CA/Luigifab_Versioning.csv"],
+            ["src/app/locale/fr_FR/Luigifab_Versioning.csv", "app/locale/fr_FR/Luigifab_Versioning.csv"],
+            ["src/app/locale/it_CH/Luigifab_Versioning.csv", "app/locale/it_CH/Luigifab_Versioning.csv"],
+            ["src/app/locale/it_IT/Luigifab_Versioning.csv", "app/locale/it_IT/Luigifab_Versioning.csv"],
+            ["src/app/locale/ja_JP/Luigifab_Versioning.csv", "app/locale/ja_JP/Luigifab_Versioning.csv"],
+            ["src/app/locale/nl_NL/Luigifab_Versioning.csv", "app/locale/nl_NL/Luigifab_Versioning.csv"],
+            ["src/app/locale/pl_PL/Luigifab_Versioning.csv", "app/locale/pl_PL/Luigifab_Versioning.csv"],
+            ["src/app/locale/pt_BR/Luigifab_Versioning.csv", "app/locale/pt_BR/Luigifab_Versioning.csv"],
+            ["src/app/locale/pt_PT/Luigifab_Versioning.csv", "app/locale/pt_PT/Luigifab_Versioning.csv"],
+            ["src/app/locale/ru_RU/Luigifab_Versioning.csv", "app/locale/ru_RU/Luigifab_Versioning.csv"],
+            ["src/app/locale/tr_TR/Luigifab_Versioning.csv", "app/locale/tr_TR/Luigifab_Versioning.csv"],
+            ["src/app/locale/zh_CN/Luigifab_Versioning.csv", "app/locale/zh_CN/Luigifab_Versioning.csv"],
+            ["src/app/etc/modules/Luigifab_Versioning.xml", "app/etc/modules/Luigifab_Versioning.xml"],
+            ["src/app/code/community/Luigifab/Versioning/", "app/code/community/Luigifab/Versioning/"],
+            ["src/app/design/adminhtml/default/default/layout/luigifab/versioning.xml", "app/design/adminhtml/default/default/layout/luigifab/versioning.xml"],
+            ["src/app/design/adminhtml/default/default/template/luigifab/versioning/", "app/design/adminhtml/default/default/template/luigifab/versioning/"],
+            ["src/skin/adminhtml/default/default/css/luigifab/versioning/", "skin/adminhtml/default/default/css/luigifab/versioning/"],
+            ["src/skin/adminhtml/default/default/images/luigifab/versioning/", "skin/adminhtml/default/default/images/luigifab/versioning/"],
+            ["src/skin/adminhtml/default/default/js/luigifab/versioning/", "skin/adminhtml/default/default/js/luigifab/versioning/"],
+            ["src/errors/", "errors/"]
+        ]
+    }
+}

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Created S/03/12/2011
+ * Updated V/12/06/2020
+ *
+ * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://www.luigifab.fr/openmage/versioning
+ *
+ * This program is free software, you can redistribute it or modify
+ * it under the terms of the GNU General Public License (GPL) as published
+ * by the free software foundation, either version 2 of the license, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but without any warranty, without even the implied warranty of
+ * merchantability or fitness for a particular purpose. See the
+ * GNU General Public License (GPL) for more details.
+-->
+
+<config>
+	<modules>
+		<Luigifab_Versioning>
+			<version>4.0.0</version>
+		</Luigifab_Versioning>
+	</modules>
+	<global>
+		<blocks>
+			<versioning>
+				<class>Luigifab_Versioning_Block</class>
+			</versioning>
+		</blocks>
+		<helpers>
+			<versioning>
+				<class>Luigifab_Versioning_Helper</class>
+			</versioning>
+		</helpers>
+		<models>
+			<versioning>
+				<class>Luigifab_Versioning_Model</class>
+				<adaptators>
+					<git>versioning/scm_git</git>
+				</adaptators>
+			</versioning>
+		</models>
+	</global>
+	<admin>
+		<routers>
+			<adminhtml>
+				<args>
+					<modules>
+						<Luigifab_Versioning before="Mage_Adminhtml">Luigifab_Versioning</Luigifab_Versioning>
+					</modules>
+				</args>
+			</adminhtml>
+		</routers>
+	</admin>
+	<adminhtml>
+		<events>
+			<admin_system_config_changed_section_versioning>
+				<observers>
+					<versioning>
+						<class>versioning/observer</class>
+						<method>updateConfig</method>
+					</versioning>
+				</observers>
+			</admin_system_config_changed_section_versioning>
+			<!--admin_versioning_add_fields>
+				<observers>
+					<demo>
+						<class>versioning/demo</class>
+						<method>addFieldsEvent</method>
+					</demo>
+				</observers>
+			</admin_versioning_add_fields>
+			<admin_versioning_upgrade_before>
+				<observers>
+					<demo>
+						<class>versioning/demo</class>
+						<method>beforeUpgradeEvent</method>
+					</demo>
+				</observers>
+			</admin_versioning_upgrade_before>
+			<admin_versioning_upgrade_after>
+				<observers>
+					<demo>
+						<class>versioning/demo</class>
+						<method>afterUpgradeEvent</method>
+					</demo>
+				</observers>
+			</admin_versioning_upgrade_after-->
+		</events>
+		<layout>
+			<updates>
+				<versioning>
+					<file>luigifab/versioning.xml</file>
+				</versioning>
+			</updates>
+		</layout>
+		<translate>
+			<modules>
+				<Luigifab_Versioning>
+					<files>
+						<default>Luigifab_Versioning.csv</default>
+					</files>
+				</Luigifab_Versioning>
+			</modules>
+		</translate>
+	</adminhtml>
+	<default>
+		<versioning>
+			<general>
+				<diff_limit>1</diff_limit>
+				<diff_filter>MRTUXB</diff_filter>
+			</general>
+		</versioning>
+	</default>
+</config>
