@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated S/16/05/2020
+ * Updated S/01/08/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -130,7 +130,8 @@ class Processor {
 	public function saveReport(array $data) {
 
 		$id  = ceil(microtime(true) * random_int(100, 999));
-		$dir = str_replace('/errors', '', __DIR__).'/var/report/';
+		$dir = defined('MAGENTO_ROOT') ? MAGENTO_ROOT.'/errors' : __DIR__;
+		$dir = str_replace('/errors', '', $dir).'/var/report/';
 		if (!is_dir($dir))
 			@mkdir($dir, 0755, true);
 

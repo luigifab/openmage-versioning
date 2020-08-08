@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/31/05/2020
+ * Updated D/26/07/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -168,7 +168,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null) {
 
 		$help   = Mage::helper('versioning');
-		$limit  = Mage::getStoreConfig('versioning/general/diff_limit');
+		$limit  = (int) Mage::getStoreConfig('versioning/general/diff_limit');
 		$filter = Mage::getStoreConfig('versioning/general/diff_filter');
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
@@ -217,7 +217,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 					}
 					// par nom de fichier
 					if (!$ign) {
-						$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strripos($line, '/') + 1);
+						$ign = mb_substr($line, mb_strripos($line, '/') + 1);
 						$ign = in_array($ign, $excl);
 					}
 					// ignore la ligne
@@ -229,11 +229,11 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				unset($lines[$i]);
 			else if ($cut && (mb_strlen($line) > 1500)) {
 				if ($line[0] == '+')
-					$lines[$i] = '<ins>'.mb_substr($help->escapeEntities($line), 0, 1500).'<b class="cut">...</b></ins>';
+					$lines[$i] = '<ins>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></ins>';
 				else if ($line[0] == '-')
-					$lines[$i] = '<del>'.mb_substr($help->escapeEntities($line), 0, 1500).'<b class="cut">...</b></del>';
+					$lines[$i] = '<del>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></del>';
 				else
-					$lines[$i] = mb_substr($help->escapeEntities($line), 0, 1500).'<b class="cut">...</b>';
+					$lines[$i] = mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i>';
 			}
 			else if ($line[0] == '+')
 				$lines[$i] = '<ins>'.$help->escapeEntities($line).'</ins>';
@@ -249,7 +249,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			str_replace("\t", '    ', implode("\n", $lines));
 	}
 
-	public function getCurrentDiffStatus($from = null, $to = null, $dir = null) {
+	public function getCurrentDiffStatus($from = null, $to = null, $dir = null, $excl = null) {
 
 		$help = Mage::helper('versioning');
 
@@ -267,6 +267,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		if (!empty($dir))
 			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
+		if (!empty($excl))
+			$excl = explode(',', $excl);
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
@@ -296,10 +298,22 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$lines[$i] = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $help->__('unknown:--------')), $line);
 			else if (mb_stripos($line, 'B') === 0)
 				$lines[$i] = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
+
+			if (is_array($excl)) {
+				// par extension
+				$ign = mb_strripos($lines[$i], '.');
+				$ign = mb_substr($lines[$i], ($ign > 0) ? $ign + 1 : mb_strripos($lines[$i], '/') + 1);
+				if (in_array($ign, $excl))
+					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
+				// par nom de fichier
+				$ign = mb_substr($lines[$i], mb_strripos($lines[$i], '/') + 1);
+				if (in_array($ign, $excl))
+					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
+			}
 		}
 
 		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".$help->__('For the current diff')."\n\n".
-			str_replace("\t", '    ', $help->escapeEntities(implode("\n", $lines)));
+			str_replace(["\t", '§{#{§', '§}#}§'], ['    ', '<u>', '</u>'], $help->escapeEntities(implode("\n", $lines)));
 	}
 
 	public function getCurrentStatus($dir = null) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated S/09/11/2019
+ * Updated S/01/08/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -17,7 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-chdir(__DIR__);
+chdir(defined('MAGENTO_ROOT') ? MAGENTO_ROOT.'/errors' : __DIR__);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

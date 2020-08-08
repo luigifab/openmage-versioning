@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated D/31/05/2020
+ * Updated D/26/07/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -52,8 +52,8 @@ body.adminhtml-versioning-repository-index #apijsDialog, #page-login {
 body.adminhtml-versioning-repository-status pre ins { display:inline-block; width:100%; text-decoration:none; background-color:#CFC; }
 body.adminhtml-versioning-repository-status pre del { display:inline-block; width:100%; text-decoration:none; background-color:#FCC; }
 body.adminhtml-versioning-repository-status pre strong { display:inline-block; width:100%; }
-body.adminhtml-versioning-repository-status pre ins b.cut { background-color:#99FF99; }
-body.adminhtml-versioning-repository-status pre del b.cut { background-color:#FFA6A6; }
+body.adminhtml-versioning-repository-status pre ins i { font-style:normal; background-color:#99FF99; }
+body.adminhtml-versioning-repository-status pre del i { font-style:normal; background-color:#FFA6A6; }
 
 body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repository-history pre {
 	margin-bottom:1em; padding:0.8em 1em 1em; overflow:hidden;

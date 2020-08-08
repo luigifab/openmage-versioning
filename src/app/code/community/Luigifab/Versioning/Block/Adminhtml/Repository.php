@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/10/11/2019
+ * Updated J/30/07/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -27,8 +27,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		$this->_controller = 'adminhtml_repository';
 		$this->_blockGroup = 'versioning';
 		$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
-			$this->__('Revisions history (<span id="scmtype">%s</span>)', $system->getType()) :
-			$this->__('Revisions history (<span id="scmtype">%s</span>, %s)', $system->getType(), $branch);
+			$this->__('Revisions history (%s)', '<span id="scmtype">'.$system->getType().'</span>') :
+			$this->__('Revisions history (%s, %s)', '<span id="scmtype">'.$system->getType().'</span>', $branch);
 
 		$this->_removeButton('add');
 

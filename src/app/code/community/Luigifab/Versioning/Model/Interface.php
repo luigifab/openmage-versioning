@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/21/01/2020
- * Updated D/31/05/2020
+ * Updated M/14/07/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -33,7 +33,7 @@ interface Luigifab_Versioning_Model_Interface {
 
 	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null);
 
-	public function getCurrentDiffStatus($from = null, $to = null, $dir = null);
+	public function getCurrentDiffStatus($from = null, $to = null, $dir = null, $excl = null);
 
 	public function getCurrentStatus($dir = null);
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/31/05/2020
+ * Updated D/26/07/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -142,19 +142,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 
 	public function decorateDescription($value, $row, $column, $isExport) {
-
-		$bugtracker  = Mage::getStoreConfig('versioning/scm/bugtracker');
-		$description = nl2br($row->getData('description'));
-
-		if (!empty($bugtracker)) {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=+$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=+$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[+~%\/.\w\-_]*)?\??(?:[\-+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
-			$description = preg_replace('#\#(\d+)#', '<a href="'.$bugtracker.'$1" class="issue">$1</a>', $description);
-		}
-		else {
-			$description = preg_replace('/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=+$,\w]+@)?[A-Za-z0-9.\-]+|(?:www.|[\-;:&=+$,\w]+@)[A-Za-z0-9.\-]+)((?:\/[+~%\/.\w\-_]*)?\??(?:[\-+=&;%@.\w_]*)#?(?:[\w]*))?)/', '<a href="$1" class="linkext">$1</a>', $description);
-		}
-
-		return $description;
+		$link = Mage::getStoreConfig('versioning/scm/bugtracker');
+		$text = nl2br($row->getData('description'));
+		return empty($link) ? $text : preg_replace('/#(\d+)/', '<a href="'.$link.'$1" class="issue">$1</a>', $text);
 	}
 
 	public function decorateLink($value, $row, $column, $isExport) {
