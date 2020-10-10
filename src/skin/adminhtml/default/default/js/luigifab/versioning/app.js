@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated J/25/06/2020
+ * Updated M/06/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -32,7 +32,7 @@ var versioning = new (function () {
 
 	this.start = function () {
 
-		if (document.getElementById('versioning_grid_table')) {
+		if (document.getElementById('versioning_grid_table') && document.querySelector('table.data tbody input')) {
 			console.info('versioning.app - hello');
 			this.drawGraph(self.versioningIds, self.versioningCols).startDiff();
 		}
@@ -61,16 +61,11 @@ var versioning = new (function () {
 			// utilise une jolie boîte de dialogue
 			apijs.dialog.dialogConfirmation(
 				title, // title
-				this.decode(content), // text
+				this.decode(content),         // text
 				versioning.actionConfirmFlag, // callback
 				url,   // args
-				'notransition versioning ' + document.getElementById('scmtype').textContent // icon
+				'versioning ' + document.getElementById('scmtype').textContent // icon
 			);
-
-			var elem = document.createElement('p');
-			elem.setAttribute('class', 'credits');
-			elem.appendChild(document.createTextNode(self.versioningText[1]));
-			apijs.dialog.t1.appendChild(elem);
 
 			return false;
 		}
@@ -109,8 +104,7 @@ var versioning = new (function () {
 
 	this.actionConfirmFlag = function (url) {
 		versioning.loader();
-		if (apijs.version < 600) apijs.dialog.styles.remove('waiting', 'lock');
-		else                     apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
+		apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
 		self.location.href = url;
 	};
 
@@ -124,25 +118,18 @@ var versioning = new (function () {
 	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
 	this.confirmUpgrade = function (url, title) {
 
-		var content = self.versioningText[0], credits = self.versioningText[1];
-
 		try {
 			// avec l'apijs
 			// utilise une jolie boîte de dialogue
 			url.match(/revision\/(\w+)\//);
 			apijs.dialog.dialogFormOptions(
-				title.replace('§', RegExp.$1), // title
-				this.decode(content), // text
+				title.replace('§', RegExp.$1),    // title
+				this.decode(self.versioningText), // text
 				url,  // action
-				versioning.actionConfirmUpgrade, // callback (en deux temps, vérification puis redirection)
+				versioning.actionConfirmUpgrade,  // callback (en deux temps, vérification puis redirection)
 				null, // args
-				'notransition versioning ' + document.getElementById('scmtype').textContent // icon
+				'versioning ' + document.getElementById('scmtype').textContent // icon
 			);
-
-			var elem = document.createElement('p');
-			elem.setAttribute('class', 'credits');
-			elem.appendChild(document.createTextNode(credits));
-			apijs.dialog.t1.appendChild(elem);
 
 			return false;
 		}
@@ -154,7 +141,7 @@ var versioning = new (function () {
 				// sans l'apijs
 				// simule la boîte de dialogue de l'apijs
 				var data = document.createElement('div'),
-				    text = this.decode(content).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/]/g, '>'),
+				    text = this.decode(self.versioningText).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\[/g, '<').replace(/]/g, '>'),
 				    icon = document.getElementById('scmtype').textContent;
 
 				url.match(/revision\/(\w+)\//);
@@ -168,7 +155,6 @@ var versioning = new (function () {
 								'<button type="button" class="cancel" onclick="versioning.closeConfirmUpgrade();">Annuler</button>' +
 							'</div>' +
 						'</form>' +
-						'<p class="credits">' + credits + '</p>' +
 					'</div>';
 
 				document.querySelector('body').appendChild(data);
@@ -213,8 +199,7 @@ var versioning = new (function () {
 		}
 		// avec l'apijs, en deux temps
 		else {
-			if (apijs.version < 600) apijs.dialog.styles.remove('waiting', 'lock');
-			else                     apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
+			apijs.dialog.remove('waiting', 'lock'); // obligatoire sinon demande de confirmation de quitter la page
 			self.location.href = action + apijs.serialize(document.getElementById('apijsBox')).replace(/[=&]/g, '/');
 		}
 

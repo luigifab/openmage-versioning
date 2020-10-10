@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/28/09/2019
+ * Updated J/13/08/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -162,7 +162,7 @@
 							<label>Disable the page from these IP addresses</label>
 							<comment>Separate addresses by a space.</comment>
 							<sort_order>25</sort_order>
-							<frontend_type>text</frontend_type>
+							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
@@ -226,7 +226,7 @@
 							<label>Disable the page from these IP addresses</label>
 							<comment>Separate addresses by a space.</comment>
 							<sort_order>35</sort_order>
-							<frontend_type>text</frontend_type>
+							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
@@ -288,7 +288,7 @@
 							<label>Show the report from these IP addresses</label>
 							<comment>Separate addresses by a space.</comment>
 							<sort_order>45</sort_order>
-							<frontend_type>text</frontend_type>
+							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>

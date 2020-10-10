@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/26/07/2020
+ * Updated J/08/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -22,23 +22,27 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
 	// utilise GIT_SSH si le fichier de configuration existe
-	public function getCommitsCollection($local = false, $error = null) {
+	public function getCommitsCollection($local = false) {
 
 		if (!empty($this->items))
 			return $this->items;
 
-		// lecture de l'historique des commits
+		if (empty($this->getSoftwareVersion()))
+			Mage::throwException('The git command is not available.');
 		if (!is_dir('./.git/') && !is_dir('../.git/'))
-			Mage::throwException('The .git directory does not exist!');
+			Mage::throwException('The .git directory does not exist.');
 
-		$configsh = realpath('./.git/ssh/config.sh');
-		if (!is_string($configsh))
-			$configsh = realpath('../.git/ssh/config.sh');
+		if (!$local) {
+			$configsh = realpath('./.git/ssh/config.sh');
+			if (!is_string($configsh))
+				$configsh = realpath('../.git/ssh/config.sh');
+		}
 
 		$help = Mage::helper('versioning');
 		$desc = version_compare($this->getSoftwareVersion(), '1.7.2', '>=') ? '%B' : '%s%n%b';
 		$line = (int) Mage::getStoreConfig('versioning/scm/number'); // nombre de ligne
 
+		// lecture de l'historique des commits
 		if ($local) {
 			exec('
 				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
@@ -61,75 +65,76 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			', $data, $val);
 		}
 
-		// nettoyage du résultat
+		// nettoyage de la réponse
 		$data = implode("\n", $data);
 		$data = preg_replace('#<!\[CDATA\[\s+]]>#', '', $data);
 		$data = str_replace("\n\n", "\n", $data);
 
-		// traitement de la réponse
-		if (($val !== 0) || (mb_stripos($data, '</log>') === false) ||
-		    (mb_stripos($data, 'error: ') !== false) || (mb_stripos($data, 'fatal: ') !== false)) {
+		// traitement de la réponse en cas d'erreur
+		if (($val !== 0) || (mb_stripos($data, '</log>') === false) || (mb_stripos($data, 'error: ') !== false) ||
+		    (mb_stripos($data, 'fatal: ') !== false)) {
 
-			$data = is_array($data) ? implode("\n", $data) : $data;
-			$data = (mb_stripos($data, '<log') !== false) ? mb_substr($data, 0, mb_stripos($data, '<log')) : $data;
-			$data = '<u>Response:</u>'."\n".$data;
+			$pos  = mb_stripos($data, '<log');
+			$data = (($pos !== 0) && ($pos !== false)) ? mb_substr($data, 0, $pos) : $data;
+			$data = '<u>Response:</u>'."\n".(empty($data) ? 'empty' : $help->escapeEntities($data));
 
-			$config = '<u>The git/config file:</u>'."\n".$help->escapeEntities(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config')));
+			$error = ($local ? $help->__('Can not get local commits history.') : $help->__('Can not get remote commits history.')).
+				"\n\n".
+				'<pre lang="mul">'.trim($data).
+					($local ? '' : "\n".'<u>The git/config file:</u>'."\n".$help->escapeEntities(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'))))
+				.'</pre>';
 
-			return $this->getCommitsCollection(true, $help->__('Can not get remote commits history.')."\n\n".'<pre lang="mul">'.trim($data)."\n".trim($config).'</pre>');
-		}
-		else {
-			if ($local && (PHP_SAPI != 'cli') && Mage::app()->getStore()->isAdmin() && Mage::getSingleton('admin/session')->isLoggedIn())
+			if ((PHP_SAPI != 'cli') && Mage::app()->getStore()->isAdmin() && Mage::getSingleton('admin/session')->isLoggedIn())
 				Mage::getSingleton('adminhtml/session')->addNotice($error);
-			else if (!empty($error))
+			else
 				Mage::throwException(strip_tags($error));
 
-			$branchs = [];
-			$data = (mb_stripos($data, '<') !== 0) ? mb_substr($data, mb_stripos($data, '<')) : $data;
-			$xml  = new DOMDocument();
-			$xml->loadXML('<root>'.$data.'</root>');
+			// réessaye une seule fois
+			return $local ? new Varien_Data_Collection() : $this->getCommitsCollection(true);
+		}
 
-			// extraction des données
-			// construction de la collection des commits
-			$this->items = new Varien_Data_Collection();
+		// traitement de la réponse en cas de succès
+		$branchs = [];
+		$data    = (mb_stripos($data, '<') !== 0) ? mb_substr($data, mb_stripos($data, '<')) : $data;
 
-			foreach ($xml->getElementsByTagName('log') as $logentry) {
+		$xml = new DOMDocument();
+		$xml->loadXML('<root>'.$data.'</root>');
 
-				$revision    = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
-				$parents     = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
-				$author      = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
-				$timestamp   = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
-				$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
+		// extraction des données
+		// construction de la collection des commits
+		$this->items = new Varien_Data_Collection();
 
-				preg_match('#\s*{([^}]+)}\s*$#', $description, $branch);
-				if (!empty($branch)) {
-					$description = preg_replace('#\s*{[^}]+}\s*$#', '', $description);
-					$branch = trim(is_array($branch) ? array_pop($branch) : $branch);
-				}
-				else {
-					$branch = 'unknown';
-				}
+		foreach ($xml->getElementsByTagName('log') as $logentry) {
 
-				if (!in_array($branch, $branchs))
-					$branchs[] = $branch;
+			$revision    = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
+			$parents     = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
+			$author      = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
+			$timestamp   = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
+			$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
-				$item = new Varien_Object();
-				$item->setData('current_revision', $this->getCurrentRevision());
-				$item->setData('branch', $branch);
-				$item->setData('revision', $revision);
-				$item->setData('parents', explode(' ', $parents));
-				$item->setData('date', date('c', strtotime($timestamp)));
-				$item->setData('author', preg_replace('#<[^>]+>#', '', $author));
-				$item->setData('description', $help->escapeEntities($description));
-
-				$this->items->addItem($item);
+			preg_match('#\s*{([^}]+)}\s*$#', $description, $branch);
+			if (!empty($branch)) {
+				$description = preg_replace('#\s*{[^}]+}\s*$#', '', $description);
+				$branch = trim(is_array($branch) ? array_pop($branch) : $branch);
+			}
+			else {
+				$branch = 'unknown';
 			}
 
-			// gestion des colonnes
-			// en fonction des branches
-			foreach ($this->items as $item) {
-				$item->setData('column', array_search($item->getData('branch'), $branchs));
-			}
+			if (!in_array($branch, $branchs))
+				$branchs[] = $branch;
+
+			$item = new Varien_Object();
+			$item->setData('current_revision', $this->getCurrentRevision());
+			$item->setData('column', array_search($branch, $branchs));
+			$item->setData('branch', $branch);
+			$item->setData('revision', $revision);
+			$item->setData('parents', explode(' ', $parents));
+			$item->setData('date', date('c', strtotime($timestamp)));
+			$item->setData('author', preg_replace('#<[^>]+>#', '', $author));
+			$item->setData('description', $help->escapeEntities($description));
+
+			$this->items->addItem($item);
 		}
 
 		return $this->items;
@@ -170,6 +175,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		$help   = Mage::helper('versioning');
 		$limit  = (int) Mage::getStoreConfig('versioning/general/diff_limit');
 		$filter = Mage::getStoreConfig('versioning/general/diff_filter');
+		$cut    = false;
+		$ign    = false;
 
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
@@ -193,17 +200,20 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
-		$cut = false; $ign = false;
 		foreach ($lines as $i => $line) {
 
-			if (empty($line))
+			if (empty($line)) {
 				unset($lines[$i]);
-			else if (mb_stripos($line, '--- a/') === 0)
+			}
+			else if (mb_stripos($line, '--- a/') === 0) {
 				unset($lines[$i]);
-			else if (mb_stripos($line, '+++ b/') === 0)
+			}
+			else if (mb_stripos($line, '+++ b/') === 0) {
 				unset($lines[$i]);
-			else if ($line == '\\ No newline at end of file')
+			}
+			else if ($line == '\\ No newline at end of file') {
 				unset($lines[$i]);
+			}
 			else if (mb_stripos($line, 'diff --git a') === 0) {
 				$cut = mb_stripos($line, '.min.') !== false; // 13 = mb_strlen('diff --git a/')
 				$lines[$i] = "\n".'<strong>=== '.mb_substr($help->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
@@ -225,8 +235,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 						unset($lines[$i]);
 				}
 			}
-			else if ($ign)
+			else if ($ign) {
 				unset($lines[$i]);
+			}
 			else if ($cut && (mb_strlen($line) > 1500)) {
 				if ($line[0] == '+')
 					$lines[$i] = '<ins>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></ins>';
@@ -235,12 +246,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				else
 					$lines[$i] = mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i>';
 			}
-			else if ($line[0] == '+')
+			else if ($line[0] == '+') {
 				$lines[$i] = '<ins>'.$help->escapeEntities($line).'</ins>';
-			else if ($line[0] == '-')
+			}
+			else if ($line[0] == '-') {
 				$lines[$i] = '<del>'.$help->escapeEntities($line).'</del>';
-			else
+			}
+			else {
 				$lines[$i] = $help->escapeEntities($line);
+			}
 		}
 
 		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
@@ -276,28 +290,36 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
 		foreach ($lines as $i => $line) {
 
-			if (mb_stripos($line, 'A') === 0)
+			if (mb_stripos($line, 'A') === 0) {
 				$lines[$i] = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $help->__('new file:-------')), $line);
-			else if (mb_stripos($line, 'C') === 0)
+			}
+			else if (mb_stripos($line, 'C') === 0) {
 				$lines[$i] = preg_replace("#C\d*\t#", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
-			else if (mb_stripos($line, 'D') === 0)
+			}
+			else if (mb_stripos($line, 'D') === 0) {
 				$lines[$i] = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $help->__('deleted:--------')), $line);
-			else if (mb_stripos($line, 'M') === 0)
+			}
+			else if (mb_stripos($line, 'M') === 0) {
 				$lines[$i] = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
+			}
 			else if (mb_stripos($line, 'R') === 0) {
 				$tmp = (array) preg_split('#\s+#', $line); // (yes)
 				if ((count($tmp) == 3) && (mb_stripos($tmp[1], mb_substr($tmp[2], 0, mb_strripos($tmp[2], '/'))) === 0))
 					$line = $tmp[0]."\t".$tmp[1].' > '.mb_substr($tmp[2], mb_strripos($tmp[2], '/') + 1);
 				$lines[$i] = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
 			}
-			else if (mb_stripos($line, 'T') === 0)
+			else if (mb_stripos($line, 'T') === 0) {
 				$lines[$i] = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $help->__('type changed:---')), $line);
-			else if (mb_stripos($line, 'U') === 0)
+			}
+			else if (mb_stripos($line, 'U') === 0) {
 				$lines[$i] = str_replace('U'."\t", "\t\t".str_replace('-', ' ', $help->__('unmerged:-------')), $line);
-			else if (mb_stripos($line, 'X') === 0)
+			}
+			else if (mb_stripos($line, 'X') === 0) {
 				$lines[$i] = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $help->__('unknown:--------')), $line);
-			else if (mb_stripos($line, 'B') === 0)
+			}
+			else if (mb_stripos($line, 'B') === 0) {
 				$lines[$i] = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
+			}
 
 			if (is_array($excl)) {
 				// par extension

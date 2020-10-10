@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/30/07/2020
+ * Updated J/08/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -32,12 +32,14 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 		$this->_removeButton('add');
 
-		$this->_addButton('diff', [
-			'label'   => 'diff',
-			'title'   => $this->__('Show diff'),
-			'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', ['from' => 'abc', 'to' => 'abc'])."');",
-			'class'   => 'go'
-		]);
+		if (Mage::registry('current_collection')->getSize() > 1) {
+			$this->_addButton('diff', [
+				'label'   => 'diff',
+				'title'   => $this->__('Show diff'),
+				'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', ['from' => 'abc', 'to' => 'abc'])."');",
+				'class'   => 'go'
+			]);
+		}
 
 		$this->_addButton('log', [
 			'label'   => 'log',
@@ -84,8 +86,9 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 
 	public function getGridHtml() {
 
-		$commits = $this->helper('versioning')->getSystem()->getCommitsCollection();
-		$columns = $commits->getColumnValues('column'); sort($columns);
+		$commits = Mage::registry('current_collection');
+		$columns = $commits->getColumnValues('column');
+
 		$json = [];
 		$cnt  = count($commits) - 1;
 
@@ -106,8 +109,8 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 		return $this->getChildHtml('grid')."\n".
 			'<script type="text/javascript">'."\n".
 			'self.versioningIds = '.json_encode($json).";\n".
-			'self.versioningCols = '.array_pop($columns).";\n".
-			'self.versioningText = '.json_encode([$this->helper('versioning')->getFields(), $this->__('Martian sunset seen by Spirit.')]).";\n".
+			'self.versioningCols = '.count($columns).";\n".
+			'self.versioningText = '.json_encode($this->helper('versioning')->getFields()).";\n".
 			'</script>';
 	}
 

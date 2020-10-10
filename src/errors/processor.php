@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated S/01/08/2020
+ * Updated L/05/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -79,7 +79,8 @@ class Processor {
 
 
 	public function getPageTitle() {
-		return $this->__($this->getData('type').'_pagetitle');
+		$text = $this->__($this->getData('type').'_pagetitle');
+		return empty($this->getData('report')) ? $text : $text.' ('.$this->getData('report').')';
 	}
 
 	public function getTitle() {
@@ -141,22 +142,22 @@ class Processor {
 		// data['skin'] = app()->getStore()->getData('code');
 		// data['script_name'] = 'SCRIPT_NAME'
 		$text = [
+			'',
 			'- - - -',
-			'REMOTE_ADDR '.$this->getData('ip'),
-			empty(getenv('HTTP_USER_AGENT')) ? 'HTTP_USER_AGENT not available' : 'HTTP_USER_AGENT '.getenv('HTTP_USER_AGENT'),
-			empty(getenv('HTTP_REFERER')) ? 'HTTP_REFERER not available' : 'HTTP_REFERER '.getenv('HTTP_REFERER'),
-			empty($data['url']) ? 'REQUEST_URI not available' : 'REQUEST_URI '.$data['url'],
+			empty($this->getData('ip')) ?      'REMOTE_ADDR^^^^^not available' : 'REMOTE_ADDR^^^^^'.$this->getData('ip'),
+			empty(getenv('HTTP_USER_AGENT')) ? 'HTTP_USER_AGENT^not available' : 'HTTP_USER_AGENT^'.getenv('HTTP_USER_AGENT'),
+			empty(getenv('HTTP_REFERER')) ?    'HTTP_REFERER^^^^not available' : 'HTTP_REFERER^^^^'.getenv('HTTP_REFERER'),
+			empty($data['url']) ?              'REQUEST_URI^^^^^not available' : 'REQUEST_URI^^^^^'.$data['url'],
+			'PHP_VERSION^^^^^'.PHP_VERSION,
 			'- - - -',
 			$data[1],
 			'- - - -',
-			'GET '.(empty($_GET) ? 'empty' : implode(' ', array_keys($_GET))),
-			'POST '.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
-			'FILES '.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
-			'COOKIE '.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
+			'GET^^^^'.(empty($_GET) ? 'empty' : implode(' ', array_keys($_GET))),
+			'POST^^^'.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
+			'FILES^^'.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
+			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
 
-		//array_unshift($text, str_repeat("\n%s", count($text)));
-		//$text = call_user_func_array('sprintf', $text);
-		$text = sprintf(str_repeat("\n%s", count($text)), ...$text);
+		$text = str_replace('^', chr(194).chr(160), implode("\n", $text));
 		$data = $data[0];
 
 		@file_put_contents($dir.$id, $data.$text);

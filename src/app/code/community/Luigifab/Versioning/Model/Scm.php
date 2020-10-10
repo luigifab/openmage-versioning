@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/07/01/2020
- * Updated M/21/01/2020
+ * Updated L/05/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -33,8 +33,7 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 	}
 
 	public function getSoftwareVersion() {
-		if (empty($this->version))
-			$this->isSoftwareInstalled();
+		if (empty($this->version)) $this->isSoftwareInstalled();
 		return empty($this->version) ? null : trim($this->version[0]);
 	}
 }

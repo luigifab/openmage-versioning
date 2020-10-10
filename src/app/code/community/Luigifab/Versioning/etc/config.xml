@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated J/23/07/2020
+ * Updated J/01/10/2020
  *
  * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>4.0.1</version>
+			<version>4.0.2</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -66,26 +66,26 @@
 			</admin_system_config_changed_section_versioning>
 			<!--admin_versioning_add_fields>
 				<observers>
-					<demo>
+					<versioning>
 						<class>versioning/demo</class>
 						<method>addFieldsEvent</method>
-					</demo>
+					</versioning>
 				</observers>
 			</admin_versioning_add_fields>
 			<admin_versioning_upgrade_before>
 				<observers>
-					<demo>
+					<versioning>
 						<class>versioning/demo</class>
 						<method>beforeUpgradeEvent</method>
-					</demo>
+					</versioning>
 				</observers>
 			</admin_versioning_upgrade_before>
 			<admin_versioning_upgrade_after>
 				<observers>
-					<demo>
+					<versioning>
 						<class>versioning/demo</class>
 						<method>afterUpgradeEvent</method>
-					</demo>
+					</versioning>
 				</observers>
 			</admin_versioning_upgrade_after-->
 		</events>
