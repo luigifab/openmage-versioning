@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated S/14/09/2019
+ * Updated L/22/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,7 +21,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-		$locale = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
+		$locale = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $this->getStoreId());
 
 		// exemple d'une adresse de base : https://mario/sites/14/web/(xyz/)(index.php/)
 		// exemple d'une adresse finale  : https://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
@@ -45,8 +45,8 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	private function getStoreId() {
 
-		$website = (int) $this->getRequest()->getParam('website', 0);
 		$store   = (int) $this->getRequest()->getParam('store', 0);
+		$website = (int) $this->getRequest()->getParam('website', 0);
 
 		if (!empty($store))
 			$storeId = Mage::app()->getStore($store)->getId();

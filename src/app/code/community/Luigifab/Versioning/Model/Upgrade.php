@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated V/12/06/2020
+ * Updated M/02/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -33,14 +33,14 @@ class Luigifab_Versioning_Model_Upgrade {
 		ini_set('output_buffering', 0);
 		ini_set('implicit_flush', 1);
 		ini_set('display_errors', 1);
-		ob_implicit_flush(true);
+		ob_implicit_flush();
 		ignore_user_abort(true);
 
 		try {
 			for ($i = 0; $i < ob_get_level(); $i++)
 				ob_end_clean();
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			Mage::log($e->getMessage(), Zend_Log::ERR);
 		}
 
@@ -124,7 +124,7 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			Mage::getSingleton('adminhtml/session')->addSuccess($help->__('Update to revision %s completed.', $targetRevision));
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
 			$H['status']   = $e->getMessage();
@@ -204,7 +204,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::dispatchEvent('adminhtml_cache_flush_all');
 			Mage::app()->getCacheInstance()->flush();
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			Mage::log($e->getMessage(), Zend_Log::ERR);
 		}
 
@@ -212,7 +212,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::app()->cleanCache();
 			Mage::dispatchEvent('adminhtml_cache_flush_system');
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			Mage::log($e->getMessage(), Zend_Log::ERR);
 		}
 
@@ -220,7 +220,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::getModel('core/design_package')->cleanMergedJsCss();
 			Mage::dispatchEvent('clean_media_cache_after');
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			Mage::log($e->getMessage(), Zend_Log::ERR);
 		}
 

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated V/30/08/2019
+ * Updated V/12/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,17 +21,21 @@ class Luigifab_Versioning_Model_Source_Type {
 
 	public function toOptionArray() {
 
-		$config  = Mage::getConfig()->getNode('global/models/versioning/adaptators')->asArray();
-		$options = [];
+		if (empty($this->_options)) {
 
-		foreach ($config as $code => $key) {
-			$system = Mage::getSingleton($key);
-			$options[$key] = ['value' => $key, 'label' => $system->isSoftwareInstalled() ?
-				Mage::helper('versioning')->__('%s (%s)', mb_strtoupper($system->getType()), $system->getSoftwareVersion()) :
-				Mage::helper('versioning')->__('%s (not available)', mb_strtoupper($system->getType()))];
+			$this->_options = [];
+			$config = Mage::getConfig()->getNode('global/models/versioning/adaptators')->asArray();
+
+			foreach ($config as $code => $key) {
+				$system = Mage::getSingleton($key);
+				$this->_options[$key] = ['value' => $key, 'label' => $system->isSoftwareInstalled() ?
+					Mage::helper('versioning')->__('%s (%s)', mb_strtoupper($system->getType()), $system->getSoftwareVersion()) :
+					Mage::helper('versioning')->__('%s (not available)', mb_strtoupper($system->getType()))];
+			}
+
+			ksort($this->_options);
 		}
 
-		ksort($options);
-		return $options;
+		return $this->_options;
 	}
 }

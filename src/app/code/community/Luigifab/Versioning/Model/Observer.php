@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated M/24/09/2019
+ * Updated V/12/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -49,7 +49,7 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (Mage::app()->getWebsites() as $website) {
 			foreach ($website->getGroups() as $group) {
 				foreach ($group->getStores() as $store) {
-					$locale = Mage::getStoreConfig('general/locale/code', $store->getId());
+					$locale = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $store->getId());
 					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getId());
 				}
 			}
@@ -130,7 +130,8 @@ class Luigifab_Versioning_Model_Observer {
 		}
 
 		// sauvegarde des données dans un seul fichier (format CSV)
-		@unlink(BP.'/errors/config/config.dat');
+		if (is_file(BP.'/errors/config/config.dat'))
+			@unlink(BP.'/errors/config/config.dat');
 		if (count($config) > 0)
 			file_put_contents(BP.'/errors/config/config.dat', implode("\n", $config));
 	}
@@ -149,7 +150,7 @@ class Luigifab_Versioning_Model_Observer {
 
 			if (mb_stripos($key, '_byip') !== false) {
 				$value = array_filter(preg_split('#\s+#', $value));
-				$config[mb_substr($key, 0, mb_strripos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
+				$config[mb_substr($key, 0, mb_strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
 			}
 		}
 

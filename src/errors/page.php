@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated S/16/05/2020
+ * Updated D/14/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,7 +20,7 @@
 if (!is_object($this))
 	exit(0);
 
-$locale = mb_substr($this->getData('locale'), 0, 2);
+$locale = substr($this->getData('locale'), 0, 2);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $locale ?>" lang="<?php echo $locale ?>">

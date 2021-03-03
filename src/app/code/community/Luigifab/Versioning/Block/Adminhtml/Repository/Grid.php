@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/26/07/2020
+ * Updated D/07/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -129,7 +129,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 
 
 	public function decorateRevision($value, $row, $column, $isExport) {
-		return ($value == $row->getData('current_revision')) ? sprintf('<strong>%s</strong>', $value) : $value;
+		return (!$isExport && ($value == $row->getData('current_revision'))) ? sprintf('<strong>%s</strong>', $value) : $value;
 	}
 
 	public function decorateDiff($value, $row, $column, $isExport) {
@@ -137,20 +137,19 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 	}
 
 	public function decorateAuthor($value, $row, $column, $isExport) {
-		return str_replace(' ', '&nbsp;', trim($value));
+		return $isExport ? $value : str_replace(' ', '&nbsp;', trim($value));
 	}
-
 
 	public function decorateDescription($value, $row, $column, $isExport) {
 		$link = Mage::getStoreConfig('versioning/scm/bugtracker');
 		$text = nl2br($row->getData('description'));
-		return empty($link) ? $text : preg_replace('/#(\d+)/', '<a href="'.$link.'$1" class="issue">$1</a>', $text);
+		return ($isExport || empty($link)) ? $text : preg_replace('/#(\d+)/', '<a href="'.$link.'$1" class="issue">$1</a>', $text);
 	}
 
 	public function decorateLink($value, $row, $column, $isExport) {
-		$url = $this->getUrl('*/*/upgrade', ['revision' => $row->getData('revision')]);
 		return sprintf('<button type="button" class="slink" onclick="versioning.confirmUpgrade(\'%s\', \'%s\');">%s</button>',
-			$url, $this->__('Update to revision %s', '§'), $this->__('Deliver'));
+			$this->getUrl('*/*/upgrade', ['revision' => $row->getData('revision')]),
+			$this->__('Update to revision %s', '§'), $this->__('Deliver'));
 	}
 
 

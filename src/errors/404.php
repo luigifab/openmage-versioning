@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated S/01/08/2020
+ * Updated J/04/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -17,7 +17,7 @@
  * GNU General Public License (GPL) for more details.
  */
 
-chdir(defined('MAGENTO_ROOT') ? MAGENTO_ROOT.'/errors' : __DIR__);
+chdir(defined('BP') ? BP.'/errors' : __DIR__);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

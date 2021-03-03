@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/08/10/2020
+ * Updated J/18/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -181,12 +181,21 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
 		// have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
+		// https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
 			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
 			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space';
 		else
 			$command = 'git diff -U'.$limit.' --diff-filter='.$filter;
+
+		// https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
+		if (version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
+			if (mb_strpos($excl, 'copyright') !== false)
+				$command .= ' --ignore-matching-lines " Copyright 20[0-9][0-9]\-20[0-9][0-9]"';
+			if (mb_strpos($excl, 'updatedat') !== false)
+				$command .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]"';
+		}
 
 		if (!empty($from) && !empty($to))
 			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
@@ -221,13 +230,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 					$ign = $cut && in_array('min', $excl);
 					// par extension
 					if (!$ign) {
-						$ign = mb_strripos($line, '.');
-						$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strripos($line, '/') + 1);
+						$ign = mb_strrpos($line, '.');
+						$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strrpos($line, '/') + 1);
 						$ign = in_array($ign, $excl);
 					}
 					// par nom de fichier
 					if (!$ign) {
-						$ign = mb_substr($line, mb_strripos($line, '/') + 1);
+						$ign = mb_substr($line, mb_strrpos($line, '/') + 1);
 						$ign = in_array($ign, $excl);
 					}
 					// ignore la ligne
@@ -267,6 +276,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		$help = Mage::helper('versioning');
 
+		// https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
 			$command = 'git diff --name-status --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
@@ -304,8 +314,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			}
 			else if (mb_stripos($line, 'R') === 0) {
 				$tmp = (array) preg_split('#\s+#', $line); // (yes)
-				if ((count($tmp) == 3) && (mb_stripos($tmp[1], mb_substr($tmp[2], 0, mb_strripos($tmp[2], '/'))) === 0))
-					$line = $tmp[0]."\t".$tmp[1].' > '.mb_substr($tmp[2], mb_strripos($tmp[2], '/') + 1);
+				if ((count($tmp) == 3) && (($pos = mb_strrpos($tmp[2], '/')) !== false) && (mb_stripos($tmp[1], mb_substr($tmp[2], 0, $pos)) === 0))
+					$line = $tmp[0]."\t".$tmp[1].' > '.mb_substr($tmp[2], $pos + 1);
 				$lines[$i] = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
 			}
 			else if (mb_stripos($line, 'T') === 0) {
@@ -323,12 +333,12 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 			if (is_array($excl)) {
 				// par extension
-				$ign = mb_strripos($lines[$i], '.');
-				$ign = mb_substr($lines[$i], ($ign > 0) ? $ign + 1 : mb_strripos($lines[$i], '/') + 1);
+				$ign = mb_strrpos($lines[$i], '.');
+				$ign = mb_substr($lines[$i], ($ign > 0) ? $ign + 1 : mb_strrpos($lines[$i], '/') + 1);
 				if (in_array($ign, $excl))
 					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
 				// par nom de fichier
-				$ign = mb_substr($lines[$i], mb_strripos($lines[$i], '/') + 1);
+				$ign = mb_substr($lines[$i], mb_strrpos($lines[$i], '/') + 1);
 				if (in_array($ign, $excl))
 					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
 			}

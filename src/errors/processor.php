@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated L/05/10/2020
+ * Updated D/14/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -32,7 +32,7 @@ class Processor {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
 		$ip = empty($ip) ? getenv('REMOTE_ADDR') : array_pop($ip);
-		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? mb_substr($ip, 7) : $ip;
+		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
 
 		$this->setData('ip', $ip);
 		$this->setData('type', $type);
@@ -41,8 +41,23 @@ class Processor {
 			@mkdir('./config/', 0755);
 
 		// gestion des locales
-		$files  = array_merge(scandir('./config/', SCANDIR_SORT_NONE), glob('../app/locale/*/Luigifab_Versioning.csv'));
-		$result = $this->searchLocale($files);
+		$locales = [];
+		$files   = array_merge(glob('./config/*.csv'), glob('../app/locale/*/Luigifab_Versioning.csv'));
+
+		foreach ($files as $file) {
+			// app/locale/en_US/Luigifab_Versioning.csv
+			if (mb_stripos($file, 'Luigifab_Versioning.csv') !== false) {
+				$locale = mb_substr($file, mb_stripos($file, 'locale/') + 7);
+				$locale = (string) mb_substr($locale, 0, mb_stripos($locale, '/')); // (yes)
+				$locales[] = $locale;
+			}
+			// en-US.csv ou en_US.csv
+			else if ((mb_stripos($file, '.csv') !== false) && (mb_stripos($file, '.') !== 0)) {
+				$locales[] = (string) str_replace('-', '_', mb_substr($file, 0, -4)); // (yes)
+			}
+		}
+
+		$result = $this->searchLocale($locales);
 
 		setlocale(LC_ALL, $result.'utf8');
 		$this->setData('locale', $result);
@@ -50,8 +65,8 @@ class Processor {
 		// le premier fichier contient les traductions configurées dans le back-office
 		// le second fichier contient les traductions par défaut (n'écrase pas les valeurs du back-office)
 		// le troisième fichier sert si les fichiers précédents sont incomplets
-		$this->loadCSV('./config/'.$this->getData('locale').'.csv');
-		$this->loadCSV('../app/locale/'.$this->getData('locale').'/Luigifab_Versioning.csv');
+		$this->loadCSV('./config/'.$result.'.csv');
+		$this->loadCSV('../app/locale/'.$result.'/Luigifab_Versioning.csv');
 		$this->loadCSV('../app/locale/en_US/Luigifab_Versioning.csv');
 
 		// chargement de la configuration
@@ -63,7 +78,7 @@ class Processor {
 			$data = explode("\n", $data);
 
 			foreach ($data as $config) {
-				if ((mb_strlen($config) > 3) && (mb_stripos($config, '#') !== 0)) {
+				if ((mb_strlen($config) > 3) && ($config[0] != '#')) {
 					[$key, $value] = explode('=', $config);
 					$this->config[$key] = in_array($value, [0, 1, '0', '1'], true) ? ($value != 0) : $value;
 				}
@@ -100,11 +115,11 @@ class Processor {
 	public function getUrl(string $file) {
 
 		$base = getenv('SCRIPT_NAME');                                             // /sites/14/web/errors[/503.php] /sites/14/web[/index.php]
-		$base = mb_substr($base, 0, mb_strripos($base, '/'));                      // /sites/14/web/errors           /sites/14/web
+		$base = mb_substr($base, 0, mb_strrpos($base, '/'));                       // /sites/14/web/errors           /sites/14/web
 		$base = (mb_stripos($base, 'errors') === false) ? $base.'/errors' : $base; // /sites/14/web/errors           /sites/14/web/errors
 
 		if ($file == 'favicon.ico')
-			return mb_substr($base, 0, mb_strripos($base, '/')).'/favicon.ico';
+			return mb_substr($base, 0, mb_strrpos($base, '/')).'/favicon.ico';
 		else if (mb_stripos($file, '/config/') === false)
 			return is_file('./config/'.$file) ? $base.'/config/'.$file : $base.'/'.$file;
 		else
@@ -131,7 +146,7 @@ class Processor {
 	public function saveReport(array $data) {
 
 		$id  = ceil(microtime(true) * random_int(100, 999));
-		$dir = defined('MAGENTO_ROOT') ? MAGENTO_ROOT.'/errors' : __DIR__;
+		$dir = defined('BP') ? BP.'/errors' : __DIR__;
 		$dir = str_replace('/errors', '', $dir).'/var/report/';
 		if (!is_dir($dir))
 			@mkdir($dir, 0755, true);
@@ -157,9 +172,8 @@ class Processor {
 			'FILES^^'.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
 			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
 
-		$text = str_replace('^', chr(194).chr(160), implode("\n", $text));
 		$data = $data[0];
-
+		$text = str_replace('^', chr(194).chr(160), implode("\n", $text));
 		@file_put_contents($dir.$id, $data.$text);
 
 		$this->setData('report', $id);
@@ -168,7 +182,7 @@ class Processor {
 		$email = (array) explode(' ', $this->getConfig('email')); // (yes)
 		if (!empty($email)) {
 			$subject = 'Fatal error #'.$id;
-			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strripos($email[0], '@'));
+			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
 			$message = '<pre><strong>'.$data.'</strong>'.$text.'</pre>';
 			mail(implode(', ', $email), $subject, $message, $headers);
 		}
@@ -182,7 +196,7 @@ class Processor {
 				return $txt;
 
 			$ips = './config/report.ip';
-			if (is_file($ips) && (mb_stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false))
+			if (is_file($ips) && (stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false))
 				return $txt;
 		}
 
@@ -205,67 +219,50 @@ class Processor {
 	}
 
 
-	// language et traduction
-	private function searchLocale(array $files, string $result = 'en_US', array &$available = []) {
-
-		foreach ($files as $file) {
-			// app/locale/en_US/Luigifab_Versioning.csv
-			if (mb_stripos($file, 'Luigifab_Versioning.csv') !== false) {
-				$locale = mb_substr($file, mb_stripos($file, 'locale/') + 7);
-				$locale = (string) mb_substr($locale, 0, mb_stripos($locale, '/')); // (yes)
-				$available[$locale] = $locale;
-			}
-			// en-US.csv ou en_US.csv
-			else if ((mb_stripos($file, '.csv') !== false) && (mb_stripos($file, '.') !== 0)) {
-				$locale = (string) str_replace('-', '_', mb_substr($file, 0, -4)); // (yes)
-				$available[$locale] = $locale;
-			}
-		}
+	// langue et traduction
+	private function searchLocale(array $locales, string $result = 'en_US') {
 
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
-		$preferred = array_reduce(
+		$codes = array_reduce(
 			empty(getenv('HTTP_ACCEPT_LANGUAGE')) ? [] : explode(',', getenv('HTTP_ACCEPT_LANGUAGE')),
-			static function ($result, $item) {
+			static function ($items, $item) {
 				[$code, $q] = array_merge(explode(';q=', $item), [1]);
-				$result[str_replace('-', '_', $code)] = (float) $q;
-				return $result;
+				$items[str_replace('-', '_', $code)] = (float) $q;
+				return $items;
 			},
-			[]
-		);
+			[]);
 
-		arsort($preferred);
-		$preferred = array_keys($preferred); // la liste triée des locales de HTTP_ACCEPT_LANGUAGE
-		$available = array_keys($available); // la liste des locales possibles
+		arsort($codes);
+		$codes = array_keys($codes);
 
 		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
-			if (mb_stripos($code, '_') !== false)
-				array_unshift($preferred, mb_substr($code, 0, mb_stripos($code, '_')));
-			array_unshift($preferred, $code);
+			if (mb_strpos($code, '_') !== false)
+				array_unshift($codes, mb_substr($code, 0, mb_strpos($code, '_')));
+			array_unshift($codes, $code);
 		}
 
 		// cherche la locale à utiliser
-		foreach ($preferred as $code) {
+		// essaye es ou fil puis es_ES ou fil_PH
+		foreach ($codes as $code) {
 
-			// es ou fil
-			if ((mb_strlen($code) >= 2) && (mb_stripos($code, '_') === false)) {
+			if ((mb_strlen($code) >= 2) && (mb_strpos($code, '_') === false)) {
 				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
-				if (in_array($code.'_'.mb_strtoupper($code), $available)) {
+				if (in_array($code.'_'.mb_strtoupper($code), $locales)) {
 					$result = $code.'_'.mb_strtoupper($code);
 					break;
 				}
 				// es
-				foreach ($available as $locale) {
+				foreach ($locales as $locale) {
 					if (mb_stripos($locale, $code) === 0) {
 						$result = $locale;
-						break 2; // car il y a bien 2 foreach
+						break 2;
 					}
 				}
 			}
-			// es_ES ou fil_PH
-			else if (in_array($code, $available)) {
+			else if (in_array($code, $locales)) {
 				$result = $code;
 				break;
 			}
@@ -281,6 +278,7 @@ class Processor {
 			$resource = fopen($file, 'rb');
 
 			while (($line = fgetcsv($resource, 5000)) !== false) {
+				$line = (array) $line; // (yes)
 				if (!empty($line[0]) && !empty($line[1])) {
 					$this->dataSource[] = $line[0];
 					$this->dataTranslated[] = $line[1];

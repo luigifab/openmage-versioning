@@ -3,17 +3,14 @@ Tracker   : https://github.com/luigifab/openmage-versioning
 Composer  : https://packagist.org/packages/luigifab/openmage-versioning
 Module    : Luigifab/Versioning
 License   : GNU GPL 2+ (https://opensource.org/licenses/gpl-2.0)
-Copyright : 2011-2020 Fabrice Creuzot (luigifab) <code~luigifab~fr>
+Copyright : 2011-2021 Fabrice Creuzot (luigifab) <code~luigifab~fr>
 
 
 
 
-
-THE COMPOSER KEY FOR COMMAND LINE IS: luigifab/openmage-versioning
-THE EXTENSION KEY FOR MAGENTO CONNECT MANAGER IS: https://www.luigifab.fr/magento/connect/luigifab/Luigifab_Versioning
 
 IF YOU FOUND A MISTAKE OR A BUG, PLEASE, CONTACT ME (IN FRENCH OR IN ENGLISH) AT code~luigifab~fr
-CSS AND JS FILES ARE MINIFIED WITH clean-css (github.com/jakubpawlowicz/clean-css) AND uglify-js (github.com/mishoo/UglifyJS2).
+CSS AND JS FILES ARE MINIFIED WITH clean-css (github.com/jakubpawlowicz/clean-css) AND uglify-js (github.com/mishoo/UglifyJS).
 ALL FILES (INCLUDING DOCUMENTATION AND TRANSLATIONS) ARE LICENSED UNDER THE TERMS OF THE GNU GPL 2+ LICENSE.
 THAT BEING SAID SOME FILES COME FROM OTHER PROJECTS AND ARE UNDER OTHER LICENSES (SEE AT THE END OF THIS FILE).
 
@@ -48,6 +45,7 @@ Files and directories
 - app/locale/es_PE/Luigifab_Versioning.csv
 - app/locale/es_VE/Luigifab_Versioning.csv
 - app/locale/fr_CA/Luigifab_Versioning.csv
+- app/locale/fr_CH/Luigifab_Versioning.csv
 - app/locale/fr_FR/Luigifab_Versioning.csv
 - app/locale/it_CH/Luigifab_Versioning.csv
 - app/locale/it_IT/Luigifab_Versioning.csv
@@ -59,6 +57,7 @@ Files and directories
 - app/locale/ru_RU/Luigifab_Versioning.csv
 - app/locale/sk_SK/Luigifab_Versioning.csv
 - app/locale/tr_TR/Luigifab_Versioning.csv
+- app/locale/uk_UA/Luigifab_Versioning.csv
 - app/locale/zh_CN/Luigifab_Versioning.csv
 - app/etc/modules/Luigifab_Versioning.xml
 - app/code/community/Luigifab/Versioning/
@@ -73,7 +72,7 @@ Files and directories
 Translations in de-DE (deutsch/Deutschland) by:
 - Pamela Steinborn <st.pamela~laposte~net> 2017
 Translations in en-US (english/United-States) by:
-- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2020
+- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2021
 - Alexandre Laffitte <alexandre.laffitte~label-park~com> 2016
 - Pascale Scellier <scellier.pascale~orange~fr> 2016
 Translations in es-ES (español/España) by:
@@ -81,7 +80,7 @@ Translations in es-ES (español/España) by:
 - Hélène Vergine <vergineh~gmail~com> 2017, 2020
 - Guillaume Genetet <genetet.incorporated~gmail~com> 2018 https://fr.tipeee.com/william-broome
 Translations in fr-FR (français/France) by:
-- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2020
+- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2021
 - Alexandre Laffitte <alexandre.laffitte~label-park~com> 2016
 - Pascale Scellier <scellier.pascale~orange~fr> 2016
 Translations in it-IT (italiano/Italia) by:

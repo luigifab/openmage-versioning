@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/17/10/2019
+ * Updated D/14/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -38,7 +38,8 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	}
 
 	public function _(string $data, ...$values) {
-		return (mb_stripos($txt = $this->__(' '.$data, ...$values), ' ') === 0) ? $this->__($data, ...$values) : $txt;
+		$text = $this->__(' '.$data, ...$values);
+		return ($text[0] == ' ') ? $this->__($data, ...$values) : $text;
 	}
 
 	public function escapeEntities($data, bool $quotes = false) {
@@ -145,7 +146,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
 		$ip = empty($ip) ? getenv('REMOTE_ADDR') : array_pop($ip);
-		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? mb_substr($ip, 7) : $ip;
+		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
 
 		return $ip;
 	}

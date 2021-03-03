@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated M/26/11/2019
+ * Updated D/07/02/2021
  *
- * Copyright 2011-2020 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -141,11 +141,9 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 
 	public function decorateStatus($value, $row, $column, $isExport) {
-
 		$status = in_array($row->getData('status'), ['Update completed', 'Upgrade completed']) ? 'success' : 'error';
 		$text   = ($status == 'success') ? $this->helper('versioning')->_('Success') : $this->helper('versioning')->_('Error');
-
-		return sprintf('<span class="versioning-status grid-%s">%s</span>', $status, $text);
+		return $isExport ? $text : sprintf('<span class="versioning-status grid-%s">%s</span>', $status, $text);
 	}
 
 	public function decorateDuration($value, $row, $column, $isExport) {

@@ -1,7 +1,7 @@
 {
     "type": "magento-module",
     "name": "luigifab/openmage-versioning",
-    "description": "A module to automatize the updates using GIT for OpenMage and Magento.",
+    "description": "A module to automatize the updates using GIT for OpenMage.",
     "homepage": "https://github.com/luigifab/openmage-versioning",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -23,6 +23,10 @@
         {
             "type": "other",
             "url": "https://gandi.link/f/4b904048"
+        },
+        {
+            "type": "other",
+            "url": "https://ekwateur.fr/?parrain=EKW001147103"
         }
     ],
     "require": {
@@ -56,6 +60,7 @@
             ["src/app/locale/es_PE/Luigifab_Versioning.csv", "app/locale/es_PE/Luigifab_Versioning.csv"],
             ["src/app/locale/es_VE/Luigifab_Versioning.csv", "app/locale/es_VE/Luigifab_Versioning.csv"],
             ["src/app/locale/fr_CA/Luigifab_Versioning.csv", "app/locale/fr_CA/Luigifab_Versioning.csv"],
+            ["src/app/locale/fr_CH/Luigifab_Versioning.csv", "app/locale/fr_CH/Luigifab_Versioning.csv"],
             ["src/app/locale/fr_FR/Luigifab_Versioning.csv", "app/locale/fr_FR/Luigifab_Versioning.csv"],
             ["src/app/locale/it_CH/Luigifab_Versioning.csv", "app/locale/it_CH/Luigifab_Versioning.csv"],
             ["src/app/locale/it_IT/Luigifab_Versioning.csv", "app/locale/it_IT/Luigifab_Versioning.csv"],
@@ -67,6 +72,7 @@
             ["src/app/locale/ru_RU/Luigifab_Versioning.csv", "app/locale/ru_RU/Luigifab_Versioning.csv"],
             ["src/app/locale/sk_SK/Luigifab_Versioning.csv", "app/locale/sk_SK/Luigifab_Versioning.csv"],
             ["src/app/locale/tr_TR/Luigifab_Versioning.csv", "app/locale/tr_TR/Luigifab_Versioning.csv"],
+            ["src/app/locale/uk_UA/Luigifab_Versioning.csv", "app/locale/uk_UA/Luigifab_Versioning.csv"],
             ["src/app/locale/zh_CN/Luigifab_Versioning.csv", "app/locale/zh_CN/Luigifab_Versioning.csv"],
             ["src/app/etc/modules/Luigifab_Versioning.xml", "app/etc/modules/Luigifab_Versioning.xml"],
             ["src/app/code/community/Luigifab/Versioning/", "app/code/community/Luigifab/Versioning/"],
