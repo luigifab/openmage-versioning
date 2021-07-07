@@ -1,6 +1,7 @@
 "Page title","Tytuł strony"
 "Separate addresses by a space.","Oddziel adresy przerwą."
 "INCOMPLETE MODULE INSTALLATION","NIEKOMPLETNA INSTALACJA MODUŁU"
+"Changes in <em>%s</em> are not present. Please read the documentation.","Wystąpił błąd (<em>%s</em>)."
 "IP address","Adres IP"
 "Duration","Trwanie"
 "Author","Autor"

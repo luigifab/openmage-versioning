@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated M/06/10/2020
+ * Updated L/24/05/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -71,7 +71,7 @@ var versioning = new (function () {
 		}
 		catch (e) {
 			console.error(e);
-			try { apijs.dialog.actionClose(); } catch (ee) { }
+			try { apijs.dialog.actionClose(); } catch (ignore) { }
 
 			try {
 				// sans l'apijs
@@ -135,7 +135,7 @@ var versioning = new (function () {
 		}
 		catch (e) {
 			console.error(e);
-			try { apijs.dialog.actionClose(); } catch (ee) { }
+			try { apijs.dialog.actionClose(); } catch (ignore) { }
 
 			try {
 				// sans l'apijs
@@ -179,7 +179,7 @@ var versioning = new (function () {
 	};
 
 	this.closeConfirmUpgrade = function () {
-		document.getElementById('apijsDialog').parentNode.removeChild(document.getElementById('apijsDialog'));
+		document.getElementById('apijsDialog').remove();
 	};
 
 	this.actionConfirmUpgrade = function (action) {

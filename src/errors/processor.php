@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated D/14/02/2021
+ * Updated V/18/06/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -22,7 +22,6 @@ array_walk_recursive($_POST, static function (&$val) { $val = trim($val); });
 
 class Processor {
 
-	private $type;
 	private $config = [];
 	private $dataSource = [];
 	private $dataTranslated = [];
@@ -48,7 +47,7 @@ class Processor {
 			// app/locale/en_US/Luigifab_Versioning.csv
 			if (mb_stripos($file, 'Luigifab_Versioning.csv') !== false) {
 				$locale = mb_substr($file, mb_stripos($file, 'locale/') + 7);
-				$locale = (string) mb_substr($locale, 0, mb_stripos($locale, '/')); // (yes)
+				$locale = mb_substr($locale, 0, mb_stripos($locale, '/'));
 				$locales[] = $locale;
 			}
 			// en-US.csv ou en_US.csv
@@ -57,7 +56,7 @@ class Processor {
 			}
 		}
 
-		$result = $this->searchLocale($locales);
+		$result = $this->searchCurrentLocale($locales);
 
 		setlocale(LC_ALL, $result.'utf8');
 		$this->setData('locale', $result);
@@ -151,8 +150,8 @@ class Processor {
 		if (!is_dir($dir))
 			@mkdir($dir, 0755, true);
 
-		// data[0] = $e->getMessage()
-		// data[1] = $e->getTraceAsString()
+		// data[0] = $t->getMessage()
+		// data[1] = $t->getTraceAsString()
 		// data['url'] = 'REQUEST_URI'
 		// data['skin'] = app()->getStore()->getData('code');
 		// data['script_name'] = 'SCRIPT_NAME'
@@ -220,7 +219,7 @@ class Processor {
 
 
 	// langue et traduction
-	private function searchLocale(array $locales, string $result = 'en_US') {
+	private function searchCurrentLocale(array $locales, string $result = 'en_US') {
 
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
@@ -234,13 +233,13 @@ class Processor {
 			[]);
 
 		arsort($codes);
-		$codes = array_keys($codes);
+		$codes = array_map('\strval', array_keys($codes));
 
 		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
-			if (mb_strpos($code, '_') !== false)
-				array_unshift($codes, mb_substr($code, 0, mb_strpos($code, '_')));
+			if (strpos($code, '_') !== false)
+				array_unshift($codes, substr($code, 0, strpos($code, '_')));
 			array_unshift($codes, $code);
 		}
 
@@ -248,15 +247,15 @@ class Processor {
 		// essaye es ou fil puis es_ES ou fil_PH
 		foreach ($codes as $code) {
 
-			if ((mb_strlen($code) >= 2) && (mb_strpos($code, '_') === false)) {
+			if ((strlen($code) >= 2) && (strpos($code, '_') === false)) {
 				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
-				if (in_array($code.'_'.mb_strtoupper($code), $locales)) {
-					$result = $code.'_'.mb_strtoupper($code);
+				if (in_array($code.'_'.strtoupper($code), $locales)) {
+					$result = $code.'_'.strtoupper($code);
 					break;
 				}
 				// es
 				foreach ($locales as $locale) {
-					if (mb_stripos($locale, $code) === 0) {
+					if (stripos($locale, $code) === 0) {
 						$result = $locale;
 						break 2;
 					}

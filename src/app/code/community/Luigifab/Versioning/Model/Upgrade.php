@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated M/02/02/2021
+ * Updated V/18/06/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -40,8 +40,8 @@ class Luigifab_Versioning_Model_Upgrade {
 			for ($i = 0; $i < ob_get_level(); $i++)
 				ob_end_clean();
 		}
-		catch (Throwable $e) {
-			Mage::log($e->getMessage(), Zend_Log::ERR);
+		catch (Throwable $t) {
+			Mage::log($t->getMessage(), Zend_Log::ERR);
 		}
 
 		return $this;
@@ -124,14 +124,14 @@ class Luigifab_Versioning_Model_Upgrade {
 
 			Mage::getSingleton('adminhtml/session')->addSuccess($help->__('Update to revision %s completed.', $targetRevision));
 		}
-		catch (Throwable $e) {
+		catch (Throwable $t) {
 
 			$H['duration'] = ceil(microtime(true) - $H['duration']);
-			$H['status']   = $e->getMessage();
+			$H['status']   = $t->getMessage();
 
-			if (in_array($e->getMessage(), ['Not authorized', 'An update is in progress'])) {
+			if (in_array($t->getMessage(), ['Not authorized', 'An update is in progress'])) {
 
-				if ($e->getMessage() == 'An update is in progress') {
+				if ($t->getMessage() == 'An update is in progress') {
 					$this->writeError($help->__('Stop! Stop! Stop! An update is in progress.'));
 					Mage::getSingleton('adminhtml/session')->addError($help->__('Please wait, an update is in progress.'));
 				}
@@ -148,14 +148,14 @@ class Luigifab_Versioning_Model_Upgrade {
 			}
 			else {
 				if (is_file($log))
-					$H['status'] = $e->getMessage()."\n".trim(file_get_contents($log));
+					$H['status'] = $t->getMessage()."\n".trim(file_get_contents($log));
 
-				$this->writeError($e->getMessage());
-				Mage::getSingleton('adminhtml/session')->addError(nl2br($e->getMessage()));
+				$this->writeError($t->getMessage());
+				Mage::getSingleton('adminhtml/session')->addError(nl2br($t->getMessage()));
 
 				$this->writeEvent('admin_versioning_upgrade_after...');
 				Mage::dispatchEvent('admin_versioning_upgrade_after',
-					['repository' => $system, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $e]);
+					['repository' => $system, 'revision' => $targetRevision, 'controller' => $this, 'exception' => $t]);
 
 				$this->writeTitle($help->__('4) Unlocking'), true);
 				if (is_file($lock))
@@ -204,24 +204,24 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::dispatchEvent('adminhtml_cache_flush_all');
 			Mage::app()->getCacheInstance()->flush();
 		}
-		catch (Throwable $e) {
-			Mage::log($e->getMessage(), Zend_Log::ERR);
+		catch (Throwable $t) {
+			Mage::log($t->getMessage(), Zend_Log::ERR);
 		}
 
 		try {
 			Mage::app()->cleanCache();
 			Mage::dispatchEvent('adminhtml_cache_flush_system');
 		}
-		catch (Throwable $e) {
-			Mage::log($e->getMessage(), Zend_Log::ERR);
+		catch (Throwable $t) {
+			Mage::log($t->getMessage(), Zend_Log::ERR);
 		}
 
 		try {
 			Mage::getModel('core/design_package')->cleanMergedJsCss();
 			Mage::dispatchEvent('clean_media_cache_after');
 		}
-		catch (Throwable $e) {
-			Mage::log($e->getMessage(), Zend_Log::ERR);
+		catch (Throwable $t) {
+			Mage::log($t->getMessage(), Zend_Log::ERR);
 		}
 
 		$dirs = [
@@ -230,8 +230,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::getBaseDir('media').'/css/',
 			Mage::getBaseDir('media').'/css_secure/',
 			Mage::getBaseDir('media').'/js_secure/',
-			Mage::getBaseDir('media').'/js/',
-			BP.'/includes/src/'
+			Mage::getBaseDir('media').'/js/'
 		];
 
 		exec('rm -rf '.implode(' ', $dirs));

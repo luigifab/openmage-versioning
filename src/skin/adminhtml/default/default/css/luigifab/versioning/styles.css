@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated M/06/10/2020
+ * Updated D/16/05/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -70,7 +70,6 @@ button.slink {
 /* &&&&&&&&&&&&&&&&&&&&&& versioning/repository/index &&& */
 body.adminhtml-versioning-repository-index .notice-msg pre { line-height:1.1em; font-weight:400; }
 body.adminhtml-versioning-repository-index button.delpage.delete span { padding-left:0; background-image:none; }
-body.adminhtml-versioning-repository-index div.grid div.hor-scroll { position:relative; overflow:hidden; }
 
 body.adminhtml-versioning-repository-index table.data tr.headings th.no-link { padding:3px 4px; text-align:center; color:#666; }
 body.adminhtml-versioning-repository-index table.data td { vertical-align:middle; cursor:pointer; }
@@ -80,12 +79,12 @@ body.adminhtml-versioning-repository-index table.data td input { cursor:pointer;
 body.adminhtml-versioning-repository-index table.data td input[onchange]:enabled { visibility:visible; }
 body.adminhtml-versioning-repository-index table.data td a.issue { float:right; padding-left:0.3em; color:#999; }
 
-body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg {
-	position:absolute; left:157px; width:197px; z-index:50; overflow:hidden;
+body.adminhtml-versioning-repository-index div.grid svg {
+	position:absolute; left:184px; width:197px; z-index:50; overflow:hidden;
 	background-color:rgba(0, 0, 0, 0.09); transition:width 0.4s;
 }
 
-body.adminhtml-versioning-repository-index div.grid div.hor-scroll svg .k { transition:opacity 0.25s; }
+body.adminhtml-versioning-repository-index div.grid svg .k { transition:opacity 0.25s; }
 body.adminhtml-versioning-repository-index table.data tr.k button { transition:opacity 0.6s, visibility 0.6s; }
 body.adminhtml-versioning-repository-index table.data tr.k { transition:color 0.6s; }
 
@@ -143,8 +142,6 @@ body.progress div.content-header td.form-buttons, body.progress div.content-head
 #page-login div.login-box input.form-button { border:0; background:none; }
 #page-login div.login-box label { font-weight:400; text-decoration:none; color:white; }
 #page-login div.login-box a { text-decoration:none; color:white; }
-
-#page-login p.credits { position:absolute; bottom:0.7em; left:1em; color:#CCC; }
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& system/config &&& */
 #versioning_downtime > .comment { padding:5px; line-height:130%; color:#E41101; }

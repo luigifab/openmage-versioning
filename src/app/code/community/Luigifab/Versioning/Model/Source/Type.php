@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated V/12/02/2021
+ * Updated V/16/04/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -26,7 +26,7 @@ class Luigifab_Versioning_Model_Source_Type {
 			$this->_options = [];
 			$config = Mage::getConfig()->getNode('global/models/versioning/adaptators')->asArray();
 
-			foreach ($config as $code => $key) {
+			foreach ($config as $key) {
 				$system = Mage::getSingleton($key);
 				$this->_options[$key] = ['value' => $key, 'label' => $system->isSoftwareInstalled() ?
 					Mage::helper('versioning')->__('%s (%s)', mb_strtoupper($system->getType()), $system->getSoftwareVersion()) :

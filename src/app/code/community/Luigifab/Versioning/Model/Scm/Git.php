@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/18/02/2021
+ * Updated S/20/03/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -224,7 +224,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				unset($lines[$i]);
 			}
 			else if (mb_stripos($line, 'diff --git a') === 0) {
-				$cut = mb_stripos($line, '.min.') !== false; // 13 = mb_strlen('diff --git a/')
+				$cut = mb_stripos($line, '.min.') !== false;                          // 13 = mb_strlen('diff --git a/')
 				$lines[$i] = "\n".'<strong>=== '.mb_substr($help->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
 				if (is_array($excl)) {
 					$ign = $cut && in_array('min', $excl);
@@ -332,15 +332,18 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			}
 
 			if (is_array($excl)) {
+				// par min
+				if (mb_stripos($lines[$i], '.min.') !== false && in_array('min', $excl))
+					$lines[$i] = str_replace('.min.', '.§{#{§min§}#}§.', $lines[$i]);
 				// par extension
 				$ign = mb_strrpos($lines[$i], '.');
 				$ign = mb_substr($lines[$i], ($ign > 0) ? $ign + 1 : mb_strrpos($lines[$i], '/') + 1);
 				if (in_array($ign, $excl))
-					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
+					$lines[$i] = str_replace('.'.$ign, '.§{#{§'.$ign.'§}#}§', $lines[$i]);
 				// par nom de fichier
 				$ign = mb_substr($lines[$i], mb_strrpos($lines[$i], '/') + 1);
 				if (in_array($ign, $excl))
-					$lines[$i] = str_replace($ign, '§{#{§'.$ign.'§}#}§', $lines[$i]);
+					$lines[$i] = str_replace('/'.$ign, '/§{#{§'.$ign.'§}#}§', $lines[$i]);
 			}
 		}
 

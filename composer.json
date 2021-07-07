@@ -2,6 +2,7 @@
     "type": "magento-module",
     "name": "luigifab/openmage-versioning",
     "description": "A module to automatize the updates using GIT for OpenMage.",
+    "keywords": ["openmage", "openmage-module"],
     "homepage": "https://github.com/luigifab/openmage-versioning",
     "license": "GPL-2.0-or-later",
     "authors": [

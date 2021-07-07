@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated L/22/02/2021
+ * Updated L/24/05/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -45,8 +45,8 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	private function getStoreId() {
 
-		$store   = (int) $this->getRequest()->getParam('store', 0);
-		$website = (int) $this->getRequest()->getParam('website', 0);
+		$store   = $this->getRequest()->getParam('store');
+		$website = $this->getRequest()->getParam('website');
 
 		if (!empty($store))
 			$storeId = Mage::app()->getStore($store)->getId();

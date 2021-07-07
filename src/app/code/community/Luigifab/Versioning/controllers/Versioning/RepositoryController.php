@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/14/02/2021
+ * Updated D/16/05/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -151,7 +151,6 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n", ' background-color:#999; background-size:100% 100%;';
 		echo "\n", ' background-image:url(',Mage::getDesign()->getSkinUrl('images/luigifab/versioning/mars-sunset.jpg'),');';
 		echo "\n", '}';
-		echo "\n", 'p.credits { position:absolute; bottom:1.2em; left:1em; padding:0; font:12px/1.5em Arial,Helvetica,sans-serif; color:#CCC; }';
 		echo "\n", 'div.obj { position:absolute; top:6em; left:30px; opacity:0.7; }';
 		echo "\n", 'div.obj object { display:block; box-shadow:#444 0 0 0.3em; }';
 		echo "\n", 'div.content {';
@@ -199,7 +198,6 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 		echo "\n",'</script>';
 		echo "\n",'</head>';
 		echo "\n",'<body>';
-		echo "\n",'<p class="credits">'.$this->__('Martian sunset seen by Spirit.').'</p>';
 		echo "\n",'<div class="obj"><object data="',Mage::getDesign()->getSkinUrl('images/luigifab/versioning/info.svg'),'" type="image/svg+xml" width="100" height="70" id="state"></object></div>';
 		echo "\n",'<div class="content" id="scroll">';
 		echo "\n",'<p class="first"><strong>',$this->__('Starting update (revision %s)', $revision),'</strong>';
