@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated L/24/05/2021
+ * Updated D/18/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -58,7 +58,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		return $storeId;
 	}
 
-	private function getLocaleName($code) {
+	private function getLocaleName(string $code) {
 
 		$locales = Mage::getSingleton('core/locale')->getOptionLocales();
 

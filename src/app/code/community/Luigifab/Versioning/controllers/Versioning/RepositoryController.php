@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/16/05/2021
+ * Updated J/05/08/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -119,8 +119,8 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 
 	public function upgradeAction() {
 
-		$revision =  $this->getRequest()->getParam('revision', ''); // string
-		$useflag  = ($this->getRequest()->getParam('use_flag', '') == '1'); // boolean
+		$revision =  $this->getRequest()->getParam('revision');         // string
+		$useflag  = ($this->getRequest()->getParam('use_flag') == '1'); // boolean
 
 		if (!Mage::getStoreConfigFlag('versioning/scm/enabled')) {
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));

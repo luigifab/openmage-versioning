@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/20/03/2021
+ * Updated D/18/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -22,7 +22,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
 	// utilise GIT_SSH si le fichier de configuration existe
-	public function getCommitsCollection($local = false) {
+	public function getCommitsCollection(bool $local = false) {
 
 		if (!empty($this->items))
 			return $this->items;

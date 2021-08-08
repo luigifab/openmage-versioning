@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/14/02/2021
+ * Updated J/08/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -145,7 +145,7 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 	public function getIpAddr() {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
-		$ip = empty($ip) ? getenv('REMOTE_ADDR') : array_pop($ip);
+		$ip = empty($ip) ? getenv('REMOTE_ADDR') : reset($ip);
 		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
 
 		return $ip;

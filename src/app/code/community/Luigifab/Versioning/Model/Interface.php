@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/21/01/2020
- * Updated M/06/10/2020
+ * Updated D/18/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -25,7 +25,7 @@ interface Luigifab_Versioning_Model_Interface {
 
 	public function getSoftwareVersion();
 
-	public function getCommitsCollection($local = false);
+	public function getCommitsCollection(bool $local = false);
 
 	public function getCurrentBranch();
 

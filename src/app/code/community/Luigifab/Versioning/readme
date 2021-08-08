@@ -29,6 +29,7 @@ Files and directories
 - app/locale/de_AT/Luigifab_Versioning.csv
 - app/locale/de_CH/Luigifab_Versioning.csv
 - app/locale/de_DE/Luigifab_Versioning.csv
+- app/locale/el_GR/Luigifab_Versioning.csv
 - app/locale/en_AU/Luigifab_Versioning.csv
 - app/locale/en_CA/Luigifab_Versioning.csv
 - app/locale/en_GB/Luigifab_Versioning.csv
@@ -47,6 +48,7 @@ Files and directories
 - app/locale/fr_CA/Luigifab_Versioning.csv
 - app/locale/fr_CH/Luigifab_Versioning.csv
 - app/locale/fr_FR/Luigifab_Versioning.csv
+- app/locale/hu_HU/Luigifab_Versioning.csv
 - app/locale/it_CH/Luigifab_Versioning.csv
 - app/locale/it_IT/Luigifab_Versioning.csv
 - app/locale/ja_JP/Luigifab_Versioning.csv
@@ -54,6 +56,7 @@ Files and directories
 - app/locale/pl_PL/Luigifab_Versioning.csv
 - app/locale/pt_BR/Luigifab_Versioning.csv
 - app/locale/pt_PT/Luigifab_Versioning.csv
+- app/locale/ro_RO/Luigifab_Versioning.csv
 - app/locale/ru_RU/Luigifab_Versioning.csv
 - app/locale/sk_SK/Luigifab_Versioning.csv
 - app/locale/tr_TR/Luigifab_Versioning.csv

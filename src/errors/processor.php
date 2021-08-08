@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated V/18/06/2021
+ * Updated J/08/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -30,7 +30,7 @@ class Processor {
 	public function init(string $type) {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
-		$ip = empty($ip) ? getenv('REMOTE_ADDR') : array_pop($ip);
+		$ip = empty($ip) ? getenv('REMOTE_ADDR') : reset($ip);
 		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
 
 		$this->setData('ip', $ip);

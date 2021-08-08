@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/02/11/2012
- * Updated S/16/02/2019
+ * Updated D/18/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -22,7 +22,7 @@ class Luigifab_Versioning_Model_Demo {
 	// example for EVENT admin_versioning_add_fields
 	// $observer => ['fields' => $fields]
 	//     fields = (native php object) ArrayObject
-	public function addFieldsEvent($observer) {
+	public function addFieldsEvent(Varien_Event_Observer $observer) {
 
 		$observer->getData('fields')->append('<label><input type="checkbox" name="test" value="1" /> Simple test</label>');
 	}
@@ -32,7 +32,7 @@ class Luigifab_Versioning_Model_Demo {
 	// repository = (object) Luigifab_Versioning_Model_Scm_Xxx
 	//   revision = (string) xyzxyzxyz
 	// controller = (object) Luigifab_Versioning_Model_Upgrade
-	public function beforeUpgradeEvent($observer) {
+	public function beforeUpgradeEvent(Varien_Event_Observer $observer) {
 
 		$observer->getData('controller')->writeCommand('before event example');
 		Mage::log('Luigifab_Versioning_Model_Demo::beforeUpgradeEvent, revision: '.$observer->getData('revision'));
@@ -48,7 +48,7 @@ class Luigifab_Versioning_Model_Demo {
 	//   revision = (string) xyzxyzxyz
 	// controller = (object) Luigifab_Versioning_Model_Upgrade
 	// exception  = (native php object) Exception
-	public function afterUpgradeEvent($observer) {
+	public function afterUpgradeEvent(Varien_Event_Observer $observer) {
 
 		if (!empty($observer->getData('exception'))) {
 			$observer->getData('controller')->writeCommand('after event example');

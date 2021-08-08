@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated V/18/06/2021
+ * Updated S/17/07/2021
  *
  * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -49,7 +49,7 @@ class Luigifab_Versioning_Model_Upgrade {
 
 	// exécute le processus de mise à jour
 	// log les informations de la mise à jour
-	public function process($targetRevision, $useflag) {
+	public function process(string $targetRevision, bool $flag) {
 
 		$help   = Mage::helper('versioning');
 		$system = $help->getSystem();
@@ -90,7 +90,7 @@ class Luigifab_Versioning_Model_Upgrade {
 					$system->getType(), $H['current_rev'], $targetRevision));
 
 			file_put_contents($lock, $H['current_rev'].'/'.$H['target_rev'].' from '.$H['remote_addr'].' by '.$H['user'], LOCK_EX);
-			if ($useflag)
+			if ($flag)
 				copy($lock, $help->getUpgradeFlag());
 
 			// ÉTAPE 2 et 3
@@ -175,23 +175,23 @@ class Luigifab_Versioning_Model_Upgrade {
 
 	// affiche une commande ou une information pour savoir ce qu'il se passe
 	// ajoute un peu de code HTML pour faire plus jolie
-	private function writeTitle($data, $endEvent = false) {
+	private function writeTitle(string $data, bool $endEvent = false) {
 		echo $endEvent ? '</span>'."\n".$data."\n" : "\n".$data."\n";
 	}
 
-	private function writeEvent($data) {
+	private function writeEvent(string $data) {
 		echo '<span class="event">',$data,"\n";
 	}
 
-	public function writeError($data) {
+	public function writeError(string $data) {
 		echo '<span class="error">',$data,'</span>',"\n";
 	}
 
-	public function writeNotice($data) {
+	public function writeNotice(string $data) {
 		echo '<span class="notice">',$data,'</span>',"\n";
 	}
 
-	public function writeCommand($data) {
+	public function writeCommand(string $data) {
 		echo '<code>',$data,'</code>',"\n";
 	}
 
