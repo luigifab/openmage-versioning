@@ -1,9 +1,9 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated J/30/07/2020
+ * Updated J/25/11/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -28,19 +28,19 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$from = $this->getRequest()->getParam('from');
 		$to   = $this->getRequest()->getParam('to');
 
-		if (!empty($from)) {
-			$this->_controller = 'adminhtml_status';
-			$this->_blockGroup = 'versioning';
-			$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
-				$this->__('Differences between revisions %s and %s (%s)', $from, $to, $type) :
-				$this->__('Differences between revisions %s and %s (%s, %s)', $from, $to, $type, $branch);
-		}
-		else {
+		if (empty($from)) {
 			$this->_controller = 'adminhtml_status';
 			$this->_blockGroup = 'versioning';
 			$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
 				$this->__('Repository status (%s)', $type) :
 				$this->__('Repository status (%s, %s)', $type, $branch);
+		}
+		else {
+			$this->_controller = 'adminhtml_status';
+			$this->_blockGroup = 'versioning';
+			$this->_headerText = empty($branch = $system->getCurrentBranch()) ?
+				$this->__('Differences between revisions %s and %s (%s)', $from, $to, $type) :
+				$this->__('Differences between revisions %s and %s (%s, %s)', $from, $to, $type, $branch);
 		}
 
 		$this->_removeButton('add');
@@ -81,7 +81,7 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 			return '<pre lang="mul">'.$system->getCurrentDiffStatus($from, $to, $dir, $excl).'</pre>'.
 			       '<pre lang="mul">'.$system->getCurrentDiff($from, $to, $dir, $excl).'</pre>';
 		else
-			return '<pre lang="mul">'.$system->getCurrentStatus($dir).'</pre>'.
+			return '<pre lang="mul">'.$system->getCurrentStatus($dir, $excl).'</pre>'.
 			       '<pre lang="mul">'.$system->getCurrentDiff(null, null, $dir, $excl).'</pre>';
 	}
 

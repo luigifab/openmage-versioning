@@ -1,8 +1,8 @@
 /**
  * Created J/22/12/2011
- * Updated L/24/05/2021
+ * Updated L/18/10/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -30,11 +30,11 @@ var versioning = new (function () {
 	this.svg   = null;
 	this.width = 197;
 
-	this.start = function () {
+	this.init = function () {
 
 		if (document.getElementById('versioning_grid_table') && document.querySelector('table.data tbody input')) {
 			console.info('versioning.app - hello');
-			this.drawGraph(self.versioningIds, self.versioningCols).startDiff();
+			this.drawGraph(self.versioningIds, self.versioningCols).initDiff();
 		}
 		else if (document.getElementById('versioning_history_grid_table') && document.querySelector('table.data tbody button')) {
 			console.info('versioning.app - hello');
@@ -47,13 +47,11 @@ var versioning = new (function () {
 	};
 
 	this.decode = function (data) {
-		// prise en charge de l'utf-8 avec Webkit - https://stackoverflow.com/q/3626183
-		return decodeURIComponent(escape(self.atob(data)));
+		// utf-8 avec Webkit (https://stackoverflow.com/q/3626183)
+		return decodeURIComponent(escape(atob(data)));
 	};
 
-	// Confirmation des pages de maintenance
-	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
-	// » Pour la désactivation redirige simplement sur l'action
+	// confirmation des pages de maintenance
 	this.confirmFlag = function (url, title, content) {
 
 		try {
@@ -113,9 +111,7 @@ var versioning = new (function () {
 		self.location.href = url;
 	};
 
-	// Confirmation de mise à jour
-	// » Demande confirmation avec ou sans l'apijs mais avec les mêmes informations
-	// » Génère une boîte de dialogue si l'apijs n'est pas disponible
+	// confirmation de mise à jour
 	this.confirmUpgrade = function (url, title) {
 
 		try {
@@ -206,9 +202,7 @@ var versioning = new (function () {
 		return true;
 	};
 
-	// Affichage de l'historique
-	// » Affiche les détails d'une mise à jour dans la balise pre
-	// » Marque la ligne active du tableau avec la classe current
+	// affichage de l'historique
 	this.history = function (elem, content) {
 
 		document.querySelectorAll('table.data tbody tr[class]').forEach(function (elem) { elem.classList.remove('current'); });
@@ -222,12 +216,12 @@ var versioning = new (function () {
 	// » Utilise Raphael.js 2.3.0 (93,4 ko) pour la création de l'image SVG - https://github.com/DmitryBaranovskiy/raphael
 	// » Utilise la fonction innerSVG (1,4 ko) pour l'ajout des dégradés - https://code.google.com/p/innersvg/
 	// » Pour chaque commit crée un point éventuellement suivi d'une étiquette avec le nom de la branche
-	// » Crée ensuite les lignes entres les points sans utiliser les trucs dépréciés de prototype
+	// » Crée ensuite les lignes entres les points
 	this.drawGraph = function (data, cols) {
 
 		var x, y, pX, pY, elem, gradients = '',
 			commits   = Object.keys(data).map(function (key) { return data[key]; }), // les commits sous forme d'un array
-			tableRows = $$('table.data tbody tr'), rows = tableRows.length - 1,      // les lignes du tableau html
+			tableRows = document.querySelectorAll('table.data tbody tr'), rows = tableRows.length - 1, // les lignes du tableau html
 			colors = [], styles = [], names = [], tops = [], bottoms = [],
 			grad = 0, offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0, dMiHeight = 0;
 
@@ -241,17 +235,11 @@ var versioning = new (function () {
 			return 0;
 		});
 
-		// recheche de la hauteur et de la position du graphique (avec Prototype > 1.7 ou non)
+		// recheche de la hauteur et de la position du graphique
 		// offsetTop = la position du haut du graphique (à partir du haut du document)
 		//  topPoint = la position du haut de la première ligne dans le tableau (à partir du haut du document)
-		if (typeof Element.Layout == 'function') {
-			offsetTop   = tableRows.first().getLayout().get('top') - 1;
-			graphHeight = tableRows.last().getLayout().get('top') + tableRows.last().getLayout().get('height') - offsetTop - 1;
-		}
-		else {
-			offsetTop   = Element.positionedOffset(tableRows.first())[1] - 1;
-			graphHeight = Element.positionedOffset(tableRows.last())[1] + tableRows.last().getDimensions().height - offsetTop - 1;
-		}
+		offsetTop   = this.getTopPosition(tableRows[0]) - 1;
+		graphHeight = this.getTopPosition(tableRows[rows]) + tableRows[rows].offsetHeight - offsetTop - 1;
 
 		// initialisation du graphique
 		// canvas = l'élément svg
@@ -299,15 +287,8 @@ var versioning = new (function () {
 		commits.forEach(function (commit) {
 
 			// recherche de la position du point
-			// avec Prototype > 1.7 ou non
-			if (typeof Element.Layout == 'function') {
-				topPoint = tableRows[rows - commit.row].getLayout().get('top') - offsetTop;
-				miHeight = tableRows[rows - commit.row].getLayout().get('height') / 2;
-			}
-			else {
-				topPoint = Element.positionedOffset(tableRows[rows - commit.row])[1] - offsetTop;
-				miHeight = tableRows[rows - commit.row].getDimensions().height / 2;
-			}
+			topPoint = this.getTopPosition(tableRows[rows - commit.row]) - offsetTop;
+			miHeight = tableRows[rows - commit.row].offsetHeight / 2;
 
 			// sur X (position horizontale) le  25 correspond à l'espace entre les colonnes, donc entre deux branches
 			// sur X (position horizontale) le +20 permet de ne pas coller la première branche au bord
@@ -360,15 +341,8 @@ var versioning = new (function () {
 				if (typeof parent == 'object') {
 
 					// recherche de la position du point
-					// avec Prototype > 1.7 ou non
-					if (typeof Element.Layout == 'function') {
-						topPoint = tableRows[rows - parent.row].getLayout().get('top') - offsetTop;
-						miHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
-					}
-					else {
-						topPoint = Element.positionedOffset(tableRows[rows - parent.row])[1] - offsetTop;
-						miHeight = tableRows[rows - parent.row].getDimensions().height / 2;
-					}
+					topPoint = this.getTopPosition(tableRows[rows - parent.row]) - offsetTop;
+					miHeight = tableRows[rows - parent.row].offsetHeight / 2;
 
 					// sur X (position horizontale) le 25 correspond à l'espace entre les colonnes, donc entre deux branches
 					// sur X (position horizontale) le +20 permet de ne pas coller la première branche au bord
@@ -392,11 +366,7 @@ var versioning = new (function () {
 							'<stop offset="100%" stop-color="' + ((x > pX) ? commit.color : parent.color) + '"></stop>' +
 						'</linearGradient>';
 
-						// avec Prototype > 1.7 ou non
-						if (typeof Element.Layout == 'function')
-							dMiHeight = tableRows[rows - parent.row].getLayout().get('height') / 2;
-						else
-							dMiHeight = tableRows[rows - parent.row].getDimensions().height / 2;
+						dMiHeight = tableRows[rows - parent.row].offsetHeight / 2;
 						dMiHeight += miHeight;
 
 						if ((parent.revision === tops[parent.col]) && (y + dMiHeight < pY)) {
@@ -451,7 +421,7 @@ var versioning = new (function () {
 
 		}, this); // pour que ci-dessus this = this
 
-		// une seule fois sinon ok que pour le dernier ajout avec Edge 14
+		// une seule fois sinon fonctionne que pour le dernier ajout avec Edge 14
 		if (gradients.length > 0)
 			document.querySelector('svg defs').innerSVG = gradients;
 
@@ -465,6 +435,11 @@ var versioning = new (function () {
 		return this;
 	};
 
+	this.getTopPosition = function (elem) {
+		var bodyRect = document.querySelector('body').getBoundingClientRect(), elemRect = elem.getBoundingClientRect();
+		return elemRect.top - bodyRect.top;
+	};
+
 	this.mouseOver = function (show) {
 		this.svg.canvas.style.width = show ? this.width + 'px' : '197px';
 		this.svg.canvas.style.pointerEvents = show ? 'none' : 'inherit';
@@ -475,10 +450,8 @@ var versioning = new (function () {
 		document.getElementById('versioning_grid_table').setAttribute('class', 'data ' + klass);
 	};
 
-	// Gestion des cases du diff
-	// » Gère l'activation du lien vers la page du diff
-	// » Active automatiquement les premières cases
-	this.startDiff = function () {
+	// gestion des cases du diff
+	this.initDiff = function () {
 
 		var a = 1, b = 1, c = true;
 		document.querySelectorAll('table.data input[type="radio"]').forEach(function (elem) {
@@ -535,4 +508,4 @@ var versioning = new (function () {
 })();
 
 if (typeof self.addEventListener == 'function')
-	self.addEventListener('load', versioning.start.bind(versioning));
+	self.addEventListener('load', versioning.init.bind(versioning));

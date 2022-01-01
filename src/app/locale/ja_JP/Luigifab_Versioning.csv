@@ -2,3 +2,6 @@
 "IP address","IPアドレス"
 "Duration","長さ"
 "Author","作成者"
+"%s kB","%s ko"
+"%s MB","%s Mo"
+"%s GB","%s Go"

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated D/07/02/2021
+ * Updated S/23/10/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -80,7 +80,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 		]);
 
 		$this->addColumn('user', [
-			'header'   => $this->__('User'),
+			'header'   => $this->__('User Name'),
 			'index'    => 'user',
 			'align'    => 'center',
 			'sortable' => false,

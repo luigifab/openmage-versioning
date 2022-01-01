@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/05/08/2021
+ * Updated S/09/10/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,6 +18,18 @@
  */
 
 class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml_Controller_Action {
+
+	protected function _validateSecretKey() {
+
+		$result = parent::_validateSecretKey();
+
+		if (!$result && ($this->getFullActionName() == 'adminhtml_versioning_repository_status')) {
+			$this->getRequest()->setParam(Mage_Adminhtml_Model_Url::SECRET_KEY_PARAM_NAME, Mage::getSingleton('adminhtml/url')->getSecretKey());
+			$result = parent::_validateSecretKey();
+		}
+
+		return $result;
+	}
 
 	protected function _isAllowed() {
 		return Mage::getSingleton('admin/session')->isAllowed('tools/versioning');

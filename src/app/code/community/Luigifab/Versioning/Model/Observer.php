@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated V/12/02/2021
+ * Updated D/10/10/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -49,7 +49,7 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (Mage::app()->getWebsites() as $website) {
 			foreach ($website->getGroups() as $group) {
 				foreach ($group->getStores() as $store) {
-					$locale = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $store->getId());
+					$locale = Mage::getStoreConfig('general/locale/code', $store->getId());
 					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getId());
 				}
 			}
@@ -69,7 +69,7 @@ class Luigifab_Versioning_Model_Observer {
 	//  [report_pagetitle]   [report_title]   [error404_content]
 
 	// pagetitle/title, content, autoreload (*.csv)
-	private function updateTranslations(array $global) {
+	protected function updateTranslations(array $global) {
 
 		$translations = [];
 
@@ -83,13 +83,13 @@ class Luigifab_Versioning_Model_Observer {
 				$value = str_replace('"', '""', trim($value));
 
 				// versioning/downtime/*title
-				if (mb_stripos($key, 'title') !== false) {
+				if (stripos($key, 'title') !== false) {
 
 					if (!empty($value))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 				}
 				// versioning/downtime/*content
-				else if (mb_stripos($key, 'content') !== false) {
+				else if (stripos($key, 'content') !== false) {
 
 					if (!empty($value) && (mb_stripos($value, '<') === 0))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
@@ -97,7 +97,7 @@ class Luigifab_Versioning_Model_Observer {
 						$translations[$locale][] =  '"'.$key.'","<p>'.str_replace("\n", '<br />', $value).'</p>"';
 				}
 				// versioning/downtime/*autoreload
-				else if (mb_stripos($key, 'autoreload') !== false) {
+				else if (stripos($key, 'autoreload') !== false) {
 
 					if (!empty($value) && (mb_stripos($value, '[') !== false) && (mb_stripos($value, ']') !== false))
 						$translations[$locale][] = '"'.$key.'","'.str_replace(['[', ']'], ['<span>', '</span>'], $value).'"';
@@ -114,7 +114,7 @@ class Luigifab_Versioning_Model_Observer {
 	}
 
 	// email, custom (config.dat)
-	private function updateDataConfig(array $global) {
+	protected function updateDataConfig(array $global) {
 
 		$config = [];
 
@@ -125,7 +125,7 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if ((mb_stripos($key, '_email') !== false) || (mb_stripos($key, '_custom') !== false))
+			if ((stripos($key, '_email') !== false) || (stripos($key, '_custom') !== false))
 				$config[] = $key.'='.str_replace('=', '', $value);
 		}
 
@@ -137,7 +137,7 @@ class Luigifab_Versioning_Model_Observer {
 	}
 
 	// byip (error503.ip upgrade.ip report.ip)
-	private function updateIpConfig(array $global) {
+	protected function updateIpConfig(array $global) {
 
 		$config = [];
 
@@ -148,9 +148,10 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (mb_stripos($key, '_byip') !== false) {
+			if (stripos($key, '_byip') !== false) {
+				$key   = (string) substr($key, 0, strrpos($key, '_')); // (yes)
 				$value = array_filter(preg_split('#\s+#', $value));
-				$config[mb_substr($key, 0, mb_strrpos($key, '_'))][] = '-'.implode("-\n-", $value).'-';
+				$config[$key][] = '-'.implode("-\n-", $value).'-';
 			}
 		}
 

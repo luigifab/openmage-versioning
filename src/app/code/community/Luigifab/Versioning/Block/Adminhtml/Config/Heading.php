@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated D/18/07/2021
+ * Updated V/22/10/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,14 +21,14 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 
 	public function render(Varien_Data_Form_Element_Abstract $element) {
 
-		$locale = Mage::getStoreConfig(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $this->getStoreId());
+		$locale = Mage::getStoreConfig('general/locale/code', $this->getStoreId());
 
 		// exemple d'une adresse de base : https://mario/sites/14/web/(xyz/)(index.php/)
 		// exemple d'une adresse finale  : https://mario/sites/14/web/errors/upgrade.php?lang=fr_FR
 		$url = Mage::app()->getDefaultStoreView()->getBaseUrl();
 		$url = preg_replace('#/[^/]+\.php\d*/#', '/', $url);
 
-		if (Mage::getStoreConfigFlag(Mage_Core_Model_Store::XML_PATH_STORE_IN_URL))
+		if (Mage::getStoreConfigFlag('web/url/use_store'))
 			$url = str_replace('/'.Mage::app()->getDefaultStoreView()->getData('code').'/', '/', $url);
 
 		// versioning_downtime_error503.php versioning_downtime_error404.php
@@ -43,7 +43,17 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 			$element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($locale)));
 	}
 
-	private function getStoreId() {
+	protected function getLocaleName(string $code) {
+
+		$locales = Mage::getSingleton('core/locale')->getOptionLocales();
+
+		foreach ($locales as $locale) {
+			if ($locale['value'] == $code)
+				return $locale['label'];
+		}
+	}
+
+	protected function getStoreId() {
 
 		$store   = $this->getRequest()->getParam('store');
 		$website = $this->getRequest()->getParam('website');
@@ -56,15 +66,5 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 			$storeId = Mage::app()->getDefaultStoreView()->getId();
 
 		return $storeId;
-	}
-
-	private function getLocaleName(string $code) {
-
-		$locales = Mage::getSingleton('core/locale')->getOptionLocales();
-
-		foreach ($locales as $locale) {
-			if ($locale['value'] == $code)
-				return $locale['label'];
-		}
 	}
 }

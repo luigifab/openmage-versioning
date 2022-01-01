@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated S/17/07/2021
+ * Updated J/30/09/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -175,11 +175,11 @@ class Luigifab_Versioning_Model_Upgrade {
 
 	// affiche une commande ou une information pour savoir ce qu'il se passe
 	// ajoute un peu de code HTML pour faire plus jolie
-	private function writeTitle(string $data, bool $endEvent = false) {
+	protected function writeTitle(string $data, bool $endEvent = false) {
 		echo $endEvent ? '</span>'."\n".$data."\n" : "\n".$data."\n";
 	}
 
-	private function writeEvent(string $data) {
+	protected function writeEvent(string $data) {
 		echo '<span class="event">',$data,"\n";
 	}
 
@@ -198,7 +198,7 @@ class Luigifab_Versioning_Model_Upgrade {
 	// tente de vider totalement le cache (du moins essaye)
 	// utilise les méthodes et événements du core puis supprime tous les répertoires
 	// n'utilise surtout pas le fichier versioning.log pour Mage::log
-	private function clearAllCache() {
+	protected function clearAllCache() {
 
 		try {
 			Mage::dispatchEvent('adminhtml_cache_flush_all');

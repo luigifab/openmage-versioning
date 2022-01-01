@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/18/07/2021
+ * Updated V/24/12/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -19,13 +19,15 @@
 
 class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
+	protected $_code = 'git';
+
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
 	// utilise GIT_SSH si le fichier de configuration existe
 	public function getCommitsCollection(bool $local = false) {
 
-		if (!empty($this->items))
-			return $this->items;
+		if (!empty($this->_items))
+			return $this->_items;
 
 		if (empty($this->getSoftwareVersion()))
 			Mage::throwException('The git command is not available.');
@@ -102,7 +104,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		// extraction des données
 		// construction de la collection des commits
-		$this->items = new Varien_Data_Collection();
+		$this->_items = new Varien_Data_Collection();
 
 		foreach ($xml->getElementsByTagName('log') as $logentry) {
 
@@ -134,10 +136,10 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$item->setData('author', preg_replace('#<[^>]+>#', '', $author));
 			$item->setData('description', $help->escapeEntities($description));
 
-			$this->items->addItem($item);
+			$this->_items->addItem($item);
 		}
 
-		return $this->items;
+		return $this->_items;
 	}
 
 
@@ -159,15 +161,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 	public function getCurrentRevision() {
 
-		if (!empty($this->revision))
-			return $this->revision;
+		if (!empty($this->_revision))
+			return $this->_revision;
 
 		exec('git rev-parse --short HEAD', $data);
 		$data = trim(implode($data));
 		$data = empty($data) ? null : $data;
 
-		$this->revision = $data;
-		return $this->revision;
+		$this->_revision = $data;
+		return $this->_revision;
 	}
 
 	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null) {
@@ -190,7 +192,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$command = 'git diff -U'.$limit.' --diff-filter='.$filter;
 
 		// https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
-		if (version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
+		if (!empty($excl) && version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
 			if (mb_strpos($excl, 'copyright') !== false)
 				$command .= ' --ignore-matching-lines " Copyright 20[0-9][0-9]\-20[0-9][0-9]"';
 			if (mb_strpos($excl, 'updatedat') !== false)
@@ -206,6 +208,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 		if (!empty($excl))
 			$excl = explode(',', $excl);
+
+		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
+			$command .= ' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight';
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
@@ -269,7 +274,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
 			'Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),'."\n".
 			'have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).'."\n".
-			str_replace("\t", '    ', implode("\n", $lines));
+			str_replace(["\t", '[7m', '[27m'], ['    ', '<b class="high">', '</b>'], implode("\n", $lines));
 	}
 
 	public function getCurrentDiffStatus($from = null, $to = null, $dir = null, $excl = null) {
@@ -293,6 +298,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 		if (!empty($excl))
 			$excl = explode(',', $excl);
+
+		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
+			$command .= ' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight';
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
@@ -331,34 +339,33 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$lines[$i] = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
 			}
 
-			if (is_array($excl)) {
-				// par min
-				if (mb_stripos($lines[$i], '.min.') !== false && in_array('min', $excl))
-					$lines[$i] = str_replace('.min.', '.§{#{§min§}#}§.', $lines[$i]);
-				// par extension
-				$ign = mb_strrpos($lines[$i], '.');
-				$ign = mb_substr($lines[$i], ($ign > 0) ? $ign + 1 : mb_strrpos($lines[$i], '/') + 1);
-				if (in_array($ign, $excl))
-					$lines[$i] = str_replace('.'.$ign, '.§{#{§'.$ign.'§}#}§', $lines[$i]);
-				// par nom de fichier
-				$ign = mb_substr($lines[$i], mb_strrpos($lines[$i], '/') + 1);
-				if (in_array($ign, $excl))
-					$lines[$i] = str_replace('/'.$ign, '/§{#{§'.$ign.'§}#}§', $lines[$i]);
-			}
+			if (is_array($excl))
+				$lines[$i] = $this->markExcludedFile($lines[$i], $excl);
 		}
 
-		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".$help->__('For the current diff')."\n\n".
-			str_replace(["\t", '§{#{§', '§}#}§'], ['    ', '<u>', '</u>'], $help->escapeEntities(implode("\n", $lines)));
+		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
+			$help->__('For the current diff')."\n\n".
+			str_replace(["\t", '§{#{§', '§}#}§', '[7m', '[27m'], ['    ', '<u>', '</u>', '<b class="high">', '</b>'], $help->escapeEntities(implode("\n", $lines)));
 	}
 
-	public function getCurrentStatus($dir = null) {
+	public function getCurrentStatus($dir = null, $excl = null) {
 
 		$command = 'git status';
 		if (!empty($dir))
 			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 
 		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
-		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".Mage::helper('versioning')->escapeEntities(implode("\n", $lines));
+
+		if (!empty($excl)) {
+			$excl = explode(',', $excl);
+			foreach ($lines as $i => $line) {
+				if (is_array($excl))
+					$lines[$i] = $this->markExcludedFile($line, $excl);
+			}
+		}
+
+		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
+			str_replace(['§{#{§', '§}#}§'], ['<u>', '</u>'], Mage::helper('versioning')->escapeEntities(implode("\n", $lines)));
 	}
 
 

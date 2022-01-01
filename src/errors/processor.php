@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/08/07/2021
+ * Updated J/02/12/2021
  *
- * Copyright 2011-2021 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -22,9 +22,9 @@ array_walk_recursive($_POST, static function (&$val) { $val = trim($val); });
 
 class Processor {
 
-	private $config = [];
-	private $dataSource = [];
-	private $dataTranslated = [];
+	private $_config = [];
+	private $_dataSource = [];
+	private $_dataTranslated = [];
 
 
 	public function init(string $type) {
@@ -79,7 +79,7 @@ class Processor {
 			foreach ($data as $config) {
 				if ((mb_strlen($config) > 3) && ($config[0] != '#')) {
 					[$key, $value] = explode('=', $config);
-					$this->config[$key] = in_array($value, [0, 1, '0', '1'], true) ? ($value != 0) : $value;
+					$this->_config[$key] = in_array($value, [0, 1, '0', '1'], true) ? ($value != 0) : $value;
 				}
 			}
 		}
@@ -164,25 +164,23 @@ class Processor {
 			empty($data['url']) ?              'REQUEST_URI^^^^^not available' : 'REQUEST_URI^^^^^'.$data['url'],
 			'PHP_VERSION^^^^^'.PHP_VERSION,
 			'- - - -',
-			$data[1],
-			'- - - -',
 			'GET^^^^'.(empty($_GET) ? 'empty' : implode(' ', array_keys($_GET))),
 			'POST^^^'.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
 			'FILES^^'.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
 			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
 
-		$data = $data[0];
+		$data = (mb_stripos($data[0], $data[1]) === false) ? $data[0]."\n".$data[1] : $data[0];
 		$text = str_replace('^', chr(194).chr(160), implode("\n", $text));
 		@file_put_contents($dir.$id, $data.$text);
 
 		$this->setData('report', $id);
-		$this->setData('report_content', '<strong>'.$data.'</strong>'.htmlspecialchars($text, ENT_NOQUOTES | ENT_SUBSTITUTE));
+		$this->setData('report_content', htmlspecialchars($data.$text, ENT_NOQUOTES | ENT_SUBSTITUTE));
 
 		$email = (array) explode(' ', $this->getConfig('email')); // (yes)
 		if (!empty($email)) {
 			$subject = 'Fatal error #'.$id;
 			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
-			$message = '<pre><strong>'.$data.'</strong>'.$text.'</pre>';
+			$message = '<pre>'.$this->getData('report_content').'</pre>';
 			mail(implode(', ', $email), $subject, $message, $headers);
 		}
 	}
@@ -191,7 +189,7 @@ class Processor {
 
 		if (!empty($txt = $this->getData('report_content'))) {
 
-			if (isset($_SERVER['MAGE_IS_DEVELOPER_MODE']))
+			if (!empty($_SERVER['MAGE_IS_DEVELOPER_MODE']) || !empty($_ENV['MAGE_IS_DEVELOPER_MODE']))
 				return $txt;
 
 			$ips = './config/report.ip';
@@ -205,7 +203,7 @@ class Processor {
 
 	// configuration et données
 	public function getConfig(string $key) {
-		return empty($this->config[$this->type.'_'.$key]) ? false : $this->config[$this->type.'_'.$key];
+		return empty($this->_config[$this->type.'_'.$key]) ? false : $this->_config[$this->type.'_'.$key];
 	}
 
 	public function getData(string $key) {
@@ -219,18 +217,17 @@ class Processor {
 
 
 	// langue et traduction
-	private function searchCurrentLocale(array $locales, string $result = 'en_US') {
+	protected function searchCurrentLocale(array $locales, string $result = 'en_US') {
 
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
 		$codes = array_reduce(
 			empty(getenv('HTTP_ACCEPT_LANGUAGE')) ? [] : explode(',', getenv('HTTP_ACCEPT_LANGUAGE')),
 			static function ($items, $item) {
-				[$code, $q] = array_merge(explode(';q=', $item), [1]);
+				[$code, $q] = explode(';q=', $item.';q=1');
 				$items[str_replace('-', '_', $code)] = (float) $q;
 				return $items;
-			},
-			[]);
+			}, []);
 
 		arsort($codes);
 		$codes = array_map('\strval', array_keys($codes));
@@ -270,7 +267,7 @@ class Processor {
 		return $result;
 	}
 
-	private function loadCSV(string $file) {
+	protected function loadCSV(string $file) {
 
 		if (is_file($file)) {
 
@@ -279,8 +276,8 @@ class Processor {
 			while (($line = fgetcsv($resource, 5000)) !== false) {
 				$line = (array) $line; // (yes)
 				if (!empty($line[0]) && !empty($line[1])) {
-					$this->dataSource[] = $line[0];
-					$this->dataTranslated[] = $line[1];
+					$this->_dataSource[] = $line[0];
+					$this->_dataTranslated[] = $line[1];
 				}
 			}
 
@@ -294,16 +291,16 @@ class Processor {
 			return '';
 
 		$text  = stripslashes($text);
-		$index = array_search($text, $this->dataSource);
+		$index = array_search($text, $this->_dataSource);
 
 		if (!empty($values)) {
 			$final = '';
-			$parts = is_numeric($index) ? explode('§', $this->dataTranslated[$index]) : explode('§', $text);
+			$parts = is_numeric($index) ? explode('§', $this->_dataTranslated[$index]) : explode('§', $text);
 			foreach ($parts as $i => $part)
 				$final .= empty($values[$i]) ? $part : $part.$values[$i];
 		}
 		else {
-			$final = is_numeric($index) ? $this->dataTranslated[$index] : $text;
+			$final = is_numeric($index) ? $this->_dataTranslated[$index] : $text;
 		}
 
 		return str_replace([' ?', ' !', ' ;', ' :'], ['&nbsp;?', '&nbsp;!', '&nbsp;;', '&nbsp;:'], $final);
