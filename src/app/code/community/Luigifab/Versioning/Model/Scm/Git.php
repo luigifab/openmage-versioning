@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/24/12/2021
+ * Updated D/26/12/2021
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -210,9 +210,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$excl = explode(',', $excl);
 
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			$command .= ' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight';
-
-		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+		else
+			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		foreach ($lines as $i => $line) {
 
@@ -300,9 +300,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$excl = explode(',', $excl);
 
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			$command .= ' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight';
-
-		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+		else
+			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
 		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
