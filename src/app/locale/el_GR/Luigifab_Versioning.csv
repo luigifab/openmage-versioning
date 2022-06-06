@@ -2,6 +2,7 @@
 "INCOMPLETE MODULE INSTALLATION","ΕΛΛΙΠΉΣ ΕΓΚΑΤΆΣΤΑΣΗ ΜΟΝΆΔΑΣ"
 "IP address","Διεύθυνση IP"
 "Duration","Διάρκεια"
+" Error","Σφάλμα"
 "Author","Συντάκτης"
 "new file:-------","νέο αρχείο:------"
 "copied:---------","αντιγραφή:-------"
@@ -12,3 +13,4 @@
 "unmerged:-------","μη συγχωνευμένο:-"
 "unknown:--------","άγνωστο:---------"
 "pairing broken:-","pairing broken:--"
+"error404_title","Η σελίδα δεν βρέθηκε"

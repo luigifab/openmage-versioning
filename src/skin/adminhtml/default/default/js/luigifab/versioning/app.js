@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated L/18/10/2021
+ * Updated J/26/05/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -43,7 +43,7 @@ var versioning = new (function () {
 	};
 
 	this.loader = function () {
-		document.querySelector('body').classList.add('progress');
+		document.querySelector('body').classList.add('fabload');
 	};
 
 	this.decode = function (data) {

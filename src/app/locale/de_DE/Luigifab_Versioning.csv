@@ -50,7 +50,7 @@
 "Use update page","Update Seite benutzen"
 "Are you sure you want to launch the update process?<br />Be careful, you can't cancel this operation.","Sind sie sicher, den Update-Prozess starten zu wollen?<br />Achtung, dieser Vorgang kann nicht abgebrochen werden."
 "Are you sure you want to enable the maintenance page?","Sind Sie sicher, die Wartungsseite aktivieren zu wollen?"
-"Your IP address: <strong>%s</strong>","Ihre IP Adresse: <strong>%s</strong>"
+"Your IP address: <strong>%s</strong>","Ihre IP-Adresse: <strong>%s</strong>"
 "<strong>Nobody</strong> will have access to the frontend.","<strong>Niemand</strong> hat Zugriff zum Frontend."
 "<strong>You will have</strong> access to the frontend.","<strong>Sie haben</strong> Zugriff zum Frontend."
 "<strong>You will not have</strong> access to the frontend.","<strong>Sie haben keinen</strong> Zugriff zum Frontend."

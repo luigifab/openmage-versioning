@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/03/2012
- * Updated M/20/08/2019
+ * Updated S/19/02/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -26,7 +26,7 @@ class Luigifab_Versioning_Model_Source_Number {
 			['value' => 30,  'label' => 30],
 			['value' => 50,  'label' => 50],
 			['value' => 100, 'label' => 100],
-			['value' => 200, 'label' => 200]
+			['value' => 200, 'label' => 200],
 		];
 	}
 }

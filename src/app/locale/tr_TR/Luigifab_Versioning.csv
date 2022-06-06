@@ -1,6 +1,7 @@
 "Page title","Sayfa başlığı"
 "IP address","IP adresi"
 "Duration","Süre"
+" Error","Hata"
 "Author","Yazar"
 "new file:-------","yeni dosya:-----------"
 "copied:---------","kopyalandı:-----------"
@@ -11,3 +12,4 @@
 "unmerged:-------","birleştirilmedi:------"
 "unknown:--------","bilinmiyor:-----------"
 "pairing broken:-","pairing broken:-------"
+"error404_title","Sayfa bulunamadı"

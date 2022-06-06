@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/23/10/2021
+ * Updated S/19/02/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -50,7 +50,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('to', [
@@ -59,7 +59,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('branch', [
@@ -68,7 +68,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'align'    => 'center',
 			'width'    => '130px',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('remote_addr', [
@@ -76,7 +76,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'index'    => 'remote_addr',
 			'align'    => 'center',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('user', [
@@ -84,7 +84,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'index'    => 'user',
 			'align'    => 'center',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('date', [
@@ -95,7 +95,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'align'    => 'center',
 			'width'    => '150px',
 			'sortable' => false,
-			'filter'   => false
+			'filter'   => false,
 		]);
 
 		$this->addColumn('duration', [
@@ -105,7 +105,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'width'    => '60px',
 			'sortable' => false,
 			'filter'   => false,
-			'frame_callback' => [$this, 'decorateDuration']
+			'frame_callback' => [$this, 'decorateDuration'],
 		]);
 
 		$this->addColumn('status', [
@@ -114,7 +114,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'width'     => '125px',
 			'filter'    => false,
 			'sortable'  => false,
-			'frame_callback' => [$this, 'decorateStatus']
+			'frame_callback' => [$this, 'decorateStatus'],
 		]);
 
 		$this->addColumn('action', [
@@ -124,7 +124,7 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => [$this, 'decorateLink']
+			'frame_callback' => [$this, 'decorateLink'],
 		]);
 
 		return parent::_prepareColumns();

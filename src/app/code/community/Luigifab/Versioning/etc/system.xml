@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated S/03/07/2021
+ * Updated V/20/05/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -84,7 +84,6 @@
 						</number>
 						<bugtracker translate="label">
 							<label>Bug tracker</label>
-							<frontend_type>text</frontend_type>
 							<validate>validate-url</validate>
 							<sort_order>12</sort_order>
 							<show_in_default>1</show_in_default>
@@ -120,7 +119,6 @@
 						</error503>
 						<error503_pagetitle translate="label">
 							<label>Page title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>21</sort_order>
 							<show_in_default>1</show_in_default>
@@ -129,7 +127,6 @@
 						</error503_pagetitle>
 						<error503_title translate="label">
 							<label>Main title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>22</sort_order>
 							<show_in_default>1</show_in_default>
@@ -148,7 +145,6 @@
 						<error503_autoreload translate="label comment">
 							<label>Text with automatic reload period</label>
 							<comment>Use [10] for a 10-seconds delay.</comment>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
 							<sort_order>24</sort_order>
@@ -184,7 +180,6 @@
 						</upgrade>
 						<upgrade_pagetitle translate="label">
 							<label>Page title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>31</sort_order>
 							<show_in_default>1</show_in_default>
@@ -193,7 +188,6 @@
 						</upgrade_pagetitle>
 						<upgrade_title translate="label">
 							<label>Main title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>32</sort_order>
 							<show_in_default>1</show_in_default>
@@ -212,7 +206,6 @@
 						<upgrade_autoreload translate="label comment">
 							<label>Text with automatic reload period</label>
 							<comment>Use [10] for a 10-seconds delay.</comment>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<source_model>adminhtml/system_config_source_yesno</source_model>
 							<sort_order>34</sort_order>
@@ -248,7 +241,6 @@
 						</report>
 						<report_pagetitle translate="label">
 							<label>Page title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>41</sort_order>
 							<show_in_default>1</show_in_default>
@@ -257,7 +249,6 @@
 						</report_pagetitle>
 						<report_title translate="label">
 							<label>Main title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>42</sort_order>
 							<show_in_default>1</show_in_default>
@@ -276,7 +267,6 @@
 						<report_email translate="label comment">
 							<label>Send report by email to</label>
 							<comment>Separate addresses by a space.</comment>
-							<frontend_type>text</frontend_type>
 							<sort_order>44</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
@@ -310,7 +300,6 @@
 						</error404>
 						<error404_pagetitle translate="label">
 							<label>Page title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>51</sort_order>
 							<show_in_default>1</show_in_default>
@@ -319,7 +308,6 @@
 						</error404_pagetitle>
 						<error404_title translate="label">
 							<label>Main title</label>
-							<frontend_type>text</frontend_type>
 							<frontend_model>versioning/adminhtml_config_fields</frontend_model>
 							<sort_order>52</sort_order>
 							<show_in_default>1</show_in_default>

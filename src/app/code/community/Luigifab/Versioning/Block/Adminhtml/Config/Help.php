@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated J/30/09/2021
+ * Updated L/23/05/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -23,18 +23,18 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 
 		$msg = $this->checkChanges();
 		if ($msg !== true)
-			return sprintf('<p class="box">%s %s <span class="right"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
+			return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
 				'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/openmage/versioning',
 				$this->__('INCOMPLETE MODULE INSTALLATION'),
 				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
 
-		return sprintf('<p class="box">%s %s <span class="right"><a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
+		return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
 			'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/openmage/versioning');
 	}
 
 	protected function checkChanges() {
 
-		$index = file_get_contents(BP.'/index.php');
+		$index = file_get_contents(getenv('SCRIPT_FILENAME') ?? BP.'/index.php');
 		if (mb_strpos($index, '::f{4}:\\d{1,3}') === false)
 			return 'index.php';
 		if (mb_strpos($index, '? substr($ip, 7)') === false)

@@ -1,6 +1,6 @@
 /**
  * Created J/22/12/2011
- * Updated V/24/12/2021
+ * Updated V/27/05/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -17,8 +17,13 @@
  */
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& global &&& */
+body.adminhtml-versioning-repository-index h3.icon-head, body.adminhtml-versioning-repository-history h3.icon-head,
+body.adminhtml-versioning-repository-status h3.icon-head {
+	min-height:19px; padding-left:22px;
+}
+
 body.adminhtml-versioning-repository-index h3.icon-head.bzr, body.adminhtml-versioning-repository-history h3.icon-head.bzr,
-body.adminhtml-versioning-repository-status h3.icon-head, #apijsBox.versioning.bzr h1 {
+body.adminhtml-versioning-repository-status h3.icon-head.bzr, #apijsBox.versioning.bzr h1 {
 	background:url("../../../images/luigifab/versioning/bzr.png") no-repeat left center;
 }
 
@@ -88,8 +93,8 @@ body.adminhtml-versioning-repository-index div.grid svg .k { transition:opacity 
 body.adminhtml-versioning-repository-index table.data tr.k button { transition:opacity 0.6s, visibility 0.6s; }
 body.adminhtml-versioning-repository-index table.data tr.k { transition:color 0.6s; }
 
-body.progress * { cursor:progress !important; }
-body.progress div.content-header td.form-buttons, body.progress div.content-header-floating td.form-buttons { visibility:hidden; }
+body.fabload * { cursor:progress !important; }
+body.fabload div.content-header td.form-buttons, body.fabload div.content-header-floating td.form-buttons { pointer-events:none; opacity:0.5; }
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apijs/confirm &&& */
 #apijsBox.versioning { width:30rem; }
@@ -136,6 +141,7 @@ body.progress div.content-header td.form-buttons, body.progress div.content-head
 }
 
 #page-login div.login-container { padding:0; background:none; }
+#page-login div.login-container:before { display:none; }
 #page-login div.login-box div.login-form { background:none; }
 #page-login div.login-box div.bottom { display:none; }
 #page-login div.login-box input { padding:0.4em 0.2em; border:0; }

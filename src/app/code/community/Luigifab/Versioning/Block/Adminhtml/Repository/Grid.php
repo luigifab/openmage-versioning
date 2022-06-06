@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/07/02/2021
+ * Updated S/19/02/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -48,7 +48,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'filter'    => false,
 			'sortable'  => false,
 			'column_css_class' => 'revision',
-			'frame_callback'   => [$this, 'decorateRevision']
+			'frame_callback'   => [$this, 'decorateRevision'],
 		]);
 
 		$this->addColumn('diff', [
@@ -58,7 +58,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => [$this, 'decorateDiff']
+			'frame_callback' => [$this, 'decorateDiff'],
 		]);
 
 		$this->addColumn('graph', [
@@ -66,7 +66,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'width'     => '200px',
 			'filter'    => false,
 			'sortable'  => false,
-			'is_system' => true
+			'is_system' => true,
 		]);
 
 		$this->addColumn('author', [
@@ -75,7 +75,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'align'     => 'center',
 			'filter'    => false,
 			'sortable'  => false,
-			'frame_callback' => [$this, 'decorateAuthor']
+			'frame_callback' => [$this, 'decorateAuthor'],
 		]);
 
 		$this->addColumn('description', [
@@ -83,7 +83,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'index'     => 'description',
 			'filter'    => false,
 			'sortable'  => false,
-			'frame_callback' => [$this, 'decorateDescription']
+			'frame_callback' => [$this, 'decorateDescription'],
 		]);
 
 		$this->addColumn('date', [
@@ -94,7 +94,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'align'     => 'center',
 			'width'     => '150px',
 			'filter'    => false,
-			'sortable'  => false
+			'sortable'  => false,
 		]);
 
 		$this->addColumn('action', [
@@ -104,7 +104,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository_Grid extends Mage_Adminhtml
 			'filter'    => false,
 			'sortable'  => false,
 			'is_system' => true,
-			'frame_callback' => [$this, 'decorateLink']
+			'frame_callback' => [$this, 'decorateLink'],
 		]);
 
 		return parent::_prepareColumns();
