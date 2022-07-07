@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/02/12/2021
+ * Updated D/03/07/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -25,7 +25,6 @@ class Processor {
 	private $_config = [];
 	private $_dataSource = [];
 	private $_dataTranslated = [];
-
 
 	public function init(string $type) {
 
@@ -91,7 +90,6 @@ class Processor {
 		}
 	}
 
-
 	public function getPageTitle() {
 		$text = $this->__($this->getData('type').'_pagetitle');
 		return empty($this->getData('report')) ? $text : $text.' ('.$this->getData('report').')';
@@ -109,7 +107,6 @@ class Processor {
 		$text = $this->__($this->getData('type').'_autoreload');
 		return (mb_stripos($text, '_autoreload') === false) ? '<p id="reload">'.$text.'</p>' : '';
 	}
-
 
 	public function getUrl(string $file) {
 
@@ -155,7 +152,7 @@ class Processor {
 		// data['url'] = 'REQUEST_URI'
 		// data['skin'] = app()->getStore()->getData('code');
 		// data['script_name'] = 'SCRIPT_NAME'
-		$text = [
+		$text = str_replace('^', chr(194).chr(160), implode("\n", [
 			'',
 			'- - - -',
 			empty($this->getData('ip')) ?      'REMOTE_ADDR^^^^^not available' : 'REMOTE_ADDR^^^^^'.$this->getData('ip'),
@@ -167,16 +164,16 @@ class Processor {
 			'GET^^^^'.(empty($_GET) ? 'empty' : implode(' ', array_keys($_GET))),
 			'POST^^^'.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
 			'FILES^^'.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
-			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE)))];
+			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE))),
+		]));
 
-		$data = (mb_stripos($data[0], $data[1]) === false) ? $data[0]."\n".$data[1] : $data[0];
-		$text = str_replace('^', chr(194).chr(160), implode("\n", $text));
-		@file_put_contents($dir.$id, $data.$text);
+		$emsg = (mb_stripos($data[0], $data[1]) === false) ? $data[0]."\n".$data[1] : $data[0];
+		@file_put_contents($dir.$id, $emsg.$text);
 
 		$this->setData('report', $id);
-		$this->setData('report_content', htmlspecialchars($data.$text, ENT_NOQUOTES | ENT_SUBSTITUTE));
+		$this->setData('report_content', htmlspecialchars($emsg.$text, ENT_NOQUOTES | ENT_SUBSTITUTE));
 
-		$email = (array) explode(' ', $this->getConfig('email')); // (yes)
+		$email = array_filter(explode(' ', $this->getConfig('email')));
 		if (!empty($email)) {
 			$subject = 'Fatal error #'.$id;
 			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
@@ -200,8 +197,7 @@ class Processor {
 		return false;
 	}
 
-
-	// configuration et données
+	// config et données
 	public function getConfig(string $key) {
 		return empty($this->_config[$this->type.'_'.$key]) ? false : $this->_config[$this->type.'_'.$key];
 	}
@@ -214,7 +210,6 @@ class Processor {
 		$this->{$key} = $value;
 		return $this;
 	}
-
 
 	// langue et traduction
 	protected function searchCurrentLocale(array $locales, string $result = 'en_US') {
@@ -235,7 +230,7 @@ class Processor {
 		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
-			if (strpos($code, '_') !== false)
+			if (str_contains($code, '_'))
 				array_unshift($codes, substr($code, 0, strpos($code, '_')));
 			array_unshift($codes, $code);
 		}
@@ -244,7 +239,7 @@ class Processor {
 		// essaye es ou fil puis es_ES ou fil_PH
 		foreach ($codes as $code) {
 
-			if ((strlen($code) >= 2) && (strpos($code, '_') === false)) {
+			if ((strlen($code) >= 2) && !str_contains($code, '_')) {
 				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
 				if (in_array($code.'_'.strtoupper($code), $locales)) {
 					$result = $code.'_'.strtoupper($code);
@@ -273,8 +268,7 @@ class Processor {
 
 			$resource = fopen($file, 'rb');
 
-			while (($line = fgetcsv($resource, 5000)) !== false) {
-				$line = (array) $line; // (yes)
+			while (!empty($line = fgetcsv($resource, 5000))) {
 				if (!empty($line[0]) && !empty($line[1])) {
 					$this->_dataSource[] = $line[0];
 					$this->_dataTranslated[] = $line[1];
@@ -305,4 +299,10 @@ class Processor {
 
 		return str_replace([' ?', ' !', ' ;', ' :'], ['&nbsp;?', '&nbsp;!', '&nbsp;;', '&nbsp;:'], $final);
 	}
+}
+
+if (!function_exists('str_contains')) {
+    function str_contains($haystack, $needle) {
+        return ($needle === '') || (strpos($haystack, $needle) !== false);
+    }
 }

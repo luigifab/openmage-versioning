@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated S/05/12/2020
+ * Updated V/24/06/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -35,9 +35,8 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 			// construction d'un premier tableau
 			$resource = fopen($file, 'rb');
 
-			while (($line = fgetcsv($resource, 50000, ',', '`')) !== false) {
+			while (!empty($line = fgetcsv($resource, 50000, ',', '`'))) {
 
-				$line = (array) $line; // (yes)
 				if (!empty($line[0])) {
 
 					$item = new Varien_Object();

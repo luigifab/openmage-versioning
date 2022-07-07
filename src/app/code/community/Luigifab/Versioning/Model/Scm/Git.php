@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated D/26/12/2021
+ * Updated V/24/06/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -193,9 +193,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		// https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
 		if (!empty($excl) && version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
-			if (mb_strpos($excl, 'copyright') !== false)
+			if (str_contains($excl, 'copyright'))
 				$command .= ' --ignore-matching-lines " Copyright 20[0-9][0-9]\-20[0-9][0-9]"';
-			if (mb_strpos($excl, 'updatedat') !== false)
+			if (str_contains($excl, 'updatedat'))
 				$command .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]"';
 		}
 
@@ -321,7 +321,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$lines[$i] = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
 			}
 			else if (mb_stripos($line, 'R') === 0) {
-				$tmp = (array) preg_split('#\s+#', $line); // (yes)
+				$tmp = preg_split('#\s+#', $line);
 				if ((count($tmp) == 3) && (($pos = mb_strrpos($tmp[2], '/')) !== false) && (mb_stripos($tmp[1], mb_substr($tmp[2], 0, $pos)) === 0))
 					$line = $tmp[0]."\t".$tmp[1].' > '.mb_substr($tmp[2], $pos + 1);
 				$lines[$i] = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);

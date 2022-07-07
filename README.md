@@ -8,7 +8,7 @@ For more information, go to https://www.luigifab.fr/openmage/versioning (IPv6 is
 
 This repository is a releases mirror. To install the module, please use the composer key available in the documentation.
 
-- Current version: 4.4.2 (06/06/2022)
+- Current version: 4.4.3 (07/07/2022)
 - Compatibility: OpenMage 19.x / 20.x / 21.x, PHP 7.2 / 7.3 / 7.4 / 8.0 / 8.1
 - Client compatibility: Firefox 36+, Chrome 32+, Opera 19+, Edge 16+, Safari 9+
 - Translations: English (en), French (fr-FR/fr-CA), German (de), Italian (it), Portuguese (pt-PT/pt-BR), Spanish (es) / Chinese (zh), Czech (cs), Dutch (nl), Greek (el), Hungarian (hu), Japanese (ja), Polish (pl), Romanian (ro), Russian (ru), Slovak (sk), Turkish (tr), Ukrainian (uk)

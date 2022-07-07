@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated L/23/05/2022
+ * Updated V/24/06/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -35,13 +35,13 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 	protected function checkChanges() {
 
 		$index = file_get_contents(getenv('SCRIPT_FILENAME') ?? BP.'/index.php');
-		if (mb_strpos($index, '::f{4}:\\d{1,3}') === false)
+		if (!str_contains($index, '::f{4}:\\d{1,3}'))
 			return 'index.php';
-		if (mb_strpos($index, '? substr($ip, 7)') === false)
+		if (!str_contains($index, '? substr($ip, 7)'))
 			return 'index.php';
-		if (mb_strpos($index, '$ip = empty($ip) ? getenv(\'REMOTE_ADDR\')') === false)
+		if (!str_contains($index, '$ip = empty($ip) ? getenv(\'REMOTE_ADDR\')'))
 			return 'index.php';
-		if (mb_strpos($index, 'config/upgrade.ip') === false)
+		if (!str_contains($index, 'config/upgrade.ip'))
 			return 'index.php';
 
 		return true;

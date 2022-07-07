@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated D/10/10/2021
+ * Updated V/24/06/2022
  *
  * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://www.luigifab.fr/openmage/versioning
@@ -149,7 +149,7 @@ class Luigifab_Versioning_Model_Observer {
 				continue;
 
 			if (stripos($key, '_byip') !== false) {
-				$key   = (string) substr($key, 0, strrpos($key, '_')); // (yes)
+				$key   = substr($key, 0, strrpos($key, '_'));
 				$value = array_filter(preg_split('#\s+#', $value));
 				$config[$key][] = '-'.implode("-\n-", $value).'-';
 			}

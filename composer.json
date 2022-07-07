@@ -29,6 +29,7 @@
     "require": {
         "php": ">=7.2.0",
         "openmage/magento-lts": ">=19.4.0",
+        "symfony/polyfill-php80": "*",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-curl": "*",
