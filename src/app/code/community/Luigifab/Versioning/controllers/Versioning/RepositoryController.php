@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/09/10/2021
+ * Updated S/19/11/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -40,9 +40,8 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	}
 
 	public function loadLayout($ids = null, $generateBlocks = true, $generateXml = true) {
-		$this->_title($this->__('Tools'))->_title($this->__('Version control'));
 		parent::loadLayout($ids, $generateBlocks, $generateXml);
-		$this->_setActiveMenu('tools/versioning');
+		$this->_title($this->__('Tools'))->_title($this->__('Version control'))->_setActiveMenu('tools/versioning');
 		return $this;
 	}
 

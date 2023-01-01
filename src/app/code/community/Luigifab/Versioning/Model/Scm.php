@@ -1,10 +1,10 @@
 <?php
 /**
  * Created M/07/01/2020
- * Updated S/09/10/2021
+ * Updated J/17/11/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -29,7 +29,7 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 
 	public function isSoftwareInstalled() {
 
-		exec($this->getType().' --version', $data, $return);
+		exec(escapeshellcmd($this->getType()).' --version', $data, $return);
 
 		if ($return == 0) {
 			$data = preg_replace('#[^\d.]#', '', trim(implode($data)));
@@ -47,23 +47,43 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 		return $this->_version;
 	}
 
-	protected function markExcludedFile(string $line, array $excl) {
+	protected function markExcludedFile(string $line, array $excl, bool $check = false) {
 
 		// par min
-		if (mb_stripos($line, '.min.') !== false && in_array('min', $excl))
+		if ((mb_stripos($line, '.min.') !== false) && in_array('min', $excl)) {
+			if ($check)
+				return true;
 			$line = str_replace('.min.', '.§{#{§min§}#}§.', $line);
+		}
 
 		// par extension
 		$ign = mb_strrpos($line, '.');
 		$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strrpos($line, '/') + 1);
-		if (in_array($ign, $excl))
+		if (in_array($ign, $excl)) {
+			if ($check)
+				return true;
 			$line = str_replace('.'.$ign, '.§{#{§'.$ign.'§}#}§', $line);
+		}
 
 		// par nom de fichier
-		$ign = mb_substr($line, mb_strrpos($line, '/') + 1);
-		if (in_array($ign, $excl))
+		$ign = basename($line);
+		if (in_array($ign, $excl)) {
 			$line = str_replace('/'.$ign, '/§{#{§'.$ign.'§}#}§', $line);
+			if ($check)
+				return true;
+		}
 
-		return $line;
+		// par nom de dossier
+		$ign = explode('/', $line);
+		foreach ($ign as $itm) {
+			$ign = in_array($itm, $excl);
+			if ($ign) {
+				if ($check)
+					return true;
+				$line = str_replace('/'.$itm.'/', '/§{#{§'.$itm.'§}#}§/', $line);
+			}
+		}
+
+		return $check ? false : $line;
 	}
 }

@@ -3,7 +3,7 @@ Tracker   : https://github.com/luigifab/openmage-versioning
 Composer  : https://packagist.org/packages/luigifab/openmage-versioning
 Module    : Luigifab/Versioning
 License   : GNU GPL 2+ (https://opensource.org/licenses/gpl-2.0)
-Copyright : 2011-2022 Fabrice Creuzot (luigifab) <code~luigifab~fr>
+Copyright : 2011-2023 Fabrice Creuzot (luigifab) <code~luigifab~fr>
 
 
 
@@ -75,7 +75,7 @@ Files and directories
 Translations in de-DE (deutsch/Deutschland) by:
 - Pamela Steinborn <st.pamela~laposte~net> 2017
 Translations in en-US (english/United-States) by:
-- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2022
+- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2023
 - Alexandre Laffitte <alexandre.laffitte~label-park~com> 2016
 - Pascale Scellier <scellier.pascale~orange~fr> 2016
 Translations in es-ES (español/España) by:
@@ -83,7 +83,7 @@ Translations in es-ES (español/España) by:
 - Hélène Vergine <vergineh~gmail~com> 2017, 2020
 - Guillaume Genetet <genetet.incorporated~gmail~com> 2018 https://fr.tipeee.com/william-broome
 Translations in fr-FR (français/France) by:
-- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2022
+- Fabrice Creuzot (luigifab) <code~luigifab~fr> 2011-2023
 - Alexandre Laffitte <alexandre.laffitte~label-park~com> 2016
 - Pascale Scellier <scellier.pascale~orange~fr> 2016
 Translations in it-IT (italiano/Italia) by:

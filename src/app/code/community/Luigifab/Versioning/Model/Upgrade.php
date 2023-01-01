@@ -1,10 +1,10 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/30/09/2021
+ * Updated J/08/12/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -19,16 +19,13 @@
 
 class Luigifab_Versioning_Model_Upgrade {
 
-	// désactivation des tampons
+	// désactivation des tampons (sauf si zlib.output_compression)
 	// cela permet d'afficher la page au fur et à mesure de l'avancement
-	// est incapable de mettre fin à la temporisation de zlib.output_compression
-	// n'utilise surtout pas le fichier versioning.log pour Mage::log
 	// https://stackoverflow.com/a/25835968
 	public function disableAllBuffer() {
 
 		header('Content-Encoding: chunked');
 		header('Connection: Keep-Alive');
-
 		ini_set('max_execution_time', 900);
 		ini_set('output_buffering', 0);
 		ini_set('implicit_flush', 1);
@@ -40,9 +37,7 @@ class Luigifab_Versioning_Model_Upgrade {
 			for ($i = 0; $i < ob_get_level(); $i++)
 				ob_end_clean();
 		}
-		catch (Throwable $t) {
-			Mage::log($t->getMessage(), Zend_Log::ERR);
-		}
+		catch (Throwable $t) { }
 
 		return $this;
 	}
@@ -233,6 +228,6 @@ class Luigifab_Versioning_Model_Upgrade {
 			Mage::getBaseDir('media').'/js/'
 		];
 
-		exec('rm -rf '.implode(' ', $dirs));
+		exec('rm -rf '.implode(' ', array_map('escapeshellarg', $dirs)));
 	}
 }

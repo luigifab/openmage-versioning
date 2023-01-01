@@ -1,10 +1,10 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/04/02/2021
+ * Updated W/07/12/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -18,8 +18,12 @@
  */
 
 chdir(defined('BP') ? BP.'/errors' : __DIR__);
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if (!empty($_SERVER['MAGE_IS_DEVELOPER_MODE']) || !empty($_ENV['MAGE_IS_DEVELOPER_MODE'])) {
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
+	ini_set('error_prepend_string', '<pre>');
+	ini_set('error_append_string', '</pre>');
+}
 
 if (is_file('config/processor.php')) {
 	require_once('config/processor.php');

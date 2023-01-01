@@ -1,10 +1,10 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated V/16/04/2021
+ * Updated J/20/10/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -18,6 +18,8 @@
  */
 
 class Luigifab_Versioning_Model_Source_Type {
+
+	protected $_options;
 
 	public function toOptionArray() {
 

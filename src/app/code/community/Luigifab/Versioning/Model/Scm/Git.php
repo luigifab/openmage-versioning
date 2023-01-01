@@ -1,10 +1,10 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated V/24/06/2022
+ * Updated J/01/12/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -19,7 +19,11 @@
 
 class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
+	// singleton
 	protected $_code = 'git';
+	protected $_branch;
+	protected $_revision;
+
 
 	// génère une collection à partir de l'historique des commits du dépôt
 	// met en forme les données à partir de la réponse de la commande 'git log'
@@ -148,15 +152,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 	// renvoi l'état de la copie locale à partir de la réponse des commandes 'git status' et 'git diff'
 	public function getCurrentBranch() {
 
-		if (!empty($this->branch))
-			return $this->branch;
+		if (!empty($this->_branch))
+			return $this->_branch;
 
 		exec('git branch | grep "*" | cut -c3-', $data);
 		$data = trim(implode($data));
 		$data = empty($data) ? null : $data;
 
-		$this->branch = $data;
-		return $this->branch;
+		$this->_branch = $data;
+		return $this->_branch;
 	}
 
 	public function getCurrentRevision() {
@@ -185,18 +189,18 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		// have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
 		// https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
 		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
-			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space --ignore-blank-lines';
+			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
-			$command = 'git diff -U'.$limit.' --diff-filter='.$filter.' --ignore-all-space';
+			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space';
 		else
-			$command = 'git diff -U'.$limit.' --diff-filter='.$filter;
+			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter);
 
 		// https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
 		if (!empty($excl) && version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
 			if (str_contains($excl, 'copyright'))
-				$command .= ' --ignore-matching-lines " Copyright 20[0-9][0-9]\-20[0-9][0-9]"';
+				$command .= ' --ignore-matching-lines " Copyright\s+©?\s*20[0-9][0-9](-20[0-9][0-9])? "';
 			if (str_contains($excl, 'updatedat'))
-				$command .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]"';
+				$command .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/20[0-9][0-9]"';
 		}
 
 		if (!empty($from) && !empty($to))
@@ -209,6 +213,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		if (!empty($excl))
 			$excl = explode(',', $excl);
 
+		// https://stackoverflow.com/a/55891251/2980105 (diff-highlight)
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
 			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
 		else
@@ -219,13 +224,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			if (empty($line)) {
 				unset($lines[$i]);
 			}
+			else if (mb_stripos($line, 'index ') === 0) {
+				unset($lines[$i]);
+			}
 			else if (mb_stripos($line, '--- a/') === 0) {
 				unset($lines[$i]);
 			}
 			else if (mb_stripos($line, '+++ b/') === 0) {
-				unset($lines[$i]);
-			}
-			else if ($line == '\\ No newline at end of file') {
 				unset($lines[$i]);
 			}
 			else if (mb_stripos($line, 'diff --git a') === 0) {
@@ -233,21 +238,13 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$lines[$i] = "\n".'<strong>=== '.mb_substr($help->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
 				if (is_array($excl)) {
 					$ign = $cut && in_array('min', $excl);
-					// par extension
-					if (!$ign) {
-						$ign = mb_strrpos($line, '.');
-						$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strrpos($line, '/') + 1);
-						$ign = in_array($ign, $excl);
-					}
-					// par nom de fichier
-					if (!$ign) {
-						$ign = mb_substr($line, mb_strrpos($line, '/') + 1);
-						$ign = in_array($ign, $excl);
-					}
-					// ignore la ligne
+					$ign = $ign ?: $this->markExcludedFile($line, $excl, true);
 					if ($ign)
 						unset($lines[$i]);
 				}
+			}
+			else if ($line == '\\ No newline at end of file') {
+				unset($lines[$i]);
 			}
 			else if ($ign) {
 				unset($lines[$i]);
@@ -358,8 +355,8 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		if (!empty($excl)) {
 			$excl = explode(',', $excl);
-			foreach ($lines as $i => $line) {
-				if (is_array($excl))
+			if (is_array($excl)) {
+				foreach ($lines as $i => $line)
 					$lines[$i] = $this->markExcludedFile($line, $excl);
 			}
 		}

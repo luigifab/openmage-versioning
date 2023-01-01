@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated D/03/07/2022
+ * Updated L/26/12/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -22,10 +22,12 @@ array_walk_recursive($_POST, static function (&$val) { $val = trim($val); });
 
 class Processor {
 
+	private $_data = [];
 	private $_config = [];
 	private $_dataSource = [];
 	private $_dataTranslated = [];
 
+	// model
 	public function init(string $type) {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
@@ -124,22 +126,24 @@ class Processor {
 
 	public function renderPage(string $code) {
 
-		header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
-		header('Content-Type: text/html; charset=utf-8');
-		header('Cache-Control: no-cache, must-revalidate');
-		header('Expires: Tue, 07 Nov 1989 20:30:00 GMT');
-		header('X-XSS-Protection: 1; mode=block');
-		header('X-Content-Type-Options: nosniff');
-		header('X-Frame-Options: DENY');
-		header_remove('Pragma');
-		header_remove('Set-Cookie');
+		if (!headers_sent()) {
+			header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
+			header('Content-Type: text/html; charset=utf-8');
+			header('Cache-Control: no-cache, must-revalidate');
+			header('Expires: Tue, 07 Nov 1989 20:30:00 GMT');
+			header('X-XSS-Protection: 1; mode=block');
+			header('X-Content-Type-Options: nosniff');
+			header('X-Frame-Options: DENY');
+			header_remove('Pragma');
+			header_remove('Set-Cookie');
+		}
 
 		ob_start();
 		require_once(is_file('./config/page.php') ? './config/page.php' : './page.php');
 		echo str_replace(["\n\n", "\t", '  ', "\n\n", '  '], ["\n", '', ' ', "\n", ' '], ob_get_clean());
 	}
 
-	public function saveReport(array $data) {
+	public function saveReport(array $data, $t = null) {
 
 		$id  = ceil(microtime(true) * random_int(100, 999));
 		$dir = defined('BP') ? BP.'/errors' : __DIR__;
@@ -147,13 +151,16 @@ class Processor {
 		if (!is_dir($dir))
 			@mkdir($dir, 0755, true);
 
+		$_SERVER['MAGE_REPORT_ID'] = $id;
+
 		// data[0] = $t->getMessage()
 		// data[1] = $t->getTraceAsString()
-		// data['url'] = 'REQUEST_URI'
-		// data['skin'] = app()->getStore()->getData('code');
-		// data['script_name'] = 'SCRIPT_NAME'
+		// data['url']  = getenv('REQUEST_URI')
+		// data['skin'] = app()->getStore()->getData('code')
+		// data['script_name'] = getenv('SCRIPT_NAME')
 		$text = str_replace('^', chr(194).chr(160), implode("\n", [
-			'',
+			$data[0],
+			$data[1],
 			'- - - -',
 			empty($this->getData('ip')) ?      'REMOTE_ADDR^^^^^not available' : 'REMOTE_ADDR^^^^^'.$this->getData('ip'),
 			empty(getenv('HTTP_USER_AGENT')) ? 'HTTP_USER_AGENT^not available' : 'HTTP_USER_AGENT^'.getenv('HTTP_USER_AGENT'),
@@ -165,21 +172,36 @@ class Processor {
 			'POST^^^'.(empty($_POST) ? 'empty' : implode(' ', array_keys($_POST))),
 			'FILES^^'.(empty($_FILES) ? 'empty' : implode(' ', array_keys($_FILES))),
 			'COOKIE^'.(empty($_COOKIE) ? 'empty' : implode(' ', array_keys($_COOKIE))),
+			'',
 		]));
 
-		$emsg = (mb_stripos($data[0], $data[1]) === false) ? $data[0]."\n".$data[1] : $data[0];
-		@file_put_contents($dir.$id, $emsg.$text);
+		@file_put_contents($dir.$id, $text);
 
 		$this->setData('report', $id);
-		$this->setData('report_content', htmlspecialchars($emsg.$text, ENT_NOQUOTES | ENT_SUBSTITUTE));
+		$this->setData('report_content', htmlspecialchars($text, ENT_NOQUOTES | ENT_SUBSTITUTE));
 
 		$email = array_filter(explode(' ', $this->getConfig('email')));
 		if (!empty($email)) {
 			$subject = 'Fatal error #'.$id;
 			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
 			$message = '<pre>'.$this->getData('report_content').'</pre>';
-			mail(implode(', ', $email), $subject, $message, $headers);
+			@mail(implode(', ', $email), $subject, $message, $headers);
 		}
+
+		// https://github.com/luigifab/openmage-sentry
+		// @see Mage_Core_Model_App::_initCurrentStore()
+		try {
+			global $sentry;
+			if ($sentry && is_object($sentry)) {
+				if (empty($t))
+					$sentry->captureMessage('Report: '.$text, 'fatal', ['source' => 'versioning:report', 'report' => $id]);
+				else
+					$sentry->captureException($t,
+						'Report '.$id.' catched by Processor->saveReport()'."\n".mb_substr($text, mb_strpos($text, '- - - -') + 7),
+						['source' => 'versioning:report', 'report' => $id]);
+			}
+		}
+		catch (Throwable $ts) { }
 	}
 
 	public function canShowReport() {
@@ -199,33 +221,38 @@ class Processor {
 
 	// config et données
 	public function getConfig(string $key) {
-		return empty($this->_config[$this->type.'_'.$key]) ? false : $this->_config[$this->type.'_'.$key];
+		return empty($this->_config[$this->getData('type').'_'.$key]) ? false : $this->_config[$this->getData('type').'_'.$key];
 	}
 
 	public function getData(string $key) {
-		return empty($this->{$key}) ? null : $this->{$key};
+		return empty($this->_data[$key]) ? '' : $this->_data[$key];
 	}
 
 	public function setData(string $key, $value) {
-		$this->{$key} = $value;
+		$this->_data[$key] = $value;
 		return $this;
 	}
 
 	// langue et traduction
 	protected function searchCurrentLocale(array $locales, string $result = 'en_US') {
 
+		$codes = [];
+
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
-		$codes = array_reduce(
-			empty(getenv('HTTP_ACCEPT_LANGUAGE')) ? [] : explode(',', getenv('HTTP_ACCEPT_LANGUAGE')),
-			static function ($items, $item) {
-				[$code, $q] = explode(';q=', $item.';q=1');
-				$items[str_replace('-', '_', $code)] = (float) $q;
-				return $items;
-			}, []);
+		if (!empty(getenv('HTTP_ACCEPT_LANGUAGE'))) {
 
-		arsort($codes);
-		$codes = array_map('\strval', array_keys($codes));
+			$codes = array_reduce(
+				explode(',', getenv('HTTP_ACCEPT_LANGUAGE')),
+				static function ($items, $item) {
+					[$code, $q] = explode(';q=', $item.';q=1');
+					$items[str_replace('-', '_', $code)] = (float) $q;
+					return $items;
+				}, []);
+
+			arsort($codes);
+			$codes = array_map('\strval', array_keys($codes));
+		}
 
 		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
@@ -236,7 +263,6 @@ class Processor {
 		}
 
 		// cherche la locale à utiliser
-		// essaye es ou fil puis es_ES ou fil_PH
 		foreach ($codes as $code) {
 
 			if ((strlen($code) >= 2) && !str_contains($code, '_')) {

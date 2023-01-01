@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated V/24/06/2022
+ * Updated L/14/11/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -83,23 +83,23 @@ class Luigifab_Versioning_Model_Observer {
 				$value = str_replace('"', '""', trim($value));
 
 				// versioning/downtime/*title
-				if (stripos($key, 'title') !== false) {
+				if (str_contains($key, 'title')) {
 
 					if (!empty($value))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 				}
 				// versioning/downtime/*content
-				else if (stripos($key, 'content') !== false) {
+				else if (str_contains($key, 'content')) {
 
-					if (!empty($value) && (mb_stripos($value, '<') === 0))
+					if (!empty($value) && (mb_strpos($value, '<') === 0))
 						$translations[$locale][] = '"'.$key.'","'.$value.'"';
 					else if (!empty($value))
 						$translations[$locale][] =  '"'.$key.'","<p>'.str_replace("\n", '<br />', $value).'</p>"';
 				}
 				// versioning/downtime/*autoreload
-				else if (stripos($key, 'autoreload') !== false) {
+				else if (str_contains($key, 'autoreload')) {
 
-					if (!empty($value) && (mb_stripos($value, '[') !== false) && (mb_stripos($value, ']') !== false))
+					if (!empty($value) && str_contains($value, '[') && str_contains($value, ']'))
 						$translations[$locale][] = '"'.$key.'","'.str_replace(['[', ']'], ['<span>', '</span>'], $value).'"';
 				}
 			}
@@ -125,15 +125,16 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if ((stripos($key, '_email') !== false) || (stripos($key, '_custom') !== false))
+			if (str_contains($key, '_email') || str_contains($key, '_custom'))
 				$config[] = $key.'='.str_replace('=', '', $value);
 		}
 
 		// sauvegarde des données dans un seul fichier (format CSV)
-		if (is_file(BP.'/errors/config/config.dat'))
-			@unlink(BP.'/errors/config/config.dat');
+		$file = BP.'/errors/config/config.dat';
 		if (count($config) > 0)
-			file_put_contents(BP.'/errors/config/config.dat', implode("\n", $config));
+			file_put_contents($file, implode("\n", $config));
+		else if (is_file($file))
+			unlink($file);
 	}
 
 	// byip (error503.ip upgrade.ip report.ip)
@@ -148,7 +149,7 @@ class Luigifab_Versioning_Model_Observer {
 			if (empty($value))
 				continue;
 
-			if (stripos($key, '_byip') !== false) {
+			if (str_contains($key, '_byip')) {
 				$key   = substr($key, 0, strrpos($key, '_'));
 				$value = array_filter(preg_split('#\s+#', $value));
 				$config[$key][] = '-'.implode("-\n-", $value).'-';

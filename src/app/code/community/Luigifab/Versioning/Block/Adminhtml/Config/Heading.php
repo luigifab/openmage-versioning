@@ -1,10 +1,10 @@
 <?php
 /**
  * Created J/07/02/2013
- * Updated V/22/10/2021
+ * Updated S/03/12/2022
  *
- * Copyright 2011-2022 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
- * https://www.luigifab.fr/openmage/versioning
+ * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
  * it under the terms of the GNU General Public License (GPL) as published
@@ -39,8 +39,11 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Heading extends Mage_Adminhtml_
 		if ($element->getHtmlId() == 'versioning_downtime_report')
 			$url = str_replace('?lang', '?demo=1&amp;lang', $url);
 
-		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="5"><h4>%s <a href="%s">%s</a></h4></td></tr>',
-			$element->getData('label'), $url, $this->__('Preview in %s', $this->getLocaleName($locale)));
+		// getPath PR 2774
+		$isDefault = !$element->getCanUseWebsiteValue() && !$element->getCanUseDefaultValue();
+		return sprintf('<tr class="system-fieldset-sub-head"><td colspan="%d"><h4>%s <a href="%s">%s</a></h4></td></tr>',
+			(empty($element->getPath()) ? ($isDefault ? 4 : 5) : ($isDefault ? 5 : 6)),
+			$element->getLabel(), $url, $this->__('Preview in %s', $this->getLocaleName($locale)));
 	}
 
 	protected function getLocaleName(string $code) {
