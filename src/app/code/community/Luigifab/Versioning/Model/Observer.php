@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/31/05/2012
- * Updated L/14/11/2022
+ * Updated J/05/01/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -49,8 +49,8 @@ class Luigifab_Versioning_Model_Observer {
 		foreach (Mage::app()->getWebsites() as $website) {
 			foreach ($website->getGroups() as $group) {
 				foreach ($group->getStores() as $store) {
-					$locale = Mage::getStoreConfig('general/locale/code', $store->getId());
-					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store->getId());
+					$locale = Mage::getStoreConfig('general/locale/code', $store);
+					$global[$locale] = Mage::getStoreConfig('versioning/downtime', $store);
 				}
 			}
 		}

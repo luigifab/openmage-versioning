@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/27/02/2015
- * Updated J/08/12/2022
+ * Updated J/05/01/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -34,7 +34,7 @@ class Luigifab_Versioning_Model_Upgrade {
 		ignore_user_abort(true);
 
 		try {
-			for ($i = 0; $i < ob_get_level(); $i++)
+			while (ob_get_level() > 0)
 				ob_end_clean();
 		}
 		catch (Throwable $t) { }

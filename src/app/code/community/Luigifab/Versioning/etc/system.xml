@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated D/11/12/2022
+ * Updated J/05/01/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -34,7 +34,7 @@
 			<show_in_store>1</show_in_store>
 			<buttons>
 				<versioning translate="title">
-					<title>Version control</title>
+					<title>Show</title>
 					<action>adminhtml/versioning_repository/index</action>
 				</versioning>
 			</buttons>

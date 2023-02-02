@@ -1,7 +1,7 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/08/12/2022
+ * Updated S/14/01/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -48,7 +48,7 @@ h1 { margin-bottom:1em; font-size:1.3em; font-weight:400; }
 p { margin:1em 0; font-size:0.85em; line-height:140%; }
 pre { margin-top:3em; padding:2em; white-space:pre-wrap; word-break:break-all; background-color:#D0D0D0; }
 pre span.line { color:#555; }
-@media screen and (max-width:33rem),(max-device-width:33rem) {
+@media (max-width:33rem),(max-device-width:33rem) {
 div.box { margin:0 1em 1em; width:auto; }
 pre { display:none; }
 }

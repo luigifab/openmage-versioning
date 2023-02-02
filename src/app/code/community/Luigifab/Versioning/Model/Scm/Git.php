@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/01/12/2022
+ * Updated J/05/01/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -46,18 +46,18 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		$help = Mage::helper('versioning');
 		$desc = version_compare($this->getSoftwareVersion(), '1.7.2', '>=') ? '%B' : '%s%n%b';
-		$line = (int) Mage::getStoreConfig('versioning/scm/number'); // nombre de ligne
+		$line = (int) Mage::getStoreConfig('versioning/scm/number');
 
 		// lecture de l'historique des commits
 		if ($local) {
 			exec('
-				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+				export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				git log "`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.$line.' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
 		}
 		else if (is_string($configsh) && is_executable($configsh)) {
 			exec('
-				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+				export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				export GIT_SSH="'.$configsh.'";
 				git fetch 2>&1;
 				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.$line.' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
@@ -65,7 +65,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		}
 		else {
 			exec('
-				export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+				export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				git fetch 2>&1;
 				git log "origin/`git branch | grep "*" | cut -c3-`" --all --pretty=format:"<log><revno>%h</revno><parents> %p </parents><committer>%an</committer><timestamp>%ai</timestamp><message><![CDATA['.$desc.']]></message></log>" -'.$line.' | iconv -f UTF8//IGNORE -t UTF-8 -c 2>&1;
 			', $data, $val);
@@ -215,9 +215,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 		// https://stackoverflow.com/a/55891251/2980105 (diff-highlight)
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
 		else
-			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
 
 		foreach ($lines as $i => $line) {
 
@@ -256,6 +256,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 					$lines[$i] = '<del>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></del>';
 				else
 					$lines[$i] = mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i>';
+				$lines[$i] = str_replace(['[7m', '[27m'], '', $lines[$i]);
 			}
 			else if ($line[0] == '+') {
 				$lines[$i] = '<ins>'.$help->escapeEntities($line).'</ins>';
@@ -297,9 +298,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$excl = explode(',', $excl);
 
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
 		else
-			exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
 		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
@@ -351,7 +352,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		if (!empty($dir))
 			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 
-		exec('LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8 '.$command, $lines);
+		exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
 
 		if (!empty($excl)) {
 			$excl = explode(',', $excl);
@@ -374,7 +375,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		$revision = escapeshellarg($revision);
 
 		if (is_dir('../.git/')) {
-			exec('export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+			exec('export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
@@ -383,7 +384,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				git reset --hard '.$revision.' >> '.$log.' 2>&1;', $data, $val);
 		}
 		else {
-			exec('export LANG='.Mage::getSingleton('core/translate')->getLocale().'.utf8;
+			exec('export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
