@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated J/20/10/2022
+ * Updated L/24/04/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -26,13 +26,14 @@ class Luigifab_Versioning_Model_Source_Type {
 		if (empty($this->_options)) {
 
 			$this->_options = [];
-			$config = Mage::getConfig()->getNode('global/models/versioning/adaptators')->asArray();
+			$help = Mage::helper('versioning');
+			$keys = Mage::getConfig()->getNode('global/models/versioning/adaptators')->asArray();
 
-			foreach ($config as $key) {
+			foreach ($keys as $key) {
 				$system = Mage::getSingleton($key);
 				$this->_options[$key] = ['value' => $key, 'label' => $system->isSoftwareInstalled() ?
-					Mage::helper('versioning')->__('%s (%s)', mb_strtoupper($system->getType()), $system->getSoftwareVersion()) :
-					Mage::helper('versioning')->__('%s (not available)', mb_strtoupper($system->getType()))];
+					$help->__('%s (%s)', strtoupper($system->getType()), $system->getSoftwareVersion()) :
+					$help->__('%s (not available)', strtoupper($system->getType()))];
 			}
 
 			ksort($this->_options);

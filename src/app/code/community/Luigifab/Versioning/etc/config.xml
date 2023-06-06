@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated J/05/01/2023
+ * Updated V/03/03/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>4.5.1</version>
+			<version>4.5.2</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
