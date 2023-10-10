@@ -1,7 +1,7 @@
 <?php
 /**
  * Created M/27/12/2011
- * Updated L/24/04/2023
+ * Updated J/21/09/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -32,8 +32,8 @@ class Luigifab_Versioning_Model_Source_Type {
 			foreach ($keys as $key) {
 				$system = Mage::getSingleton($key);
 				$this->_options[$key] = ['value' => $key, 'label' => $system->isSoftwareInstalled() ?
-					$help->__('%s (%s)', strtoupper($system->getType()), $system->getSoftwareVersion()) :
-					$help->__('%s (not available)', strtoupper($system->getType()))];
+					$help->__('%s (%s)', strtoupper($system->getType()), $system->getSoftwareVersion()) : // not mb_strtoupper
+					$help->__('%s (not available)', strtoupper($system->getType()))]; // not mb_strtoupper
 			}
 
 			ksort($this->_options);

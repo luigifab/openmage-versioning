@@ -1,7 +1,7 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated V/24/06/2022
+ * Updated J/21/09/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -37,7 +37,7 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 		$index = file_get_contents(getenv('SCRIPT_FILENAME') ?? BP.'/index.php');
 		if (!str_contains($index, '::f{4}:\\d{1,3}'))
 			return 'index.php';
-		if (!str_contains($index, '? substr($ip, 7)'))
+		if (!str_contains($index, '? substr($ip, 7)')) // not mb_substr
 			return 'index.php';
 		if (!str_contains($index, '$ip = empty($ip) ? getenv(\'REMOTE_ADDR\')'))
 			return 'index.php';

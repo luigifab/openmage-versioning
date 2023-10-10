@@ -1,7 +1,7 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated L/26/12/2022
+ * Updated J/21/09/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -32,7 +32,7 @@ class Processor {
 
 		$ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));
 		$ip = empty($ip) ? getenv('REMOTE_ADDR') : reset($ip);
-		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip;
+		$ip = (preg_match('#^::f{4}:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$#', $ip) === 1) ? substr($ip, 7) : $ip; // not mb_substr
 
 		$this->setData('ip', $ip);
 		$this->setData('type', $type);
@@ -158,7 +158,7 @@ class Processor {
 		// data['url']  = getenv('REQUEST_URI')
 		// data['skin'] = app()->getStore()->getData('code')
 		// data['script_name'] = getenv('SCRIPT_NAME')
-		$text = str_replace('^', chr(194).chr(160), implode("\n", [
+		$text = str_replace('^', chr(194).chr(160), implode("\n", [ // not mb_chr
 			$data[0],
 			$data[1],
 			'- - - -',
@@ -212,7 +212,7 @@ class Processor {
 				return $txt;
 
 			$ips = './config/report.ip';
-			if (is_file($ips) && (stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false))
+			if (is_file($ips) && (stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false)) // not mb_stripos
 				return $txt;
 		}
 
@@ -240,6 +240,7 @@ class Processor {
 
 		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
 		// https://stackoverflow.com/a/33748742
+		// no mb_functions for locale codes
 		if (!empty(getenv('HTTP_ACCEPT_LANGUAGE'))) {
 
 			$codes = array_reduce(

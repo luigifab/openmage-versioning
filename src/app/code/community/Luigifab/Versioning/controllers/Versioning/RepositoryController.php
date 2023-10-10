@@ -1,7 +1,7 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated S/19/11/2022
+ * Updated J/21/09/2023
  *
  * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
@@ -141,7 +141,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			return $this->_redirect('*/versioning_repository/index');
 		}
 
-		$locale  = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
+		$locale  = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2); // not mb_substr
 		$upgrade = Mage::getSingleton('versioning/upgrade')->disableAllBuffer();
 
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
