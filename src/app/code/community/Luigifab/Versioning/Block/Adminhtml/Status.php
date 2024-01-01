@@ -1,9 +1,9 @@
 <?php
 /**
  * Created L/13/02/2012
- * Updated J/25/11/2021
+ * Updated D/17/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -48,20 +48,20 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		$this->_addButton('back', [
 			'label'   => $this->__('Back'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
-			'class'   => 'back'
+			'class'   => 'back',
 		]);
 
 		$this->_addButton('log', [
 			'label'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
-			'class'   => 'go'
+			'class'   => 'go',
 		]);
 
 		if (!empty($from)) {
 			$this->_addButton('status', [
 				'label'   => $this->__('Repository status'),
 				'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
-				'class'   => 'go'
+				'class'   => 'go',
 			]);
 		}
 	}
@@ -77,12 +77,20 @@ class Luigifab_Versioning_Block_Adminhtml_Status extends Mage_Adminhtml_Block_Wi
 		if (!empty($dir))
 			$dir = str_replace(['"','\'','|','\\'], '', $dir);
 
-		if (!empty($from))
-			return '<pre lang="mul">'.$system->getCurrentDiffStatus($from, $to, $dir, $excl).'</pre>'.
-			       '<pre lang="mul">'.$system->getCurrentDiff($from, $to, $dir, $excl).'</pre>';
+		if (empty($from))
+			$html = '<pre lang="mul">'.$system->getCurrentStatus($dir, $excl).'</pre>'.
+			        '<pre lang="mul">'.$system->getCurrentDiff(null, null, $dir, $excl, true).'</pre>'.
+			        '<pre lang="mul">'.$system->getCurrentDiff(null, null, $dir, $excl).'</pre>';
 		else
-			return '<pre lang="mul">'.$system->getCurrentStatus($dir, $excl).'</pre>'.
-			       '<pre lang="mul">'.$system->getCurrentDiff(null, null, $dir, $excl).'</pre>';
+			$html = '<pre lang="mul">'.$system->getCurrentDiffStatus($from, $to, $dir, $excl).'</pre>'.
+			        '<pre lang="mul">'.$system->getCurrentDiff($from, $to, $dir, $excl).'</pre>';
+
+		$dir = $system->getRootDir();
+
+		// @see https://github.com/luigifab/webext-openfileeditor
+		return preg_replace_callback('#(=== )(.*/.*\.\w+)</#', static function ($data) use ($dir) {
+			return $data[1].'<span class="ofe openfileeditor" data-file="'.$dir.'/'.$data[2].'">'.$data[2].'</span></';
+		}, $html);
 	}
 
 	public function getHeaderCssClass() {

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created J/12/08/2010
- * Updated J/21/09/2023
+ * Updated D/17/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -53,7 +53,7 @@ class Processor {
 			}
 			// en-US.csv ou en_US.csv
 			else if ((mb_stripos($file, '.csv') !== false) && (mb_stripos($file, '.') !== 0)) {
-				$locales[] = (string) str_replace('-', '_', mb_substr($file, 0, -4)); // (yes)
+				$locales[] = str_replace('-', '_', mb_substr($file, 0, -4));
 			}
 		}
 
@@ -85,11 +85,14 @@ class Processor {
 			}
 		}
 
-		// rapport de démo
 		if (!empty($_GET['demo'])) {
+			$t = new Exception('demo');
 			$this->setData('report', 123456789);
-			$this->setData('report_content', 'Maecenas turpis ex fermentum vel condimentum a pulvinar sit amet enim. Vivamus tristique dolor odio ut scelerisque velit faucibus ac.');
+			$this->setData('report_content', get_class($t).': '.$t->getMessage()."\n".
+				$t->getTraceAsString()."\n".'  thrown in '.$t->getFile().' on line '.$t->getLine());
 		}
+
+		return $this;
 	}
 
 	public function getPageTitle() {
@@ -118,13 +121,13 @@ class Processor {
 
 		if ($file == 'favicon.ico')
 			return mb_substr($base, 0, mb_strrpos($base, '/')).'/favicon.ico';
-		else if (mb_stripos($file, '/config/') === false)
+		if (mb_stripos($file, '/config/') === false)
 			return is_file('./config/'.$file) ? $base.'/config/'.$file : $base.'/'.$file;
-		else
-			return $base.'/'.$file;
+
+		return $base.'/'.$file;
 	}
 
-	public function renderPage(string $code) {
+	public function renderPage(int $code) {
 
 		if (!headers_sent()) {
 			header(($code == 404) ? 'HTTP/1.1 404 Not Found' : 'HTTP/1.1 503 Service Unavailable');
@@ -141,6 +144,8 @@ class Processor {
 		ob_start();
 		require_once(is_file('./config/page.php') ? './config/page.php' : './page.php');
 		echo str_replace(["\n\n", "\t", '  ', "\n\n", '  '], ["\n", '', ' ', "\n", ' '], ob_get_clean());
+
+		return $this;
 	}
 
 	public function saveReport(array $data, $t = null) {
@@ -159,7 +164,7 @@ class Processor {
 		// data['skin'] = app()->getStore()->getData('code')
 		// data['script_name'] = getenv('SCRIPT_NAME')
 		$text = str_replace('^', chr(194).chr(160), implode("\n", [ // not mb_chr
-			$data[0],
+			($t ? get_class($t).': ' : '').$data[0],
 			$data[1],
 			'- - - -',
 			empty($this->getData('ip')) ?      'REMOTE_ADDR^^^^^not available' : 'REMOTE_ADDR^^^^^'.$this->getData('ip'),
@@ -180,15 +185,17 @@ class Processor {
 		$this->setData('report', $id);
 		$this->setData('report_content', htmlspecialchars($text, ENT_NOQUOTES | ENT_SUBSTITUTE));
 
-		$email = array_filter(explode(' ', $this->getConfig('email')));
-		if (!empty($email)) {
-			$subject = 'Fatal error #'.$id;
-			$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($email[0], mb_strrpos($email[0], '@'));
-			$message = '<pre>'.$this->getData('report_content').'</pre>';
-			@mail(implode(', ', $email), $subject, $message, $headers);
+		if (!empty($emails = $this->getConfig('email'))) {
+			$emails = array_filter(explode(' ', $emails));
+			if (!empty($emails)) {
+				$subject = 'Fatal error #'.$id;
+				$headers = 'Content-Type: text/html; charset=utf-8'."\r\n".'From: root'.mb_substr($emails[0], mb_strrpos($emails[0], '@'));
+				$message = '<pre>'.$this->getData('report_content').'</pre>';
+				@mail(implode(', ', $emails), $subject, $message, $headers);
+			}
 		}
 
-		// https://github.com/luigifab/openmage-sentry
+		// @see https://github.com/luigifab/openmage-sentry
 		// @see Mage_Core_Model_App::_initCurrentStore()
 		try {
 			global $sentry;
@@ -196,30 +203,44 @@ class Processor {
 				if (empty($t))
 					$sentry->captureMessage('Report: '.$text, 'fatal', ['source' => 'versioning:report', 'report' => $id]);
 				else
-					$sentry->captureException($t,
-						'Report '.$id.' catched by Processor->saveReport()'."\n".mb_substr($text, mb_strpos($text, '- - - -') + 7),
-						['source' => 'versioning:report', 'report' => $id]);
+					$sentry->captureException($t, 'Report '.$id.' catched by Processor->saveReport()'."\n".mb_substr($text, mb_strpos($text, '- - - -') + 7), ['source' => 'versioning:report', 'report' => $id]);
 			}
 		}
-		catch (Throwable $ts) { }
+		catch (Throwable $ts) {
+			if (!empty($_SERVER['MAGE_IS_DEVELOPER_MODE']) || !empty($_ENV['MAGE_IS_DEVELOPER_MODE']))
+				throw $ts;
+		}
+
+		return $this;
 	}
 
 	public function canShowReport() {
 
-		if (!empty($txt = $this->getData('report_content'))) {
+		if (!empty($html = $this->getData('report_content'))) {
+
+			// @see https://github.com/luigifab/webext-openfileeditor
+			$html = preg_replace_callback('#(\#\d+ )([^(]+)\((\d+)\): #', static function ($data) {
+				return $data[1].'<span class="openfileeditor" data-line="'.$data[3].'">'.$data[2].'</span>('.$data[3].'): ';
+			}, $html);
+			$html = preg_replace_callback('#  thrown in (.+) on line (\d+)#', static function ($data) {
+				return '  thrown in <span class="openfileeditor" data-line="'.$data[2].'">'.$data[1].'</span> on line '.$data[2];
+			}, $html);
 
 			if (!empty($_SERVER['MAGE_IS_DEVELOPER_MODE']) || !empty($_ENV['MAGE_IS_DEVELOPER_MODE']))
-				return $txt;
+				return $html;
+
+			if (!empty($_SERVER['MAGE_SHOW_ERROR_REPORT']) || !empty($_ENV['MAGE_SHOW_ERROR_REPORT']))
+				return $html;
 
 			$ips = './config/report.ip';
 			if (is_file($ips) && (stripos(file_get_contents($ips), '-'.$this->getData('ip').'-') !== false)) // not mb_stripos
-				return $txt;
+				return $html;
 		}
 
 		return false;
 	}
 
-	// config et données
+	// config and data
 	public function getConfig(string $key) {
 		return empty($this->_config[$this->getData('type').'_'.$key]) ? false : $this->_config[$this->getData('type').'_'.$key];
 	}
@@ -233,13 +254,12 @@ class Processor {
 		return $this;
 	}
 
-	// langue et traduction
+	// language and translation
 	protected function searchCurrentLocale(array $locales, string $result = 'en_US') {
 
 		$codes = [];
 
-		// recherche des préférences dans HTTP_ACCEPT_LANGUAGE
-		// https://stackoverflow.com/a/33748742
+		// @see https://stackoverflow.com/a/33748742
 		// no mb_functions for locale codes
 		if (!empty(getenv('HTTP_ACCEPT_LANGUAGE'))) {
 
@@ -255,7 +275,6 @@ class Processor {
 			$codes = array_map('\strval', array_keys($codes));
 		}
 
-		// ajoute la locale présente dans l'url en premier car elle est prioritaire
 		if (!empty($_GET['lang'])) {
 			$code = str_replace('-', '_', $_GET['lang']);
 			if (str_contains($code, '_'))
@@ -263,11 +282,10 @@ class Processor {
 			array_unshift($codes, $code);
 		}
 
-		// cherche la locale à utiliser
 		foreach ($codes as $code) {
 
 			if ((strlen($code) >= 2) && !str_contains($code, '_')) {
-				// es devient es_ES de manière à prioriser es_ES au lieu d'utiliser es_XX
+				// es becomes es_ES to prioritize es_ES instead of es_XX
 				if (in_array($code.'_'.strtoupper($code), $locales)) {
 					$result = $code.'_'.strtoupper($code);
 					break;
@@ -304,6 +322,8 @@ class Processor {
 
 			fclose($resource);
 		}
+
+		return $this;
 	}
 
 	public function __(string $text, ...$values) {
@@ -329,7 +349,7 @@ class Processor {
 }
 
 if (!function_exists('str_contains')) {
-    function str_contains($haystack, $needle) {
-        return ($needle === '') || (strpos($haystack, $needle) !== false);
-    }
+	function str_contains($haystack, $needle) {
+		return ($needle === '') || (strpos($haystack, $needle) !== false);
+	}
 }

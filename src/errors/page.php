@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated J/21/09/2023
+ * Updated S/09/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -21,6 +21,7 @@ if (!is_object($this))
 	exit(0);
 
 $locale = substr($this->getData('locale'), 0, 2); // not mb_substr
+$code   = (string) $code; // int2string
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $locale ?>" lang="<?php echo $locale ?>">
@@ -46,8 +47,9 @@ border-radius:50%; border-bottom:1px solid #CACACA; background-color:#EEE;
 }
 h1 { margin-bottom:1em; font-size:1.3em; font-weight:400; }
 p { margin:1em 0; font-size:0.85em; line-height:140%; }
-pre { margin-top:3em; padding:2em; white-space:pre-wrap; word-break:break-all; background-color:#D0D0D0; }
-pre span.line { color:#555; }
+p.date { font-style:italic; color:#777; }
+pre { margin-top:3em; padding:2em; line-height:135%; white-space:pre-wrap; word-break:break-all; background-color:#D0D0D0; }
+pre::first-line { font-weight:bold; }
 @media (max-width:33rem),(max-device-width:33rem) {
 div.box { margin:0 1em 1em; width:auto; }
 pre { display:none; }
@@ -56,11 +58,12 @@ pre { display:none; }
 <script type="text/javascript">
 self.cnt = 0;
 self.addEventListener('load', function () {
-	if (document.getElementById('reload')) {
-		self.cnt = parseInt(document.getElementById('reload').querySelector('span').innerHTML, 10);
+	self.root = document.getElementById('reload');
+	if (self.root) {
+		self.cnt = parseInt(self.root.querySelector('span').innerHTML, 10);
 		self.setInterval(function () {
 			if (--self.cnt > 1)
-				document.getElementById('reload').querySelector('span').innerHTML = self.cnt;
+				self.root.querySelector('span').innerHTML = self.cnt;
 		}, 1000);
 		self.setTimeout(function () { self.location.reload(); }, (self.cnt - 1) * 1000);
 	}
@@ -79,9 +82,10 @@ self.addEventListener('load', function () {
 			<?php if (!empty($id = $this->getData('report'))): ?>
 				<p><?php echo $this->__('Error number: §', $id) ?></p>
 			<?php endif ?>
+			<p class="date"><?php echo date('c') ?></p>
 		</div>
-		<?php if (!empty($txt = $this->canShowReport())): ?>
-			<pre><?php echo preg_replace('/\n(#\d+) /', "\n".'<span class="line">$1</span> ', $txt) ?></pre>
+		<?php if (!empty($html = $this->canShowReport())): ?>
+			<pre><?php echo $html ?></pre>
 		<?php endif ?>
 	</div>
 </body>

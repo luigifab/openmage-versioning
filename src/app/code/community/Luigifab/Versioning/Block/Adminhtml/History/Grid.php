@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated S/19/02/2022
+ * Updated S/09/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -35,8 +35,8 @@ class Luigifab_Versioning_Block_Adminhtml_History_Grid extends Mage_Adminhtml_Bl
 
 	protected function _prepareCollection() {
 
-		$page = $this->getParam($this->getVarNamePage(), 1);
-		$size = $this->getParam($this->getVarNameLimit(), 20);
+		$page = (int) $this->getParam($this->getVarNamePage(), 1);
+		$size = (int) $this->getParam($this->getVarNameLimit(), 20);
 
 		$this->setCollection(Mage::getModel('versioning/history')->init($page, $size));
 		return parent::_prepareCollection();

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/05/01/2023
+ * Updated S/23/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -19,10 +19,7 @@
 
 class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
-	// singleton
 	protected $_code = 'git';
-	protected $_branch;
-	protected $_revision;
 
 
 	// génère une collection à partir de l'historique des commits du dépôt
@@ -44,9 +41,9 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 				$configsh = realpath('../.git/ssh/config.sh');
 		}
 
-		$help = Mage::helper('versioning');
-		$desc = version_compare($this->getSoftwareVersion(), '1.7.2', '>=') ? '%B' : '%s%n%b';
-		$line = (int) Mage::getStoreConfig('versioning/scm/number');
+		$helper = Mage::helper('versioning');
+		$desc   = version_compare($this->getSoftwareVersion(), '1.7.2', '>=') ? '%B' : '%s%n%b';
+		$line   = (int) Mage::getStoreConfig('versioning/scm/number');
 
 		// lecture de l'historique des commits
 		if ($local) {
@@ -82,12 +79,12 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 			$pos  = mb_stripos($data, '<log');
 			$data = (($pos !== 0) && ($pos !== false)) ? mb_substr($data, 0, $pos) : $data;
-			$data = '<u>Response:</u>'."\n".(empty($data) ? 'empty' : $help->escapeEntities($data));
+			$data = '<u>Response:</u>'."\n".(empty($data) ? 'empty' : $helper->escapeEntities($data));
 
-			$error = ($local ? $help->__('Can not get local commits history.') : $help->__('Can not get remote commits history.')).
+			$error = ($local ? $helper->__('Can not get local commits history.') : $helper->__('Can not get remote commits history.')).
 				"\n\n".
 				'<pre lang="mul">'.trim($data).
-					($local ? '' : "\n".'<u>The git/config file:</u>'."\n".$help->escapeEntities(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'))))
+					($local ? '' : "\n".'<u>The git/config file:</u>'."\n".$helper->escapeEntities(trim(file_get_contents(is_file('./.git/config') ? './.git/config' : '../.git/config'))))
 				.'</pre>';
 
 			if ((PHP_SAPI != 'cli') && Mage::app()->getStore()->isAdmin() && Mage::getSingleton('admin/session')->isLoggedIn())
@@ -107,16 +104,15 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		$xml->loadXML('<root>'.$data.'</root>');
 
 		// extraction des données
-		// construction de la collection des commits
 		$this->_items = new Varien_Data_Collection();
 
-		foreach ($xml->getElementsByTagName('log') as $logentry) {
+		foreach ($xml->getElementsByTagName('log') as $domNodeList) {
 
-			$revision    = trim($logentry->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
-			$parents     = trim($logentry->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
-			$author      = trim($logentry->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
-			$timestamp   = trim($logentry->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
-			$description = trim($logentry->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
+			$revision    = trim($domNodeList->getElementsByTagName('revno')->item(0)->firstChild->nodeValue);
+			$parents     = trim($domNodeList->getElementsByTagName('parents')->item(0)->firstChild->nodeValue);
+			$author      = trim($domNodeList->getElementsByTagName('committer')->item(0)->firstChild->nodeValue);
+			$timestamp   = trim($domNodeList->getElementsByTagName('timestamp')->item(0)->firstChild->nodeValue);
+			$description = trim($domNodeList->getElementsByTagName('message')->item(0)->firstChild->nodeValue);
 
 			preg_match('#\s*{([^}]+)}\s*$#', $description, $branch);
 			if (!empty($branch)) {
@@ -138,7 +134,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			$item->setData('parents', explode(' ', $parents));
 			$item->setData('date', date('c', strtotime($timestamp)));
 			$item->setData('author', preg_replace('#<[^>]+>#', '', $author));
-			$item->setData('description', $help->escapeEntities($description));
+			$item->setData('description', $helper->escapeEntities($description));
 
 			$this->_items->addItem($item);
 		}
@@ -176,10 +172,11 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		return $this->_revision;
 	}
 
-	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null) {
+	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null, $cached = false) {
 
-		$help   = Mage::helper('versioning');
+		$helper = Mage::helper('versioning');
 		$limit  = (int) Mage::getStoreConfig('versioning/general/diff_limit');
+		$rename = (int) Mage::getStoreConfig('versioning/general/diff_rename');
 		$filter = Mage::getStoreConfig('versioning/general/diff_filter');
 		$cut    = false;
 		$ign    = false;
@@ -187,37 +184,42 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		// --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
 		// Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),
 		// have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).
-		// https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
-		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
-			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space --ignore-blank-lines';
+		// @see https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
+		// @see https://github.com/git/git/commit/e8b2dc2c2a8415bfd180ecf5cc237a54e69ac2e9 (find-renames/M)
+		if (version_compare($this->getSoftwareVersion(), '2.18', '>='))
+			$cmd = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space --ignore-blank-lines -M'.$rename;
+		else if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
+			$cmd = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
-			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space';
+			$cmd = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter).' --ignore-all-space';
 		else
-			$command = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter);
+			$cmd = 'git diff -U'.$limit.' --diff-filter='.escapeshellarg($filter);
 
-		// https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
+		// @see https://github.com/git/git/commit/296d4a94e7231a1d57356889f51bff57a1a3c5a1 (ignore-matching-lines)
 		if (!empty($excl) && version_compare($this->getSoftwareVersion(), '2.30.0', '>=')) {
 			if (str_contains($excl, 'copyright'))
-				$command .= ' --ignore-matching-lines " Copyright\s+©?\s*20[0-9][0-9](-20[0-9][0-9])? "';
+				$cmd .= ' --ignore-matching-lines " Copyright\s+©?\s*20[0-9][0-9](-20[0-9][0-9])? "';
 			if (str_contains($excl, 'updatedat'))
-				$command .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/20[0-9][0-9]"';
+				$cmd .= ' --ignore-matching-lines " Updated [A-Z]/[0-9][0-9]/[0-9][0-9]/20[0-9][0-9]"';
 		}
 
 		if (!empty($from) && !empty($to))
-			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
+			$cmd .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
 		else if (!empty($from))
-			$command .= ' '.escapeshellarg($from).'..';
+			$cmd .= ' '.escapeshellarg($from).'..';
 
+		if ($cached)
+			$cmd = str_replace('git diff', 'git diff --cached', $cmd);
 		if (!empty($dir))
-			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
+			$cmd .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 		if (!empty($excl))
 			$excl = explode(',', $excl);
 
-		// https://stackoverflow.com/a/55891251/2980105 (diff-highlight)
+		// @see https://stackoverflow.com/a/55891251/2980105 (diff-highlight)
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$cmd.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
 		else
-			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$cmd, $lines);
 
 		foreach ($lines as $i => $line) {
 
@@ -235,7 +237,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			}
 			else if (mb_stripos($line, 'diff --git a') === 0) {
 				$cut = mb_stripos($line, '.min.') !== false;                          // 13 = mb_strlen('diff --git a/')
-				$lines[$i] = "\n".'<strong>=== '.mb_substr($help->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
+				$lines[$i] = "\n".'<strong>=== '.mb_substr($helper->escapeEntities($line), 13, mb_stripos($line, ' b/') - 13).'</strong>';
 				if (is_array($excl)) {
 					$ign = $cut && in_array('min', $excl);
 					$ign = $ign ?: $this->markExcludedFile($line, $excl, true);
@@ -251,25 +253,25 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			}
 			else if ($cut && (mb_strlen($line) > 1500)) {
 				if ($line[0] == '+')
-					$lines[$i] = '<ins>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></ins>';
+					$lines[$i] = '<ins>'.mb_substr($helper->escapeEntities($line), 0, 1500).'<i>...</i></ins>';
 				else if ($line[0] == '-')
-					$lines[$i] = '<del>'.mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i></del>';
+					$lines[$i] = '<del>'.mb_substr($helper->escapeEntities($line), 0, 1500).'<i>...</i></del>';
 				else
-					$lines[$i] = mb_substr($help->escapeEntities($line), 0, 1500).'<i>...</i>';
+					$lines[$i] = mb_substr($helper->escapeEntities($line), 0, 1500).'<i>...</i>';
 				$lines[$i] = str_replace(['[7m', '[27m'], '', $lines[$i]);
 			}
 			else if ($line[0] == '+') {
-				$lines[$i] = '<ins>'.$help->escapeEntities($line).'</ins>';
+				$lines[$i] = '<ins>'.$helper->escapeEntities($line).'</ins>';
 			}
 			else if ($line[0] == '-') {
-				$lines[$i] = '<del>'.$help->escapeEntities($line).'</del>';
+				$lines[$i] = '<del>'.$helper->escapeEntities($line).'</del>';
 			}
 			else {
-				$lines[$i] = $help->escapeEntities($line);
+				$lines[$i] = $helper->escapeEntities($line);
 			}
 		}
 
-		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
+		return '<span>'.str_replace('\'', '', $cmd).'</span>'."\n".
 			'Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R),'."\n".
 			'have their Type changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).'."\n".
 			str_replace(["\t", '[7m', '[27m'], ['    ', '<b class="high">', '</b>'], implode("\n", $lines));
@@ -277,82 +279,86 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 
 	public function getCurrentDiffStatus($from = null, $to = null, $dir = null, $excl = null) {
 
-		$help = Mage::helper('versioning');
+		$helper = Mage::helper('versioning');
+		$rename = (int) Mage::getStoreConfig('versioning/general/diff_rename');
 
-		// https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
-		if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
-			$command = 'git diff --name-status --ignore-all-space --ignore-blank-lines';
+		// @see https://github.com/git/git/commit/36617af7ed594d1928554356d809bd611c642dd2 (ignore-blank-lines)
+		// @see https://github.com/git/git/commit/e8b2dc2c2a8415bfd180ecf5cc237a54e69ac2e9 (find-renames/M);
+		if (version_compare($this->getSoftwareVersion(), '2.18', '>='))
+			$cmd = 'git diff --name-status --ignore-all-space --ignore-blank-lines -M'.$rename;
+		else if (version_compare($this->getSoftwareVersion(), '1.8.4', '>='))
+			$cmd = 'git diff --name-status --ignore-all-space --ignore-blank-lines';
 		else if (version_compare($this->getSoftwareVersion(), '1.5', '>='))
-			$command = 'git diff --name-status --ignore-all-space';
+			$cmd = 'git diff --name-status --ignore-all-space';
 		else
-			$command = 'git diff --name-status';
+			$cmd = 'git diff --name-status';
 
 		if (!empty($from) && !empty($to))
-			$command .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
+			$cmd .= ' '.escapeshellarg($from).'..'.escapeshellarg($to);
 		else if (!empty($from))
-			$command .= ' '.escapeshellarg($from).'..';
+			$cmd .= ' '.escapeshellarg($from).'..';
 
 		if (!empty($dir))
-			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
+			$cmd .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 		if (!empty($excl))
 			$excl = explode(',', $excl);
 
 		if (is_executable('/usr/share/doc/git/contrib/diff-highlight/diff-highlight'))
-			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$cmd.' | /usr/share/doc/git/contrib/diff-highlight/diff-highlight', $lines);
 		else
-			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
+			exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$cmd, $lines);
 
 		// Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), Type changed (T), Unmerged (U), Unknown (X), pairing Broken (B)
 		// C and R are always followed by a score (denoting the percentage of similarity between the source and target of the move or copy)
 		foreach ($lines as $i => $line) {
 
 			if (mb_stripos($line, 'A') === 0) {
-				$lines[$i] = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $help->__('new file:-------')), $line);
+				$lines[$i] = str_replace('A'."\t", "\t\t".str_replace('-', ' ', $helper->__('new file:-------')), $line);
 			}
 			else if (mb_stripos($line, 'C') === 0) {
-				$lines[$i] = preg_replace("#C\d*\t#", "\t\t".str_replace('-', ' ', $help->__('copied:---------')), $line);
+				$lines[$i] = preg_replace("#C\d*\t#", "\t\t".str_replace('-', ' ', $helper->__('copied:---------')), $line);
 			}
 			else if (mb_stripos($line, 'D') === 0) {
-				$lines[$i] = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $help->__('deleted:--------')), $line);
+				$lines[$i] = str_replace('D'."\t", "\t\t".str_replace('-', ' ', $helper->__('deleted:--------')), $line);
 			}
 			else if (mb_stripos($line, 'M') === 0) {
-				$lines[$i] = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $help->__('modified:-------')), $line);
+				$lines[$i] = str_replace('M'."\t", "\t\t".str_replace('-', ' ', $helper->__('modified:-------')), $line);
 			}
 			else if (mb_stripos($line, 'R') === 0) {
-				$tmp = preg_split('#\s+#', $line);
+				$tmp = (array) preg_split('#\s+#', $line); // (yes)
 				if ((count($tmp) == 3) && (($pos = mb_strrpos($tmp[2], '/')) !== false) && (mb_stripos($tmp[1], mb_substr($tmp[2], 0, $pos)) === 0))
 					$line = $tmp[0]."\t".$tmp[1].' > '.mb_substr($tmp[2], $pos + 1);
-				$lines[$i] = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $help->__('renamed:--------')), $line);
+				$lines[$i] = preg_replace("#R\d*\t#", "\t\t".str_replace('-', ' ', $helper->__('renamed:--------')), $line);
 			}
 			else if (mb_stripos($line, 'T') === 0) {
-				$lines[$i] = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $help->__('type changed:---')), $line);
+				$lines[$i] = str_replace('T'."\t", "\t\t".str_replace('-', ' ', $helper->__('type changed:---')), $line);
 			}
 			else if (mb_stripos($line, 'U') === 0) {
-				$lines[$i] = str_replace('U'."\t", "\t\t".str_replace('-', ' ', $help->__('unmerged:-------')), $line);
+				$lines[$i] = str_replace('U'."\t", "\t\t".str_replace('-', ' ', $helper->__('unmerged:-------')), $line);
 			}
 			else if (mb_stripos($line, 'X') === 0) {
-				$lines[$i] = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $help->__('unknown:--------')), $line);
+				$lines[$i] = str_replace('X'."\t", "\t\t".str_replace('-', ' ', $helper->__('unknown:--------')), $line);
 			}
 			else if (mb_stripos($line, 'B') === 0) {
-				$lines[$i] = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $help->__('pairing broken:-')), $line);
+				$lines[$i] = str_replace('B'."\t", "\t\t".str_replace('-', ' ', $helper->__('pairing broken:-')), $line);
 			}
 
 			if (is_array($excl))
 				$lines[$i] = $this->markExcludedFile($lines[$i], $excl);
 		}
 
-		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
-			$help->__('For the current diff')."\n\n".
-			str_replace(["\t", '§{#{§', '§}#}§', '[7m', '[27m'], ['    ', '<u>', '</u>', '<b class="high">', '</b>'], $help->escapeEntities(implode("\n", $lines)));
+		return '<span>'.str_replace('\'', '', $cmd).'</span>'."\n".
+			$helper->__('For the current diff')."\n\n".
+			str_replace(["\t", '§{#{§', '§}#}§', '[7m', '[27m'], ['    ', '<u>', '</u>', '<b class="high">', '</b>'], $helper->escapeEntities(implode("\n", $lines)));
 	}
 
 	public function getCurrentStatus($dir = null, $excl = null) {
 
-		$command = 'git status';
+		$cmd = 'git status';
 		if (!empty($dir))
-			$command .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
+			$cmd .= ' '.str_replace(' ', "' '", escapeshellarg($dir));
 
-		exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$command, $lines);
+		exec('LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8 '.$cmd, $lines);
 
 		if (!empty($excl)) {
 			$excl = explode(',', $excl);
@@ -362,7 +368,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 			}
 		}
 
-		return '<span>'.str_replace('\'', '', $command).'</span>'."\n".
+		return '<span>'.str_replace('\'', '', $cmd).'</span>'."\n".
 			str_replace(['§{#{§', '§}#}§'], ['<u>', '</u>'], Mage::helper('versioning')->escapeEntities(implode("\n", $lines)));
 	}
 
@@ -375,22 +381,26 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		$revision = escapeshellarg($revision);
 
 		if (is_dir('../.git/')) {
-			exec('export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
+			exec('
+				export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d .. >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.$revision.' >> '.$log.' 2>&1;', $data, $val);
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+			', $data, $val);
 		}
 		else {
-			exec('export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
+			exec('
+				export LANG='.Mage::getSingleton('core/locale')->getLocaleCode().'.utf8;
 				echo "<span>git fetch</span>" >> '.$log.';
 				git fetch;
 				echo "<span>git clean -f -d</span>" >> '.$log.';
 				git clean -f -d >> '.$log.' 2>&1;
 				echo "<span>git reset --hard '.$revision.'</span>" >> '.$log.';
-				git reset --hard '.$revision.' >> '.$log.' 2>&1;', $data, $val);
+				git reset --hard '.$revision.' >> '.$log.' 2>&1;
+			', $data, $val);
 		}
 
 		$data  = trim(file_get_contents($log));
@@ -399,7 +409,7 @@ class Luigifab_Versioning_Model_Scm_Git extends Luigifab_Versioning_Model_Scm {
 		$object->writeCommand($data);
 
 		foreach ($lines as $line) {
-			if (mb_stripos($line, 'fatal: ') === 0)
+			if (str_starts_with($line, 'fatal: '))
 				Mage::throwException(str_replace('fatal: ', '', $line));
 		}
 

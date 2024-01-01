@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/06/04/2012
- * Updated J/30/07/2020
+ * Updated S/09/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -35,13 +35,13 @@ class Luigifab_Versioning_Block_Adminhtml_History extends Mage_Adminhtml_Block_W
 		$this->_addButton('back', [
 			'label'   => $this->__('Back'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/index')."');",
-			'class'   => 'back'
+			'class'   => 'back',
 		]);
 
 		$this->_addButton('status', [
 			'label'   => $this->__('Repository status'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
-			'class'   => 'go'
+			'class'   => 'go',
 		]);
 	}
 

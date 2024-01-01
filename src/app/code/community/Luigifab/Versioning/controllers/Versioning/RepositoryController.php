@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/21/09/2023
+ * Updated S/16/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -85,10 +85,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addUpgradeFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-			$help = Mage::helper('versioning');
-			$file = $help->getUpgradeFlag();
-			if (!is_file($file))
-				file_put_contents($file, sprintf('Flag from %s by %s', $help->getIpAddr(), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
+			$helper = Mage::helper('versioning');
+			$file   = $helper->getUpgradeFlag();
+			if (!is_file($file)) {
+				$user = Mage::getSingleton('admin/session')->getData('user')->getData('username');
+				file_put_contents($file, sprintf('Flag from %s by %s', $helper->getIpAddr(), $user));
+			}
 		}
 
 		$this->_redirect('*/*/index');
@@ -97,10 +99,12 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 	public function addMaintenanceFlagAction() {
 
 		if (!Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
-			$help = Mage::helper('versioning');
-			$file = $help->getMaintenanceFlag();
-			if (!is_file($file))
-				file_put_contents($file, sprintf('Flag from %s by %s', $help->getIpAddr(), Mage::getSingleton('admin/session')->getData('user')->getData('username')));
+			$helper = Mage::helper('versioning');
+			$file   = $helper->getMaintenanceFlag();
+			if (!is_file($file)) {
+				$user = Mage::getSingleton('admin/session')->getData('user')->getData('username');
+				file_put_contents($file, sprintf('Flag from %s by %s', $helper->getIpAddr(), $user));
+			}
 		}
 
 		$this->_redirect('*/*/index');
@@ -137,6 +141,7 @@ class Luigifab_Versioning_Versioning_RepositoryController extends Mage_Adminhtml
 			Mage::getSingleton('adminhtml/session')->addError($this->__('Please configure the module before using it.'));
 			return $this->_redirect('*/system_config/edit', ['section' => 'versioning']);
 		}
+
 		if (empty($revision) || Mage::getSingleton('admin/session')->isFirstPageAfterLogin()) {
 			return $this->_redirect('*/versioning_repository/index');
 		}

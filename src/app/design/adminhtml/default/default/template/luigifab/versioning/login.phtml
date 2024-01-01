@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/20/02/2016
- * Updated D/16/05/2021
+ * Updated S/11/11/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,8 +18,8 @@
  */
 
 $locale = substr(Mage::getSingleton('core/locale')->getLocaleCode(), 0, 2);
-$help   = $this->helper('versioning');
-$cssjs  = $help->getCssJsHtml();
+$helper = $this->helper('versioning');
+$cssjs  = $helper->getCssJsHtml();
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $locale ?>" lang="<?php echo $locale ?>" style="height:100%;">
@@ -65,7 +65,7 @@ $cssjs  = $help->getCssJsHtml();
 					<div class="clear"></div>
 					<div class="form-buttons">
 						<a href="<?php echo $this->getUrl('adminhtml/index/forgotpassword', ['_nosecret' => true]) ?>" class="left"><?php echo $this->__('Forgot your password?') ?></a>
-						<input type="submit" class="form-button" value="<?php echo $help->escapeEntities($this->__('Login'), true) ?>" />
+						<input type="submit" class="form-button" value="<?php echo $helper->escapeEntities($this->__('Login'), true) ?>" />
 					</div>
 				</div>
 			</form>

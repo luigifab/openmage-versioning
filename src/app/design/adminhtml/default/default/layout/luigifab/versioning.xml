@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated J/18/06/2020
+ * Updated S/16/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -18,7 +18,7 @@
 -->
 
 <layout version="0.1.0">
-	<adminhtml_system_config_edit>
+	<adminhtml_versioning>
 		<reference name="head">
 			<action method="addItem">
 				<type>skin_css</type>
@@ -26,15 +26,15 @@
 				<params>media="screen, projection"</params>
 			</action>
 		</reference>
+	</adminhtml_versioning>
+
+	<adminhtml_system_config_edit>
+		<update handle="adminhtml_versioning" />
 	</adminhtml_system_config_edit>
 
 	<adminhtml_versioning_repository_index>
+		<update handle="adminhtml_versioning" />
 		<reference name="head">
-			<action method="addItem">
-				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.min.css</name>
-				<params>media="screen, projection"</params>
-			</action>
 			<action method="addItem">
 				<type>skin_js</type>
 				<name>js/luigifab/versioning/app.min.js</name>
@@ -54,25 +54,15 @@
 	</adminhtml_versioning_repository_index>
 
 	<adminhtml_versioning_repository_status>
-		<reference name="head">
-			<action method="addItem">
-				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.min.css</name>
-				<params>media="screen, projection"</params>
-			</action>
-		</reference>
+		<update handle="adminhtml_versioning" />
 		<reference name="content">
 			<block type="versioning/adminhtml_status" name="versioning_status" />
 		</reference>
 	</adminhtml_versioning_repository_status>
 
 	<adminhtml_versioning_repository_history>
+		<update handle="adminhtml_versioning" />
 		<reference name="head">
-			<action method="addItem">
-				<type>skin_css</type>
-				<name>css/luigifab/versioning/styles.min.css</name>
-				<params>media="screen, projection"</params>
-			</action>
 			<action method="addItem">
 				<type>skin_js</type>
 				<name>js/luigifab/versioning/app.min.js</name>

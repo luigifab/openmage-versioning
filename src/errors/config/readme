@@ -14,7 +14,7 @@ if (file_exists($maintenanceFile)) {
     exit;
 }
 // by
-// https://www.luigifab.fr/openmage/versioning
+// @see https://www.luigifab.fr/openmage/versioning
 if (is_file('./maintenance.flag') && (mb_stripos(getenv('REQUEST_URI'), '/admin/') === false)) {
     $ips = './errors/config/error503.ip';
     $ip = empty(getenv('HTTP_X_FORWARDED_FOR')) ? false : explode(',', getenv('HTTP_X_FORWARDED_FOR'));

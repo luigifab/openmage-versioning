@@ -1,8 +1,8 @@
 /**
  * Created J/22/12/2011
- * Updated J/26/05/2022
+ * Updated S/23/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -69,7 +69,7 @@ var versioning = new (function () {
 		}
 		catch (e) {
 			console.error(e);
-			try { apijs.dialog.actionClose(); } catch (ignore) { }
+			try { apijs.dialog.actionClose(); } catch (ee) { }
 
 			try {
 				// sans l'apijs
@@ -131,7 +131,7 @@ var versioning = new (function () {
 		}
 		catch (e) {
 			console.error(e);
-			try { apijs.dialog.actionClose(); } catch (ignore) { }
+			try { apijs.dialog.actionClose(); } catch (ee) { }
 
 			try {
 				// sans l'apijs
@@ -206,7 +206,7 @@ var versioning = new (function () {
 	this.history = function (elem, content) {
 
 		document.querySelectorAll('table.data tbody tr[class]').forEach(function (elem) { elem.classList.remove('current'); });
-		document.querySelector('pre').innerHTML = this.decode(content) + "\n\n";
+		document.querySelector('pre').innerHTML = this.decode(content) + "\n";
 
 		elem.parentNode.parentNode.classList.add('current');
 		return false;
@@ -225,7 +225,7 @@ var versioning = new (function () {
 			colors = [], styles = [], names = [], tops = [], bottoms = [],
 			grad = 0, offsetTop = 0, graphHeight = 0, topPoint = 0, miHeight = 0, dMiHeight = 0;
 
-		// https://stackoverflow.com/a/1129270
+		// @see https://stackoverflow.com/a/1129270
 		// inverse l'ordre du tableau
 		commits.sort(function (a, b) {
 			if (a.row > b.row)

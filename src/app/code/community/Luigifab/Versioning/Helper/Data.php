@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/21/09/2023
+ * Updated D/03/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -67,8 +67,9 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 		return Zend_Locale_Format::toNumber($value, $options);
 	}
 
-	public function getNumberToHumanSize(int $number) {
+	public function getNumberToHumanSize($number) {
 
+		$number = (float) $number;
 		if ($number < 1) {
 			$data = '';
 		}
@@ -187,10 +188,6 @@ class Luigifab_Versioning_Helper_Data extends Mage_Core_Helper_Abstract {
 
 		$html = implode("\n", $html);
 		return base64_encode(str_replace(['<', '>'], ['[', ']'], $html));
-	}
-
-	public function getLock() {
-		return Mage::getBaseDir('var').'/versioning.lock';
 	}
 
 	public function getHistoryLog() {

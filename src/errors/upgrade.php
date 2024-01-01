@@ -1,9 +1,9 @@
 <?php
 /**
  * Created W/30/05/2012
- * Updated W/07/12/2022
+ * Updated D/12/11/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,7 +20,7 @@
 chdir(defined('BP') ? BP.'/errors' : __DIR__);
 if (!empty($_SERVER['MAGE_IS_DEVELOPER_MODE']) || !empty($_ENV['MAGE_IS_DEVELOPER_MODE'])) {
 	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
+	ini_set('display_errors', (PHP_VERSION_ID < 80100) ? '1' : 1);
 	ini_set('error_prepend_string', '<pre>');
 	ini_set('error_append_string', '</pre>');
 }

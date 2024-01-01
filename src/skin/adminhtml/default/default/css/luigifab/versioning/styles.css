@@ -1,8 +1,8 @@
 /**
  * Created J/22/12/2011
- * Updated V/27/05/2022
+ * Updated S/16/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -61,6 +61,7 @@ body.adminhtml-versioning-repository-status pre, body.adminhtml-versioning-repos
 }
 
 body.adminhtml-versioning-repository-status pre span, body.adminhtml-versioning-repository-history pre span { color:black; }
+body.adminhtml-versioning-repository-status pre span.ofe, body.adminhtml-versioning-repository-history pre span.ofe { color:inherit; }
 
 body.adminhtml-versioning-repository-history pre { height:20em; margin-bottom:2em; overflow:auto; }
 body.adminhtml-versioning-repository-history table.data tr.headings th.no-link { padding:3px 4px; text-align:center; }
@@ -109,11 +110,15 @@ body.fabload div.content-header td.form-buttons, body.fabload div.content-header
 
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& fake-apijs/confirm &&& */
 #apijsDialog.fake * { margin:0; padding:0; }
-#apijsDialog.fake { position:fixed; top:0; right:0; bottom:0; left:0; width:100%; height:100%; text-align:center; z-index:99000; }
+
+#apijsDialog.fake {
+	position:fixed; top:0; right:0; bottom:0; left:0; width:100%; height:100%; text-align:center; z-index:99000;
+	background-color:rgba(0, 0, 0, 0.65);
+}
 
 #apijsBox.fake {
 	position:relative; top:21%; display:inline-block; padding:0.6em 0.8em 2.4em; min-height:15em; overflow:hidden; text-align:left;
-	font-size:0.8rem; font-family:sans-serif; color:black; border-radius:0.8em;
+	font-size:0.8rem; font-family:sans-serif; color:black; border-radius:0.8em;  background-color:white;
 }
 
 #apijsBox.fake h1 { margin:0.15em 0 1em; font-weight:700; }

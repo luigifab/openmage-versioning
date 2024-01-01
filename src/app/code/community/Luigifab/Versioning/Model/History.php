@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/03/08/2012
- * Updated V/24/06/2022
+ * Updated S/02/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,21 +20,15 @@
 class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 	protected $_pageSize = true;
-	protected $_isCollectionLoaded = true;
 
-	// collection spécifique (ou pas...) avec un simple array
-	// avec un jolie bricolage mais c'est pas très important
 	public function init(int $page, int $size) {
 
-		$help = Mage::helper('versioning');
-		$file = $help->getHistoryLog();
+		$helper = Mage::helper('versioning');
+		$file   = $helper->getHistoryLog();
 
 		if (is_file($file)) {
 
-			// recherche des données
-			// construction d'un premier tableau
 			$resource = fopen($file, 'rb');
-
 			while (!empty($line = fgetcsv($resource, 50000, ',', '`'))) {
 
 				if (!empty($line[0])) {
@@ -67,7 +61,7 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 					// remplace le texte par sa version traduite
 					if ((mb_stripos($item->getData('details'), 'An upgrade is already underway') === 0) ||
 					    (mb_stripos($item->getData('details'), 'An update is in progress') === 0))
-						$item->setData('details', $help->__('Stop! Stop! Stop! An update is in progress.'));
+						$item->setData('details', $helper->__('Stop! Stop! Stop! An update is in progress.'));
 
 					$this->_items[] = $item;
 				}
@@ -75,12 +69,10 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 
 			fclose($resource);
 
-			// première sauvegarde
 			$this->_items = array_reverse($this->_items);
 			$this->_totalRecords = count($this->_items);
 
-			// collection finale
-			// construction de second tableau
+			// final collection
 			$items = [];
 			$from  = ($page - 1) * $size;
 			$to    = ($page - 1) * $size + $size;
@@ -90,8 +82,8 @@ class Luigifab_Versioning_Model_History extends Varien_Data_Collection {
 					$items[] = $item;
 			}
 
-			// seconde sauvegarde
 			$this->_items = $items;
+			$this->_setIsLoaded();
 		}
 
 		return $this;

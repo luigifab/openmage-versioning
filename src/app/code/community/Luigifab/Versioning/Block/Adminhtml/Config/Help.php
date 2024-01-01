@@ -1,9 +1,9 @@
 <?php
 /**
  * Created V/23/05/2014
- * Updated J/21/09/2023
+ * Updated S/11/11/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -23,13 +23,13 @@ class Luigifab_Versioning_Block_Adminhtml_Config_Help extends Mage_Adminhtml_Blo
 
 		$msg = $this->checkChanges();
 		if ($msg !== true)
-			return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%s</strong><br />%s</p>',
-				'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/openmage/versioning',
+			return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://github.com/luigifab/%3$s">github.com</a> | <a href="https://www.%4$s">%4$s</a> - ⚠ IPv6</span></p><p class="box" style="margin-top:-5px; color:white; background-color:#E60000;"><strong>%5$s</strong><br />%6$s</p>',
+				'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'openmage-versioning', 'luigifab.fr/openmage/versioning',
 				$this->__('INCOMPLETE MODULE INSTALLATION'),
 				$this->__('Changes in <em>%s</em> are not present. Please read the documentation.', $msg));
 
-		return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://www.%s">%3$s</a> | ⚠ IPv6</span></p>',
-			'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'luigifab.fr/openmage/versioning');
+		return sprintf('<p class="box">%s %s <span class="right">Stop russian war. <b>🇺🇦 Free Ukraine!</b> | <a href="https://github.com/luigifab/%3$s">github.com</a> | <a href="https://www.%4$s">%4$s</a> - ⚠ IPv6</span></p>',
+			'Luigifab/Versioning', $this->helper('versioning')->getVersion(), 'openmage-versioning', 'luigifab.fr/openmage/versioning');
 	}
 
 	protected function checkChanges() {

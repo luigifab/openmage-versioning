@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated J/05/01/2023
+ * Updated S/25/11/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -32,7 +32,7 @@
 			<show_in_default>1</show_in_default>
 			<show_in_website>1</show_in_website>
 			<show_in_store>1</show_in_store>
-			<buttons>
+			<buttons pr="3195">
 				<versioning translate="title">
 					<title>Show</title>
 					<action>adminhtml/versioning_repository/index</action>
@@ -158,11 +158,11 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>1</show_in_store>
 						</error503_autoreload>
-						<error503_byip translate="label comment">
+						<error503_byip translate="label">
 							<label>Disable the page from these IP addresses</label>
-							<comment>Separate addresses by a space.</comment>
+							<frontend_model>versioning/adminhtml_config_addresses</frontend_model>
+							<backend_model>versioning/source_array</backend_model>
 							<sort_order>25</sort_order>
-							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
@@ -219,11 +219,11 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>1</show_in_store>
 						</upgrade_autoreload>
-						<upgrade_byip translate="label comment">
+						<upgrade_byip translate="label">
 							<label>Disable the page from these IP addresses</label>
-							<comment>Separate addresses by a space.</comment>
+							<frontend_model>versioning/adminhtml_config_addresses</frontend_model>
+							<backend_model>versioning/source_array</backend_model>
 							<sort_order>35</sort_order>
-							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
@@ -270,19 +270,20 @@
 							<show_in_website>0</show_in_website>
 							<show_in_store>1</show_in_store>
 						</report_content>
-						<report_email translate="label comment">
+						<report_email translate="label">
 							<label>Send report by email to</label>
-							<comment>Separate addresses by a space.</comment>
+							<frontend_model>versioning/adminhtml_config_addresses</frontend_model>
+							<backend_model>versioning/source_array</backend_model>
 							<sort_order>44</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>
 						</report_email>
-						<report_byip translate="label comment">
+						<report_byip translate="label">
 							<label>Show the report from these IP addresses</label>
-							<comment>Separate addresses by a space.</comment>
+							<frontend_model>versioning/adminhtml_config_addresses</frontend_model>
+							<backend_model>versioning/source_array</backend_model>
 							<sort_order>45</sort_order>
-							<frontend_type>textarea</frontend_type>
 							<show_in_default>1</show_in_default>
 							<show_in_website>0</show_in_website>
 							<show_in_store>0</show_in_store>

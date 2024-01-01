@@ -1,9 +1,9 @@
 <?php
 /**
  * Created M/21/01/2020
- * Updated D/18/07/2021
+ * Updated D/17/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -25,13 +25,15 @@ interface Luigifab_Versioning_Model_Interface {
 
 	public function getSoftwareVersion();
 
+	public function getRootDir();
+
 	public function getCommitsCollection(bool $local = false);
 
 	public function getCurrentBranch();
 
 	public function getCurrentRevision();
 
-	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null);
+	public function getCurrentDiff($from = null, $to = null, $dir = null, $excl = null, $cached = false);
 
 	public function getCurrentDiffStatus($from = null, $to = null, $dir = null, $excl = null);
 

@@ -1,9 +1,9 @@
 <?php
 /**
  * Created S/03/12/2011
- * Updated J/08/10/2020
+ * Updated S/09/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -37,7 +37,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 				'label'   => 'diff',
 				'title'   => $this->__('Show diff'),
 				'onclick' => "versioning.goDiff('".$this->getUrl('*/*/status', ['from' => 'abc', 'to' => 'abc'])."');",
-				'class'   => 'go'
+				'class'   => 'go',
 			]);
 		}
 
@@ -45,27 +45,27 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			'label'   => 'log',
 			'title'   => $this->__('Updates history'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/history')."');",
-			'class'   => 'go'
+			'class'   => 'go',
 		]);
 
 		$this->_addButton('status', [
 			'label'   => 'status',
 			'title'   => $this->__('Repository status'),
 			'onclick' => "setLocation('".$this->getUrl('*/*/status')."');",
-			'class'   => 'go'
+			'class'   => 'go',
 		]);
 
 		if (is_file($this->helper('versioning')->getMaintenanceFlag())) {
 			$this->_addButton('maintenance_flag', [
 				'label'   => $this->__('Remove the maintenance page'),
 				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delMaintenanceFlag')."');",
-				'class'   => 'delpage delete'
+				'class'   => 'delpage delete',
 			]);
 		}
 		else {
 			$this->_addButton('maintenance_flag', [
 				'label'   => $this->__('Enable the maintenance page'),
-				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo()."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addMaintenanceFlag')."', this.textContent, '".$this->helper('versioning')->getMaintenanceInfo()."');",
 			]);
 		}
 
@@ -73,13 +73,13 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 			$this->_addButton('upgrade_flag', [
 				'label'   => $this->__('Remove the update page'),
 				'onclick' => "versioning.cancelFlag('".$this->getUrl('*/*/delUpgradeFlag')."');",
-				'class'   => 'delpage delete'
+				'class'   => 'delpage delete',
 			]);
 		}
 		else {
 			$this->_addButton('upgrade_flag', [
 				'label'   => $this->__('Enable the update page'),
-				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo()."');"
+				'onclick' => "versioning.confirmFlag('".$this->getUrl('*/*/addUpgradeFlag')."', this.textContent, '".$this->helper('versioning')->getUpgradeInfo()."');",
 			]);
 		}
 	}
@@ -102,7 +102,7 @@ class Luigifab_Versioning_Block_Adminhtml_Repository extends Mage_Adminhtml_Bloc
 				'parents'  => $commit->getData('parents'),
 				'branch'   => $commit->getData('branch'),
 				'col'      => $commit->getData('column'),
-				'row'      => $cnt--
+				'row'      => $cnt--,
 			];
 		}
 

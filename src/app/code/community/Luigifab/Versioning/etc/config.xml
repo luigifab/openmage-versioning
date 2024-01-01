@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  * Created S/03/12/2011
- * Updated J/21/09/2023
+ * Updated S/09/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,7 +20,7 @@
 <config>
 	<modules>
 		<Luigifab_Versioning>
-			<version>4.5.3</version>
+			<version>4.6.0</version>
 		</Luigifab_Versioning>
 	</modules>
 	<global>
@@ -110,6 +110,7 @@
 		<versioning>
 			<general>
 				<diff_limit>1</diff_limit>
+				<diff_rename>80</diff_rename>
 				<diff_filter>MRTUXB</diff_filter>
 			</general>
 		</versioning>

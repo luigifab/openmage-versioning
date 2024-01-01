@@ -1,9 +1,9 @@
 <?php
 /**
  * Created M/07/01/2020
- * Updated J/17/11/2022
+ * Updated S/23/12/2023
  *
- * Copyright 2011-2023 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
+ * Copyright 2011-2024 | Fabrice Creuzot (luigifab) <code~luigifab~fr>
  * https://github.com/luigifab/openmage-versioning
  *
  * This program is free software, you can redistribute it or modify
@@ -20,6 +20,7 @@
 abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Model_Interface {
 
 	protected $_version;
+	protected $_branch;
 	protected $_revision;
 	protected $_items;
 
@@ -29,7 +30,7 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 
 	public function isSoftwareInstalled() {
 
-		exec(escapeshellcmd($this->getType()).' --version', $data, $return);
+		exec(escapeshellcmd($this->_code).' --version', $data, $return);
 
 		if ($return == 0) {
 			$data = preg_replace('#[^\d.]#', '', trim(implode($data)));
@@ -47,16 +48,25 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 		return $this->_version;
 	}
 
+	public function getRootDir() {
+
+		$dir = realpath(BP);
+		if (!is_dir($dir.'/.'.$this->_code))
+			$dir = realpath(BP.'/..');
+
+		return $dir;
+	}
+
 	protected function markExcludedFile(string $line, array $excl, bool $check = false) {
 
-		// par min
+		// min
 		if ((mb_stripos($line, '.min.') !== false) && in_array('min', $excl)) {
 			if ($check)
 				return true;
 			$line = str_replace('.min.', '.§{#{§min§}#}§.', $line);
 		}
 
-		// par extension
+		// extension
 		$ign = mb_strrpos($line, '.');
 		$ign = mb_substr($line, ($ign > 0) ? $ign + 1 : mb_strrpos($line, '/') + 1);
 		if (in_array($ign, $excl)) {
@@ -65,7 +75,7 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 			$line = str_replace('.'.$ign, '.§{#{§'.$ign.'§}#}§', $line);
 		}
 
-		// par nom de fichier
+		// file name
 		$ign = basename($line);
 		if (in_array($ign, $excl)) {
 			$line = str_replace('/'.$ign, '/§{#{§'.$ign.'§}#}§', $line);
@@ -73,7 +83,7 @@ abstract class Luigifab_Versioning_Model_Scm implements Luigifab_Versioning_Mode
 				return true;
 		}
 
-		// par nom de dossier
+		// directory name
 		$ign = explode('/', $line);
 		foreach ($ign as $itm) {
 			$ign = in_array($itm, $excl);
